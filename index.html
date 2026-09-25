@@ -10,7 +10,7 @@ body { font-family: 'Microsoft YaHei', sans-serif; margin: 0; padding: 0; backgr
 #auth-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; justify-content: center; align-items: center; z-index: 99999; }
 .auth-box { background: linear-gradient(135deg, #2c3e50, #34495e); padding: 40px; border-radius: 16px; width: 340px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8); border: 2px solid #f1c40f; }
 .auth-box h2 { margin-bottom: 24px; color: #f1c40f; font-size: 28px; }
-.auth-box input { width: 100%; padding: 12px; margin-bottom: 16px; border: 1px solid #7f8c8d; border-radius: 8px; font-size: 14px; background: #1a1a1a; color: #fff; outline: none; }
+.auth-box input { width: 100%; padding: 12px; margin-bottom: 16px; border: 1px solid #7f8c8d; border-radius: 8px; font-size: 14px; background: #1a1a1a; color: #fff; outline: none; box-sizing: border-box; }
 .auth-box input:focus { border-color: #f1c40f; }
 .auth-box button { width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; margin-bottom: 10px; font-weight: bold; transition: 0.2s; color: white; }
 .btn-login { background: linear-gradient(to bottom, #27ae60, #2ecc71); }
@@ -25,7 +25,6 @@ body { font-family: 'Microsoft YaHei', sans-serif; margin: 0; padding: 0; backgr
 .rank-up { color: #2ecc71; } .rank-down { color: #e74c3c; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
-/* 【新增】重命名弹窗 */
 #rename-modal {
     display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 99998;
@@ -188,7 +187,6 @@ button.action-btn { padding: 6px 14px; font-size: 12px; border: none; border-rad
     <div class="auth-footer">🍞 面包护卫队出品</div>
 </div>
 
-<!-- 【新增】重命名弹窗 -->
 <div id="rename-modal">
     <div class="rename-box">
         <h3>✏️ 修改游戏昵称</h3>
@@ -207,7 +205,6 @@ button.action-btn { padding: 6px 14px; font-size: 12px; border: none; border-rad
     <div id="lobby-page" class="page active">
         <div class="top-bar">
             <div class="user-info">
-                <!-- 【修改】头像增加点击事件和title提示 -->
                 <div class="avatar" id="lobby-avatar" onclick="openRenameModal()" title="点击修改昵称">👤</div>
                 <div>
                     <h3 style="margin:0;" id="lobby-player-name">玩家</h3>
@@ -239,10 +236,9 @@ var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 var currentUserId=null,authModal=document.getElementById('auth-modal'),gameWrapper=document.getElementById('game-wrapper'),authMsgEl=document.getElementById('auth-msg');
 var userProfile={level:1,wins:0,losses:0,nickname:''};
 
-// ===== 【新增】昵称管理 =====
+// ===== 昵称管理 =====
 function getDisplayNickname() {
     if (userProfile.nickname && userProfile.nickname.trim()) return userProfile.nickname.trim();
-    // 回退到邮箱前缀
     var el = document.getElementById('lobby-player-name');
     var fallback = el ? el.getAttribute('data-email-prefix') || '玩家' : '玩家';
     return fallback;
@@ -251,7 +247,8 @@ function getDisplayNickname() {
 function updateAllNicknameDisplays() {
     var name = getDisplayNickname();
     document.getElementById('lobby-player-name').innerText = name;
-    document.getElementById('my-hero-name').innerText = name + ' (' + (currentHero ? currentHero.name : '') + ')';
+    var heroName = currentHero ? currentHero.name : '';
+    document.getElementById('my-hero-name').innerText = name + (heroName ? ' (' + heroName + ')' : '');
 }
 
 function openRenameModal() {
@@ -259,8 +256,9 @@ function openRenameModal() {
     var input = document.getElementById('rename-input');
     var msg = document.getElementById('rename-msg');
     input.value = userProfile.nickname || '';
+    input.defaultValue = userProfile.nickname || '';
     msg.innerText = '';
-    msg.className = 'rename-msg';
+    msg.style.color = '';
     modal.style.display = 'flex';
     setTimeout(function() { input.focus(); }, 100);
 }
@@ -269,35 +267,56 @@ function closeRenameModal() {
     document.getElementById('rename-modal').style.display = 'none';
 }
 
-async function confirmRename() {
-    var input = document.getElementById('rename-input');
-    var msg = document.getElementById('rename-msg');
-    var newName = input.value.trim();
-    if (!newName) { msg.innerText = '❌ 昵称不能为空'; msg.className = 'rename-msg error'; return; }
-    if (newName.length > 12) { msg.innerText = '❌ 昵称最多12个字符'; msg.className = 'rename-msg error'; return; }
-    if (newName === userProfile.nickname) { closeRenameModal(); return; }
-    msg.innerText = '⏳ 保存中...'; msg.className = 'rename-msg';
-    userProfile.nickname = newName;
-    // 保存到云端
+// 【修复】独立的档案保存函数，带完整错误捕获
+async function saveProfileToCloud() {
+    if (!currentUserId) return false;
     try {
-        await sb.from('user_saves').upsert({
+        var res = await sb.from('user_saves').upsert({
             user_id: currentUserId,
             save_data: userProfile,
             updated_at: new Date().toISOString()
         }, { onConflict: 'user_id' });
-        msg.innerText = '✅ 修改成功！'; msg.className = 'rename-msg success';
-        updateAllNicknameDisplays();
-        setTimeout(closeRenameModal, 600);
+        if (res.error) {
+            console.error('保存档案失败:', res.error);
+            return false;
+        }
+        return true;
     } catch (e) {
-        msg.innerText = '❌ 保存失败：' + e.message; msg.className = 'rename-msg error';
+        console.error('保存档案异常:', e);
+        return false;
     }
 }
 
-// 回车确认
+// 【修复】重命名确认 - 失败回滚内存，不关闭弹窗
+async function confirmRename() {
+    var input = document.getElementById('rename-input');
+    var msg = document.getElementById('rename-msg');
+    var newName = input.value.trim();
+
+    if (!newName) { msg.innerText = '❌ 昵称不能为空'; msg.style.color = '#e74c3c'; return; }
+    if (newName.length > 12) { msg.innerText = '❌ 昵称最多12个字符'; msg.style.color = '#e74c3c'; return; }
+    if (newName === userProfile.nickname) { closeRenameModal(); return; }
+
+    msg.innerText = '⏳ 保存中...'; msg.style.color = '#f1c40f';
+
+    var oldNickname = userProfile.nickname;
+    userProfile.nickname = newName;
+
+    var ok = await saveProfileToCloud();
+    if (!ok) {
+        userProfile.nickname = oldNickname;
+        msg.innerText = '❌ 保存失败，请检查网络后重试'; msg.style.color = '#e74c3c';
+        return;
+    }
+
+    msg.innerText = '✅ 修改成功！'; msg.style.color = '#2ecc71';
+    updateAllNicknameDisplays();
+    setTimeout(closeRenameModal, 600);
+}
+
 document.getElementById('rename-input').addEventListener('keydown', function(e) {
     if (e.key === 'Enter') confirmRename();
 });
-// 点击遮罩关闭
 document.getElementById('rename-modal').addEventListener('click', function(e) {
     if (e.target === this) closeRenameModal();
 });
@@ -339,12 +358,21 @@ function updateLobbyRankUI(ct){
 function showAuthMsg(t,tp){authMsgEl.textContent=t;authMsgEl.className='auth-msg '+tp;}
 async function handleLogin(){var e=document.getElementById('email').value.trim(),p=document.getElementById('password').value;if(!e||!p)return showAuthMsg('请填写邮箱和密码','error');showAuthMsg('登录中...','');var r=await sb.auth.signInWithPassword({email:e,password:p});if(r.error)return showAuthMsg(r.error.message,'error');}
 async function handleRegister(){var e=document.getElementById('email').value.trim(),p=document.getElementById('password').value;if(!e||!p)return showAuthMsg('请填写邮箱和密码','error');if(p.length<6)return showAuthMsg('密码至少6位','error');showAuthMsg('注册中...','');var r=await sb.auth.signUp({email:e,password:p});if(r.error)return showAuthMsg(r.error.message,'error');showAuthMsg('注册成功！请登录','success');}
-async function handleLogout(){await sb.auth.signOut();}
+
+// 【修复】退出登录前强制保存档案
+async function handleLogout(){
+    var saved = await saveProfileToCloud();
+    if (!saved && userProfile.nickname) {
+        var retry = await saveProfileToCloud();
+        if (!retry) console.warn('⚠️ 退出前保存昵称失败，可能丢失');
+    }
+    await sb.auth.signOut();
+}
+
 sb.auth.onAuthStateChange(function(ev,ses){
     if(ev==='SIGNED_IN'&&ses){
         currentUserId=ses.user.id;authModal.style.display='none';gameWrapper.style.display='block';
         var emailPrefix=ses.user.email.split('@')[0];
-        // 【修改】先设置邮箱前缀作为回退，再加载云端昵称
         document.getElementById('lobby-player-name').setAttribute('data-email-prefix', emailPrefix);
         document.getElementById('lobby-player-name').innerText = emailPrefix;
         loadSaveFromCloud();
@@ -353,7 +381,8 @@ sb.auth.onAuthStateChange(function(ev,ses){
         userProfile={level:1,wins:0,losses:0,nickname:''};updateLobbyRankUI();
     }
 });
-// 【修改】loadSaveFromCloud - 加载昵称
+
+// 【修复】加载时增加 nickname 类型校验
 async function loadSaveFromCloud(){
     var r=await sb.from('user_saves').select('save_data').eq('user_id',currentUserId).maybeSingle();
     if(r.data&&r.data.save_data){
@@ -367,7 +396,8 @@ async function loadSaveFromCloud(){
     updateAllNicknameDisplays();
     if(document.getElementById('heroes-page').classList.contains('active'))renderHeroesGrid();
 }
-// 【修改】saveRankToCloud - 保存时携带昵称
+
+// 【修复】段位结算统一使用 saveProfileToCloud
 async function saveRankToCloud(w){
     if(!currentUserId)return;var ol=userProfile.level;
     if(w){userProfile.wins++;if(userProfile.level<100)userProfile.level++;}
@@ -375,7 +405,7 @@ async function saveRankToCloud(w){
     var ct=w?'+'+(userProfile.level-ol)+' 级':'-'+(ol-userProfile.level)+' 级';
     if(userProfile.level===100&&w)ct='已达满级!';if(userProfile.level===1&&!w)ct='已是最低级';
     updateLobbyRankUI(ct);
-    await sb.from('user_saves').upsert({user_id:currentUserId,save_data:userProfile,updated_at:new Date().toISOString()},{onConflict:'user_id'});
+    await saveProfileToCloud();
 }
 
 var HEROES=[],cardEffects={},selectedHeroId='default',currentHero=null,gameState={},drawPile=[],discardPile=[],currentGameMode='match',gameOver=false;
@@ -417,7 +447,6 @@ function initBattle(){
     gameState={myHp:hero.hp,myMaxHp:hero.maxHp,myArmor:0,enemyHp:eh.hp,enemyMaxHp:eh.maxHp,enemyHeroId:eh.id,myHand:[],enemyHand:[],selectedIndices:[],myJudgments:[],enemyJudgments:[],myEquipment:{weapon:null,armor:null},enemyEquipment:{weapon:null,armor:null},isMyTurn:true,isProcessing:false,extraTurn:false,enemyExtraTurn:false,enemySkipNextDraw:false,hasUsedSkill:false,hasUsedKill:false,hasUsedWine:false,hasUsedCangdao:false,hasUsedHaoshi:false,hasUsedTangyiA:false,hasUsedTangyiB:false,hasUsedFanke:false,hasUsedBeici:false,killCountThisTurn:0,enemyHasUsedSkill:false,enemyHasUsedKill:false,enemyHasUsedWine:false,enemyHasUsedCangdao:false,enemyHasUsedHaoshi:false,enemyHasUsedTangyiA:false,enemyHasUsedTangyiB:false,enemyHasUsedBeici:false,enemyKillCountThisTurn:0,enemyArmor:0,skipDraw:false,skipPlay:false,phase:'play',duel:{active:false},heroId:hero.id};
     initDeck();drawCard('me',4);drawCard('enemy',4);renderBattle();
     var mt=currentGameMode==='rank'?'排位赛':'匹配赛';
-    // 【修改】开战日志使用昵称
     var pn=getDisplayNickname();
     document.getElementById('log').innerHTML='--- ⚔️ '+mt+'开始 | '+pn+'【'+hero.name+'】('+hero.title+') VS 敌人【'+eh.name+'】('+eh.title+') ---<br>';
 }
@@ -538,7 +567,6 @@ function getCardTooltipHTML(c){var tn='基本牌';if(isTrickCard(c))tn='锦囊�
 function showTooltipAt(c,x,y){getCardTooltipHTML(c);tooltipEl.style.display='block';var tw=tooltipEl.offsetWidth,th=tooltipEl.offsetHeight,ww=window.innerWidth,wh=window.innerHeight;var l=x+10,t=y-th-10;if(l+tw>ww)l=ww-tw-10;if(t<10)t=y+20;if(l<10)l=10;tooltipEl.style.left=l+'px';tooltipEl.style.top=t+'px';}
 function hideTooltip(){clearTimeout(tooltipTimer);tooltipEl.style.display='none';}
 
-// 【修改】renderBattle - 使用昵称
 function renderBattle(){
     var hero=currentHero;var eh=HEROES.find(function(h){return h.id===gameState.enemyHeroId;})||HEROES[0];var hl=getHandLimit();var isD=gameState.phase==='discard',isH=gameState.phase==='haoqing_select',isT=gameState.phase==='tangyi_select',isZ=gameState.phase==='zhangba_select';var ex=gameState.myHand.length-hl;
     var pn=getDisplayNickname();
