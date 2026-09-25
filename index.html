@@ -4,12 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>面包杀 · 群雄争霸</title>
-<!-- 引入 Supabase JS SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
 body { font-family: 'Microsoft YaHei', sans-serif; margin: 0; padding: 0; background: #1a1a1a; color: white; height: 100vh; width: 100vw; overflow: hidden; user-select: none; position: relative; }
 
-/* === 新增：登录弹窗样式 === */
+/* === 登录弹窗 === */
 #auth-modal {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0,0,0,0.9); display: flex; justify-content: center; align-items: center; z-index: 99999;
@@ -30,13 +29,36 @@ body { font-family: 'Microsoft YaHei', sans-serif; margin: 0; padding: 0; backgr
 .auth-msg { font-size: 13px; margin-top: 12px; min-height: 20px; }
 .auth-msg.error { color: #e74c3c; }
 .auth-msg.success { color: #2ecc71; }
+.auth-footer {
+    position: fixed; left: 16px; bottom: 14px; font-size: 12px; color: #636e72; letter-spacing: 1px;
+}
 
-/* === 新增：退出按钮样式 === */
+/* === 退出按钮 & 段位样式 === */
 .btn-logout { background: transparent; border: 1px solid #e74c3c; color: #e74c3c; padding: 4px 10px; font-size: 11px; border-radius: 4px; cursor: pointer; margin-left: 10px; }
 .btn-logout:hover { background: #e74c3c; color: white; }
-.save-status { font-size: 10px; color: #7f8c8d; margin-left: 8px; }
+.rank-badge { 
+    display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-left: 6px;
+    background: linear-gradient(135deg, #f39c12, #e67e22); color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+.rank-change { font-size: 12px; margin-left: 8px; animation: fadeIn 1s ease; }
+.rank-up { color: #2ecc71; }
+.rank-down { color: #e74c3c; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
-/* ===== 原有样式保持不变 ===== */
+/* 【新增】武将锁定遮罩 */
+.hero-card.locked { opacity: 0.45; cursor: not-allowed; }
+.hero-card.locked:hover { transform: none; border-color: #555; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
+.hero-card.locked .hero-select-btn { background: #555 !important; color: #999 !important; cursor: not-allowed; }
+.lock-overlay {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    font-size: 48px; text-shadow: 0 2px 8px rgba(0,0,0,0.8); z-index: 2; pointer-events: none;
+}
+.lock-requirement {
+    text-align: center; padding: 8px 15px; font-size: 12px; color: #e74c3c; font-weight: bold;
+    background: rgba(231,76,60,0.1); border-top: 1px solid rgba(231,76,60,0.3);
+}
+
+/* ===== 原有样式 ===== */
 .page { display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0; box-sizing: border-box; flex-direction: column; }
 .page.active { display: flex; }
 #lobby-page { background: linear-gradient(180deg, #2c3e50 0%, #000000 100%); justify-content: space-between; }
@@ -58,7 +80,7 @@ body { font-family: 'Microsoft YaHei', sans-serif; margin: 0; padding: 0; backgr
 .btn-back { background: transparent; border: 1px solid #7f8c8d; color: #bdc3c7; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 13px; }
 .btn-back:hover { border-color: #f1c40f; color: #f1c40f; }
 .heroes-grid { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; align-content: flex-start; }
-.hero-card { width: 280px; background: linear-gradient(135deg, #2c3e50, #34495e); border-radius: 12px; border: 2px solid #555; overflow: hidden; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
+.hero-card { width: 280px; background: linear-gradient(135deg, #2c3e50, #34495e); border-radius: 12px; border: 2px solid #555; overflow: hidden; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.4); position: relative; }
 .hero-card:hover { transform: translateY(-5px); border-color: #f1c40f; box-shadow: 0 8px 25px rgba(241,196,15,0.3); }
 .hero-card.selected { border-color: #f1c40f; box-shadow: 0 0 20px rgba(241,196,15,0.5); }
 .hero-portrait { width: 100%; height: 200px; background: linear-gradient(180deg, #34495e, #2c3e50); display: flex; align-items: center; justify-content: center; font-size: 80px; position: relative; overflow: hidden; }
@@ -165,7 +187,7 @@ button.action-btn { padding: 6px 14px; font-size: 12px; border: none; border-rad
 </head>
 <body>
 
-<!-- ========== 新增：登录/注册弹窗 ========== -->
+<!-- ========== 登录/注册弹窗 ========== -->
 <div id="auth-modal">
     <div class="auth-box">
         <h2>🍞 面包杀</h2>
@@ -175,21 +197,24 @@ button.action-btn { padding: 6px 14px; font-size: 12px; border: none; border-rad
         <button class="btn-register" onclick="handleRegister()">注 册</button>
         <div class="auth-msg" id="auth-msg"></div>
     </div>
+    <div class="auth-footer">🍞 面包护卫队出品</div>
 </div>
 
-<!-- ========== 游戏主体（未登录时隐藏） ========== -->
+<!-- ========== 游戏主体 ========== -->
 <div id="game-wrapper" style="display:none; width:100%; height:100%;">
-    <!-- 主页 -->
     <div id="lobby-page" class="page active">
         <div class="top-bar">
             <div class="user-info">
                 <div class="avatar">👤</div>
                 <div>
                     <h3 style="margin:0;" id="lobby-player-name">玩家</h3>
-                    <span style="font-size: 12px; color: #aaa;">LV.999 翡翠上将 <span class="save-status" id="lobby-save-status"></span></span>
+                    <span style="font-size: 12px; color: #aaa;">
+                        LV.<span id="lobby-level">1</span> 
+                        <span id="lobby-rank-badge" class="rank-badge">无段位</span>
+                        <span id="lobby-rank-change" class="rank-change"></span>
+                    </span>
                 </div>
             </div>
-            <!-- 新增退出按钮 -->
             <button class="btn-logout" onclick="handleLogout()">退出登录</button>
         </div>
         <div class="main-content">
@@ -202,7 +227,6 @@ button.action-btn { padding: 6px 14px; font-size: 12px; border: none; border-rad
         </div>
     </div>
 
-    <!-- 武将选择页 -->
     <div id="heroes-page" class="page">
         <div class="heroes-header">
             <button class="btn-back" onclick="hideHeroesPage()">← 返回</button>
@@ -214,7 +238,6 @@ button.action-btn { padding: 6px 14px; font-size: 12px; border: none; border-rad
         </div>
     </div>
 
-    <!-- 战斗页 -->
     <div id="battle-page" class="page">
         <div class="enemy-zone-wrap">
             <div class="enemy-portrait-small" id="enemy-portrait">👹</div>
@@ -264,7 +287,6 @@ button.action-btn { padding: 6px 14px; font-size: 12px; border: none; border-rad
     </div>
 </div>
 
-<!-- 响应弹窗 -->
 <div id="response-modal">
     <div class="modal-content">
         <h2 id="modal-title" style="color: #e74c3c; margin-top: 0;">提示</h2>
@@ -280,11 +302,81 @@ var SUPABASE_URL = 'https://xhehybtjnvyksjaznlla.supabase.co';
 var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoZWh5YnRqbnZ5a3NqYXpubGxhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAzMTEzMzMsImV4cCI6MjEwNTg4NzMzM30.-muF-1xOuKaAjHY0BYPgQpm2GFi62rPb0Fx33yYPbRM';
 var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// ===== 新增：认证与存档逻辑 =====
+// ===== 认证与存档逻辑 =====
 var currentUserId = null;
 var authModal = document.getElementById('auth-modal');
 var gameWrapper = document.getElementById('game-wrapper');
 var authMsgEl = document.getElementById('auth-msg');
+var userProfile = { level: 1, wins: 0, losses: 0 };
+
+var HERO_UNLOCK_LEVELS = {
+    'default': 1,
+    'wangsheng': 2,
+    'manhongyi': 3,
+    'liyucheng': 4,
+    'xuzongwei': 5
+};
+
+function isHeroUnlocked(heroId) {
+    var required = HERO_UNLOCK_LEVELS[heroId];
+    if (required === undefined) return true;
+    return userProfile.level >= required;
+}
+
+// 【修改】初始英雄血量提升至5，新增主角技能描述
+function applyHeroOverrides(heroes) {
+    var overrides = {
+        'default':    { name: '初始英雄', title: '梦的开始', hp: 5, maxHp: 5, skills: [
+            {"name":"英姿","type":"lock","desc":"锁定技，你受到伤害时摸两张牌。"},
+            {"name":"飒爽","type":"lock","desc":"锁定技，你没有手牌数量限制。"},
+            {"name":"主角","type":"lock","desc":"锁定技，你受到非伤害类负面效果(如过河拆桥、顺手牵羊、决斗)时，摸一张牌并使对方失去1点体力。"}
+        ]},
+        'wangsheng':  { title: '奇怪的鸭子' },
+        'manhongyi':  { title: '糖王大人' },
+        'xuzongwei':  { title: '帝国之主' }
+    };
+    heroes.forEach(function(h) {
+        if (overrides[h.id]) {
+            if (overrides[h.id].name) h.name = overrides[h.id].name;
+            if (overrides[h.id].title) h.title = overrides[h.id].title;
+            if (overrides[h.id].hp !== undefined) { h.hp = overrides[h.id].hp; h.maxHp = overrides[h.id].maxHp; }
+            if (overrides[h.id].skills) h.skills = overrides[h.id].skills;
+        }
+    });
+    return heroes;
+}
+
+function getRankTitle(level) {
+    if (level <= 1) return '无段位';
+    if (level <= 12) return '青铜勇士';
+    if (level <= 23) return '白银斗士';
+    if (level <= 34) return '黄金统领';
+    if (level <= 45) return '钻石战神';
+    if (level <= 56) return '翡翠上将';
+    if (level <= 67) return '三国王者';
+    return '永恒传说';
+}
+
+function updateLobbyRankUI(changeText) {
+    document.getElementById('lobby-level').innerText = userProfile.level;
+    var badge = document.getElementById('lobby-rank-badge');
+    badge.innerText = getRankTitle(userProfile.level);
+    var colors = {
+        '无段位': '#7f8c8d', '青铜勇士': '#cd7f32', '白银斗士': '#bdc3c7',
+        '黄金统领': '#f1c40f', '钻石战神': '#3498db', '翡翠上将': '#2ecc71',
+        '三国王者': '#9b59b6', '永恒传说': '#e74c3c'
+    };
+    var title = getRankTitle(userProfile.level);
+    badge.style.background = 'linear-gradient(135deg, ' + (colors[title] || '#7f8c8d') + ', ' + (colors[title] || '#7f8c8d') + 'cc)';
+    var changeEl = document.getElementById('lobby-rank-change');
+    if (changeText) {
+        changeEl.innerText = changeText;
+        changeEl.className = 'rank-change ' + (changeText.includes('+') ? 'rank-up' : 'rank-down');
+        setTimeout(function() { changeEl.innerText = ''; }, 3000);
+    } else {
+        changeEl.innerText = '';
+    }
+}
 
 function showAuthMsg(text, type) {
     authMsgEl.textContent = text;
@@ -315,46 +407,59 @@ async function handleLogout() {
     await supabaseClient.auth.signOut();
 }
 
-// 核心：监听登录状态
 supabaseClient.auth.onAuthStateChange(function(event, session) {
     if (event === 'SIGNED_IN' && session) {
         currentUserId = session.user.id;
         authModal.style.display = 'none';
         gameWrapper.style.display = 'block';
         document.getElementById('lobby-player-name').innerText = session.user.email.split('@')[0];
-        loadSaveFromCloud(); // 登录成功后加载存档
+        loadSaveFromCloud();
     } else if (event === 'SIGNED_OUT') {
         currentUserId = null;
         authModal.style.display = 'flex';
         gameWrapper.style.display = 'none';
+        userProfile = { level: 1, wins: 0, losses: 0 };
+        updateLobbyRankUI();
     }
 });
 
-// 从云端加载存档（这里可以扩展加载用户的金币、等级、解锁武将等）
 async function loadSaveFromCloud() {
-    var statusEl = document.getElementById('lobby-save-status');
-    statusEl.innerText = '⏳ 同步中...';
     var res = await supabaseClient.from('user_saves').select('save_data').eq('user_id', currentUserId).maybeSingle();
     if (res.data && res.data.save_data) {
-        console.log('云端存档已加载', res.data.save_data);
-        statusEl.innerText = '✅ 云端已同步';
-        // TODO: 如果有全局养成数据，在这里赋值给全局变量
+        var data = res.data.save_data;
+        userProfile.level = typeof data.level === 'number' ? data.level : 1;
+        userProfile.wins = typeof data.wins === 'number' ? data.wins : 0;
+        userProfile.losses = typeof data.losses === 'number' ? data.losses : 0;
     } else {
-        statusEl.innerText = '📭 新用户';
+        userProfile = { level: 1, wins: 0, losses: 0 };
+    }
+    updateLobbyRankUI();
+    if (document.getElementById('heroes-page').classList.contains('active')) {
+        renderHeroesGrid();
     }
 }
 
-// 保存对局结果或养成数据到云端
-async function saveToCloud(data) {
+async function saveRankToCloud(win) {
     if (!currentUserId) return;
+    var oldLevel = userProfile.level;
+    if (win) {
+        userProfile.wins++;
+        if (userProfile.level < 100) userProfile.level++;
+    } else {
+        userProfile.losses++;
+        if (userProfile.level > 1) userProfile.level--;
+    }
+    var changeText = win ? '+' + (userProfile.level - oldLevel) + ' 级' : '-' + (oldLevel - userProfile.level) + ' 级';
+    if (userProfile.level === 100 && win) changeText = '已达满级!';
+    if (userProfile.level === 1 && !win) changeText = '已是最低级';
+    updateLobbyRankUI(changeText);
     await supabaseClient.from('user_saves').upsert({
         user_id: currentUserId,
-        save_data: data,
+        save_data: userProfile,
         updated_at: new Date().toISOString()
     }, { onConflict: 'user_id' });
 }
 
-// ===== 原有全局变量 =====
 var HEROES = [];
 var cardEffects = {};
 var selectedHeroId = 'default';
@@ -365,7 +470,6 @@ var discardPile = [];
 var currentGameMode = 'match';
 var gameOver = false; 
 
-// ===== 从Supabase加载游戏配置数据 =====
 async function loadGameData() {
     console.log('正在从服务器加载最新游戏数据...');
     var logEl = document.getElementById('log');
@@ -379,12 +483,14 @@ async function loadGameData() {
         if (!data.length) throw new Error('未找到配置行(id=1)');
         HEROES = data[0].heroes_data || [];
         cardEffects = data[0].cards_data || {};
+        applyHeroOverrides(HEROES);
         console.log('数据加载成功，武将数量：', HEROES.length);
         initGameUI();
     } catch (e) {
         console.error('数据加载失败：', e);
         if (logEl) logEl.innerHTML = '数据加载失败：' + e.message + '。请检查Supabase配置。';
-        HEROES = [{"id":"default","name":"自定义武将","title":"无名英雄","hp":4,"maxHp":4,"portrait":"🧑","skills":[{"name":"英姿","type":"lock","desc":"锁定技，你受到伤害时摸两张牌。"},{"name":"飒爽","type":"lock","desc":"锁定技，你没有手牌数量限制。"}]}];
+        // 【修改】后备初始英雄血量改为5，新增主角技能
+        HEROES = [{"id":"default","name":"初始英雄","title":"梦的开始","hp":5,"maxHp":5,"portrait":"🧑","skills":[{"name":"英姿","type":"lock","desc":"锁定技，你受到伤害时摸两张牌。"},{"name":"飒爽","type":"lock","desc":"锁定技，你没有手牌数量限制。"},{"name":"主角","type":"lock","desc":"锁定技，你受到非伤害类负面效果时，摸一张牌并使对方失去1点体力。"}]}];
         cardEffects = {"kill":{"name":"杀","class":"kill","effect":"damage"},"fire_kill":{"name":"火杀","class":"fire_kill","effect":"fire_damage"},"thunder_kill":{"name":"雷杀","class":"thunder_kill","effect":"thunder_damage"},"dodge":{"name":"闪","class":"dodge","effect":"dodge"},"peach":{"name":"桃","class":"peach","effect":"heal"},"wine":{"name":"酒","class":"wine","effect":"wine"},"dismantle":{"name":"过河拆桥","class":"dismantle","effect":"dismantle"},"snatch":{"name":"顺手牵羊","class":"snatch","effect":"snatch"},"duel":{"name":"决斗","class":"duel","effect":"duel"},"lightning":{"name":"闪电","class":"lightning","effect":"lightning"},"indulgence":{"name":"乐不思蜀","class":"indulgence","effect":"indulgence"},"supply":{"name":"兵粮寸断","class":"supply","effect":"supply"},"nanman":{"name":"南蛮入侵","class":"nanman","effect":"nanman"},"wanjian":{"name":"万箭齐发","class":"wanjian","effect":"wanjian"},"taoyuan":{"name":"桃园结义","class":"taoyuan","effect":"taoyuan"},"harvest":{"name":"五谷丰登","class":"harvest","effect":"harvest"},"zhugeliannu":{"name":"诸葛连弩","class":"zhugeliannu","effect":"weapon_zhuge","range":1},"qinggang":{"name":"青釭剑","class":"qinggang","effect":"weapon_qinggang","range":2},"hanbing":{"name":"寒冰剑","class":"hanbing","effect":"weapon_hanbing","range":2},"guding":{"name":"古锭刀","class":"guding","effect":"weapon_guding","range":2},"zhangba":{"name":"丈八蛇矛","class":"zhangba","effect":"weapon_zhangba","range":3},"guanshi":{"name":"贯石斧","class":"guanshi","effect":"weapon_guanshi","range":3},"qinglong":{"name":"青龙偃月刀","class":"qinglong","effect":"weapon_qinglong","range":3},"zhuque":{"name":"朱雀羽扇","class":"zhuque","effect":"weapon_zhuque","range":4},"renwangdun":{"name":"仁王盾","class":"renwangdun","effect":"armor_renwang"},"baguazhen":{"name":"八卦阵","class":"baguazhen","effect":"armor_bagua"},"tengjia":{"name":"藤甲","class":"tengjia","effect":"armor_tengjia"}};
         initGameUI();
     }
@@ -402,7 +508,6 @@ function initGameUI() {
 
 window.addEventListener('DOMContentLoaded', loadGameData);
 
-// ===== 页面切换 =====
 function enterHeroSelect(mode) {
     currentGameMode = mode;
     document.getElementById('lobby-page').classList.remove('active');
@@ -433,6 +538,10 @@ function hideHeroesPage() {
 
 function confirmStartGame() {
     if (!currentHero) { alert('请先选择一个武将！'); return; }
+    if (!isHeroUnlocked(currentHero.id)) {
+        alert('该武将尚未解锁！需要达到 LV.' + HERO_UNLOCK_LEVELS[currentHero.id] + ' 才能使用。');
+        return;
+    }
     document.getElementById('heroes-page').classList.remove('active');
     document.getElementById('battle-page').classList.add('active');
     initBattle();
@@ -444,22 +553,31 @@ function backToLobby() {
         closeModal();
         document.getElementById('battle-page').classList.remove('active');
         document.getElementById('lobby-page').classList.add('active');
+        updateLobbyRankUI();
     }
 }
 
 function selectHero(heroId) {
+    if (!isHeroUnlocked(heroId)) {
+        var required = HERO_UNLOCK_LEVELS[heroId] || 1;
+        var hero = HEROES.find(function(h) { return h.id === heroId; });
+        var heroName = hero ? hero.name : heroId;
+        alert('🔒 ' + heroName + ' 尚未解锁！\n需要达到 LV.' + required + ' 才能使用（当前 LV.' + userProfile.level + '）');
+        return;
+    }
     selectedHeroId = heroId;
     currentHero = HEROES.find(function(h) { return h.id === heroId; });
     renderHeroesGrid();
 }
 
-// ===== 武将图鉴渲染 =====
 function renderHeroesGrid() {
     var grid = document.getElementById('heroes-grid');
     grid.innerHTML = '';
     HEROES.forEach(function(hero) {
+        var unlocked = isHeroUnlocked(hero.id);
+        var isSelected = hero.id === selectedHeroId && unlocked;
         var card = document.createElement('div');
-        card.className = 'hero-card' + (hero.id === selectedHeroId ? ' selected' : '');
+        card.className = 'hero-card' + (isSelected ? ' selected' : '') + (!unlocked ? ' locked' : '');
         var skillsHtml = '';
         hero.skills.forEach(function(sk) {
             var typeLabel = sk.type === 'lock' 
@@ -468,19 +586,26 @@ function renderHeroesGrid() {
             skillsHtml += '<div class="skill-item"><span class="skill-name">[' + sk.name + ']</span>' 
                 + typeLabel + '<br><span class="skill-desc">' + sk.desc + '</span></div>';
         });
+        var lockOverlayHtml = '';
+        var lockRequirementHtml = '';
+        if (!unlocked) {
+            var reqLevel = HERO_UNLOCK_LEVELS[hero.id] || 1;
+            lockOverlayHtml = '<div class="lock-overlay">🔒</div>';
+            lockRequirementHtml = '<div class="lock-requirement">🔒 LV.' + reqLevel + ' 解锁（当前 LV.' + userProfile.level + '）</div>';
+        }
         card.innerHTML = '<div class="hero-portrait"><span style="font-size:80px;">' + hero.portrait 
-            + '</span><div class="hero-name-overlay">' + hero.name + '</div></div>'
+            + '</span>' + lockOverlayHtml + '<div class="hero-name-overlay">' + hero.name + '</div></div>'
             + '<div class="hero-info"><div class="hero-title">' + hero.title + '</div>'
             + '<div class="hero-hp">❤️ 体力: ' + hero.hp + '/' + hero.maxHp + '</div></div>'
             + '<div class="hero-skills">' + skillsHtml + '</div>'
-            + '<button class="hero-select-btn ' + (hero.id === selectedHeroId ? 'equipped' : '') 
+            + lockRequirementHtml
+            + '<button class="hero-select-btn ' + (isSelected ? 'equipped' : '') 
             + '" onclick="selectHero(\'' + hero.id + '\')">'
-            + (hero.id === selectedHeroId ? '✅ 已出战' : '选择出战') + '</button>';
+            + (isSelected ? '✅ 已出战' : (!unlocked ? '🔒 未解锁' : '选择出战')) + '</button>';
         grid.appendChild(card);
     });
 }
 
-// ===== 花色/点数工具 =====
 var SUITS = ['♠', '♥', '♣', '♦'];
 var RANKS = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
 function getSuitColor(suit) { return (suit === '♥' || suit === '♦') ? 'suit-red' : 'suit-black'; }
@@ -494,7 +619,6 @@ function isWeapon(card) { return card && card.effect && card.effect.indexOf('wea
 function isArmor(card) { return card && card.effect && card.effect.indexOf('armor') === 0; }
 function isTrickCard(card) { return ['dismantle','snatch','duel','lightning','indulgence','supply','nanman','wanjian','taoyuan','harvest'].indexOf(card.effect) !== -1; }
 
-// ===== 牌堆初始化 =====
 function initDeck() {
     drawPile = []; discardPile = [];
     var deckConfig = [
@@ -524,7 +648,6 @@ function initDeck() {
 }
 function shuffleArray(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var tmp = a[i]; a[i] = a[j]; a[j] = tmp; } }
 
-// ===== 摸牌/弃牌 =====
 function drawCard(who, count) {
     count = count || 1;
     for (var ci = 0; ci < count; ci++) {
@@ -548,7 +671,6 @@ function drawCard(who, count) {
 function discardCard(card) { if (card) discardPile.push(card); }
 function log(msg) { var d = document.getElementById('log'); d.innerHTML += '<br>' + msg; d.scrollTop = d.scrollHeight; }
 
-// ===== 手牌上限 =====
 function getHandLimit() {
     if (gameState.heroId === 'default') return 999;
     if (gameState.heroId === 'liyucheng') return gameState.myMaxHp + 2;
@@ -564,7 +686,6 @@ function getEnemyHandLimit() {
     return Math.max(1, gameState.enemyHp);
 }
 
-// ===== 战斗初始化 =====
 function initBattle() {
     gameOver = false;
     var hero = currentHero;
@@ -583,6 +704,7 @@ function initBattle() {
         hasUsedSkill: false, hasUsedKill: false, hasUsedWine: false,
         hasUsedCangdao: false, hasUsedHaoshi: false,
         hasUsedTangyiA: false, hasUsedTangyiB: false, hasUsedFanke: false,
+        hasUsedBeici: false,
         killCountThisTurn: 0,
         enemyHasUsedSkill: false, enemyHasUsedKill: false, enemyHasUsedWine: false,
         enemyHasUsedCangdao: false, enemyHasUsedHaoshi: false,
@@ -600,7 +722,6 @@ function initBattle() {
     document.getElementById('log').innerHTML = '--- ⚔️ ' + modeText + '开始 | 你选择了【' + hero.name + '】 VS 敌人【' + enemyHero.name + '】(' + enemyHero.title + ') ---<br>';
 }
 
-// ===== 武将失去牌触发武魂 =====
 function playerLoseCard(card, reason) {
     if (gameState.heroId === 'wangsheng' && isKill(card) && (reason === 'play' || reason === 'discard')) {
         drawCard('me', 2);
@@ -608,7 +729,17 @@ function playerLoseCard(card, reason) {
     }
 }
 
-// ===== 无谋触发 =====
+// 【新增】主角技能触发函数
+function triggerProtagonistSkill(reason) {
+    if (gameState.heroId === 'default' && !gameOver) {
+        drawCard('me', 1);
+        gameState.enemyHp -= 1;
+        log('🌟 【主角】触发！你受到' + reason + '，摸一张牌，敌人失去1点体力(' + gameState.enemyHp + '/' + gameState.enemyMaxHp + ')。');
+        renderBattle();
+        checkWin();
+    }
+}
+
 function triggerWumou(card, callback) {
     if (gameState.heroId !== 'wangsheng' || !isTrickCard(card)) { callback(); return; }
     var hasKill = gameState.myHand.some(function(c) { return isKill(c); });
@@ -630,7 +761,6 @@ function triggerWumou(card, callback) {
     showModal('🧠 无谋 - 选择代价', '使用锦囊' + cardDesc(card) + '需弃置一张杀或失去1点体力。', btns);
 }
 
-// ===== 对敌人造成伤害 =====
 function dealDamageToEnemy(dmg, cb) {
     gameState.enemyHp -= dmg;
     log('💥 敌人受到 ' + dmg + ' 点伤害！(剩余体力: ' + gameState.enemyHp + '/' + gameState.enemyMaxHp + ')');
@@ -650,7 +780,6 @@ function dealDamageToEnemy(dmg, cb) {
     gameState.isProcessing = false; renderBattle(); checkWin(); if (cb) cb();
 }
 
-// ===== AI技能 =====
 function enemyAI_Skill(callback) {
     var enemyHero = HEROES.find(function(h) { return h.id === gameState.enemyHeroId; });
     if (!enemyHero) { callback(); return; }
@@ -693,7 +822,6 @@ function enemyAI_Skill(callback) {
     renderBattle(); setTimeout(function() { callback(); }, executed ? 800 : 100);
 }
 
-// ===== 敌人被动技能 =====
 function triggerEnemyPassive(trigger, context) {
     context = context || {};
     var eid = gameState.enemyHeroId;
@@ -714,7 +842,6 @@ function triggerEnemyPassive(trigger, context) {
     }
 }
 
-// ===== 选牌 =====
 function selectCard(index) {
     if (!gameState.isMyTurn || gameState.isProcessing) return;
     if (gameState.phase === 'discard' || gameState.phase === 'haoqing_select' || gameState.phase === 'tangyi_select' || gameState.phase === 'zhangba_select') {
@@ -726,7 +853,6 @@ function selectCard(index) {
     renderBattle();
 }
 
-// ===== 丈八蛇矛确认 =====
 function confirmZhangbaCards() {
     if (gameState.selectedIndices.length !== 2) { alert('请恰好选择2张牌！'); return; }
     var sorted = gameState.selectedIndices.slice().sort(function(a, b) { return b - a; });
@@ -738,7 +864,6 @@ function confirmZhangbaCards() {
     gameState.killCountThisTurn++; renderBattle(); enemyDefend(1, fakeKill, true);
 }
 
-// ===== 出牌主逻辑 =====
 function playCard() {
     if (gameState.phase !== 'play' || gameState.isProcessing) return;
     if (gameState.selectedIndices.length !== 1) { alert('请先选择一张牌'); return; }
@@ -746,7 +871,9 @@ function playCard() {
     
     if (isKill(card)) {
         var isWangsheng = gameState.heroId === 'wangsheng'; var isXuzongwei = gameState.heroId === 'xuzongwei';
-        var killLimit = isWangsheng ? 4 : (isXuzongwei ? 999 : 1); var hasWeapon = !!gameState.myEquipment.weapon;
+        var beiciExtra = (gameState.heroId === 'manhongyi' && gameState.hasUsedBeici) ? 1 : 0;
+        var killLimit = isWangsheng ? 4 : (isXuzongwei ? 999 : (1 + beiciExtra));
+        var hasWeapon = !!gameState.myEquipment.weapon;
         if (gameState.killCountThisTurn >= killLimit && !hasWeapon) { alert('每回合只能使用' + killLimit + '张【杀】！'); return; }
         var actualCard = card;
         if (gameState.myEquipment.weapon && gameState.myEquipment.weapon.effect === 'weapon_zhuque' && card.effect === 'damage') {
@@ -760,15 +887,27 @@ function playCard() {
         gameState.killCountThisTurn++;
         var playedCard = gameState.myHand.splice(idx, 1)[0]; discardCard(playedCard); playerLoseCard(playedCard, 'play');
         gameState.selectedIndices = []; renderBattle();
-        if (gameState.heroId === 'manhongyi' && gameState.myArmor > 0) {
+
+        if (gameState.heroId === 'manhongyi' && gameState.myArmor > 0 && !gameState.hasUsedBeici) {
             gameState.isProcessing = true;
-            showModal('📢 举报 - 触发！', '你拥有护甲，是否失去1层护甲发动【举报】？<br>效果：敌人弃置1张手牌，且无法出【闪】响应此杀。', [
-                { text: '发动举报 (-1甲)', color: '#e67e22', action: function() {
-                    gameState.myArmor -= 1; log('📢 你发动【举报】！失去1层护甲(剩余' + gameState.myArmor + ')，敌人被迫弃牌且无法闪避！');
-                    if (gameState.enemyHand.length > 0) { var rIdx = Math.floor(Math.random() * gameState.enemyHand.length); var dCard = gameState.enemyHand.splice(rIdx, 1)[0]; discardCard(dCard); log('🗑️ 敌人被迫弃置了' + cardDesc(dCard) + '。'); }
-                    closeModal(); renderBattle(); setTimeout(function() { enemyDefend(dmg, actualCard, true); }, 500);
+            showModal('🗡️ 背刺 - 触发！', '你拥有护甲，是否失去1层护甲发动【背刺】？<br>效果：获得敌人1张手牌 + 敌人无法出闪 + 本回合可额外出1张杀。', [
+                { text: '发动背刺 (-1甲)', color: '#e67e22', action: function() {
+                    gameState.myArmor -= 1;
+                    gameState.hasUsedBeici = true;
+                    log('🗡️ 你发动【背刺】！失去1层护甲(剩余' + gameState.myArmor + ')！');
+                    if (gameState.enemyHand.length > 0) {
+                        var rIdx = Math.floor(Math.random() * gameState.enemyHand.length);
+                        var stolenCard = gameState.enemyHand.splice(rIdx, 1)[0];
+                        gameState.myHand.push(stolenCard);
+                        log('🤏 你从敌人手中夺取了' + cardDesc(stolenCard) + '！');
+                    } else {
+                        log('⚠️ 敌人没有手牌可夺取。');
+                    }
+                    log('🚫 敌人将无法出闪响应此杀！本回合你可以额外出1张杀。');
+                    closeModal(); renderBattle();
+                    setTimeout(function() { enemyDefend(dmg, actualCard, true); }, 500);
                 }},
-                { text: '不举报 (正常结算)', color: '#7f8c8d', action: function() { closeModal(); renderBattle(); enemyDefend(dmg, actualCard, false); } }
+                { text: '不背刺 (正常结算)', color: '#7f8c8d', action: function() { closeModal(); renderBattle(); enemyDefend(dmg, actualCard, false); } }
             ]);
         } else { enemyDefend(dmg, actualCard, false); }
         return;
@@ -822,7 +961,6 @@ function playCard() {
     gameState.selectedIndices = []; renderBattle(); checkWin();
 }
 
-// ===== 各类技能函数保持原样 =====
 function useSkill_Zhangba() {
     if (!gameState.isMyTurn || gameState.phase !== 'play' || gameState.isProcessing || gameState.skipPlay) return;
     if (gameState.myHand.length < 2) { alert('【丈八蛇矛】需要至少2张手牌！'); return; }
@@ -903,7 +1041,6 @@ function useSkill_Default() {
     log('⚡ 你发动技能【英姿】，摸两张牌！'); drawCard('me', 2); gameState.hasUsedSkill = true; renderBattle();
 }
 
-// ===== 南蛮/万箭响应 =====
 function enemyRespondNanman() {
     gameState.isProcessing = true; renderBattle();
     setTimeout(function() {
@@ -923,7 +1060,6 @@ function enemyRespondWanjian() {
     }, 800);
 }
 
-// ===== 五谷丰登 =====
 function showHarvestModal() {
     gameState.isProcessing = true; var tc = [];
     if (drawPile.length === 0 && discardPile.length > 0) { drawPile = discardPile.slice(); discardPile = []; shuffleArray(drawPile); }
@@ -951,7 +1087,6 @@ function showHarvestModal() {
     m.style.display = 'flex';
 }
 
-// ===== 过河拆桥 =====
 function showDismantleModal() {
     gameState.isProcessing = true; var m = document.getElementById('response-modal');
     document.getElementById('modal-title').innerText = '🌉 过河拆桥 - 选择目标';
@@ -987,7 +1122,6 @@ function showDismantleModal() {
     document.getElementById('modal-buttons').appendChild(cb); m.style.display = 'flex';
 }
 
-// ===== 顺手牵羊 =====
 function showSnatchModal() {
     gameState.isProcessing = true; var m = document.getElementById('response-modal');
     document.getElementById('modal-title').innerText = '🐑 顺手牵羊 - 选择目标';
@@ -1023,7 +1157,7 @@ function showSnatchModal() {
     document.getElementById('modal-buttons').appendChild(cb); m.style.display = 'flex';
 }
 
-// ===== 决斗 =====
+// 【修改】决斗结束增加死亡检测防卡死
 function startDuel(a, d) {
     gameState.isProcessing = true; gameState.duel = { active: true, attacker: a, defender: d, currentTurn: d };
     log('⚔️ ' + (a === 'me' ? '你' : '敌人') + '对' + (d === 'me' ? '你' : '敌人') + '发起了决斗！'); renderBattle();
@@ -1048,10 +1182,15 @@ function processDuelTurn() {
 function endDuel(w) {
     gameState.duel.active = false; var l = gameState.duel.currentTurn;
     log('🏆 决斗结束！' + (w === 'me' ? '你' : '敌人') + '获胜，' + (l === 'me' ? '你' : '敌人') + '受到1点伤害！');
-    if (l === 'enemy') dealDamageToEnemy(1); else takeDamage(1);
+    if (l === 'enemy') { 
+        dealDamageToEnemy(1); 
+        // 防死锁：如果敌人没死，继续敌方回合；如果死了，checkWin会处理
+        if (gameState.enemyHp > 0 && !gameOver) finishEnemyTurnWithExtraCheck(); 
+    } else { 
+        takeDamage(1); 
+    }
 }
 
-// ===== 敌人防御 =====
 function enemyDefend(dmg, attackCard, ignoreArmorBySkill) {
     gameState.isProcessing = true; renderBattle();
     setTimeout(function() {
@@ -1116,7 +1255,6 @@ function handleKillHit(dmg, attackCard) {
     dealDamageToEnemy(dmg);
 }
 
-// ===== 结束回合 =====
 function endTurn() {
     if (!gameState.isMyTurn || gameState.phase !== 'play' || gameState.isProcessing) return;
     if (gameState.heroId === 'xuzongwei') { log('👑 【皇威】发动！你跳过弃牌阶段，直接结束回合。'); finishMyTurn(); return; }
@@ -1135,6 +1273,7 @@ function confirmDiscard() {
 function finishMyTurn() {
     gameState.isMyTurn = false; gameState.hasUsedKill = false; gameState.hasUsedSkill = false; gameState.hasUsedWine = false;
     gameState.hasUsedCangdao = false; gameState.hasUsedHaoshi = false; gameState.hasUsedTangyiA = false; gameState.hasUsedTangyiB = false; gameState.hasUsedFanke = false;
+    gameState.hasUsedBeici = false;
     gameState.killCountThisTurn = 0; gameState.phase = 'play';
     if (gameState.heroId === 'xuzongwei' && !gameState.extraTurn) {
         gameState.extraTurn = true; log('⏳ 【当先】发动！跳过敌方回合，你立即开始第二个回合！'); renderBattle(); setTimeout(function() { startMyTurn(); }, 1000);
@@ -1237,6 +1376,7 @@ function startEnemyTurn() {
     }, 500);
 }
 
+// 【修改】敌人AI增加使用拆、牵、决斗的逻辑
 function enemyAI_DelayedTricks() {
     var l = gameState.enemyHand.findIndex(function(c) { return c.effect === 'lightning'; });
     var i = gameState.enemyHand.findIndex(function(c) { return c.effect === 'indulgence'; });
@@ -1253,6 +1393,53 @@ function enemyAI_DelayedTricks() {
         var c = gameState.enemyHand.splice(s, 1)[0]; gameState.myJudgments.push({ type: 'supply', card: c });
         log('🌾 敌人对你使用了' + cardDesc(c) + '！'); renderBattle(); setTimeout(function() { enemyAI_DelayedTricks(); }, 800); return;
     }
+    // 使用决斗
+    var d = gameState.enemyHand.findIndex(function(c) { return c.effect === 'duel'; });
+    if (d !== -1 && gameState.enemyHand.filter(function(c) { return isKill(c); }).length >= 2) {
+        var c = gameState.enemyHand.splice(d, 1)[0]; discardCard(c);
+        log('⚔️ 敌人对你使用了' + cardDesc(c) + '！');
+        // 【新增】主角技能触发：受到决斗
+        triggerProtagonistSkill('【决斗】');
+        if (!gameOver) startDuel('enemy', 'me');
+        return;
+    }
+    // 使用顺手牵羊
+    var sn = gameState.enemyHand.findIndex(function(c) { return c.effect === 'snatch'; });
+    if (sn !== -1 && (gameState.myHand.length > 0 || gameState.myEquipment.weapon || gameState.myEquipment.armor)) {
+        var c = gameState.enemyHand.splice(sn, 1)[0]; discardCard(c);
+        log('🐑 敌人对你使用了' + cardDesc(c) + '！');
+        // 【新增】主角技能触发：受到顺手牵羊
+        triggerProtagonistSkill('【顺手牵羊】');
+        if (!gameOver) {
+            if (gameState.myEquipment.weapon) {
+                var w = gameState.myEquipment.weapon; gameState.myEquipment.weapon = null; gameState.enemyHand.push(w); log('🐑 敌人牵走了你的' + cardDesc(w) + '！');
+            } else if (gameState.myEquipment.armor) {
+                var a = gameState.myEquipment.armor; gameState.myEquipment.armor = null; gameState.enemyHand.push(a); log('🐑 敌人牵走了你的' + cardDesc(a) + '！');
+            } else if (gameState.myHand.length > 0) {
+                var rIdx = Math.floor(Math.random() * gameState.myHand.length); var stolen = gameState.myHand.splice(rIdx, 1)[0]; gameState.enemyHand.push(stolen); log('🐑 敌人牵走了你的一张手牌。');
+            }
+        }
+        renderBattle(); setTimeout(function() { enemyAI_DelayedTricks(); }, 800); return;
+    }
+    // 使用过河拆桥
+    var dm = gameState.enemyHand.findIndex(function(c) { return c.effect === 'dismantle'; });
+    if (dm !== -1 && (gameState.myHand.length > 0 || gameState.myEquipment.weapon || gameState.myEquipment.armor)) {
+        var c = gameState.enemyHand.splice(dm, 1)[0]; discardCard(c);
+        log('🌉 敌人对你使用了' + cardDesc(c) + '！');
+        // 【新增】主角技能触发：受到过河拆桥
+        triggerProtagonistSkill('【过河拆桥】');
+        if (!gameOver) {
+            if (gameState.myEquipment.weapon) {
+                var w = gameState.myEquipment.weapon; gameState.myEquipment.weapon = null; discardCard(w); log('🌉 敌人拆掉了你的' + cardDesc(w) + '！');
+            } else if (gameState.myEquipment.armor) {
+                var a = gameState.myEquipment.armor; gameState.myEquipment.armor = null; discardCard(a); log('🌉 敌人拆掉了你的' + cardDesc(a) + '！');
+            } else if (gameState.myHand.length > 0) {
+                var rIdx = Math.floor(Math.random() * gameState.myHand.length); var discarded = gameState.myHand.splice(rIdx, 1)[0]; discardCard(discarded); log('🌉 敌人拆掉了你的一张手牌。');
+            }
+        }
+        renderBattle(); setTimeout(function() { enemyAI_DelayedTricks(); }, 800); return;
+    }
+
     setTimeout(function() { enemyAI_Equip(); }, 800);
 }
 
@@ -1389,15 +1576,22 @@ function handleEnemyKillDodged(dmg, attackCard) {
     finishEnemyTurnWithExtraCheck();
 }
 
+// 【修改】寒冰剑弃牌触发主角技能
 function handleEnemyKillHit(dmg, attackCard) {
     if (gameState.enemyEquipment.weapon && gameState.enemyEquipment.weapon.effect === 'weapon_guding' && gameState.myHand.length === 0) { dmg += 1; log('🔪 敌人【古锭刀】发动！你无手牌，伤害+1（当前伤害:' + dmg + '）！'); }
     if (gameState.myEquipment.armor && gameState.myEquipment.armor.effect === 'armor_tengjia' && attackCard.effect === 'fire_damage') { dmg += 1; log('🔥 你的【藤甲】受到火焰伤害，伤害+1（当前伤害:' + dmg + '）！'); }
     if (gameState.enemyEquipment.weapon && gameState.enemyEquipment.weapon.effect === 'weapon_hanbing' && gameState.myHand.length >= 2) {
         log('❄️ 敌人【寒冰剑】发动！不造成伤害，改为弃置你两张牌！');
-        var discarded = 0; var names = [];
-        while (discarded < 2 && gameState.myHand.length > 0) { var rIdx = Math.floor(Math.random() * gameState.myHand.length); var dCard = gameState.myHand.splice(rIdx, 1)[0]; discardCard(dCard); names.push(dCard.name); discarded++; }
-        if (discarded > 0) log('🗑️ 你被迫弃置了：' + names.join('、') + '。');
-        closeModal(); renderBattle(); finishEnemyTurnWithExtraCheck(); return;
+        // 【新增】主角技能触发：受到寒冰剑弃牌
+        triggerProtagonistSkill('【寒冰剑】');
+        if (!gameOver) {
+            var discarded = 0; var names = [];
+            while (discarded < 2 && gameState.myHand.length > 0) { var rIdx = Math.floor(Math.random() * gameState.myHand.length); var dCard = gameState.myHand.splice(rIdx, 1)[0]; discardCard(dCard); names.push(dCard.name); discarded++; }
+            if (discarded > 0) log('🗑️ 你被迫弃置了：' + names.join('、') + '。');
+            closeModal(); renderBattle(); finishEnemyTurnWithExtraCheck(); return;
+        } else {
+            closeModal(); return;
+        }
     }
     takeDamage(dmg);
 }
@@ -1413,7 +1607,7 @@ function resolveXuSkills(queue, afterAllCallback) {
         ]);
     } else if (skillName === 'fangzhu') {
         var discarded = 0; var names = [];
-        while (discarded < 2 && gameState.enemyHand.length > 0) { var rIdx = Math.floor(Math.random() * gameState.enemyHand.length); var dCard = gameState.enemyHand.splice(rIdx, 1)[0]; discardCard(dCard); names.push(dCard.name); discarded++; }
+        while (discarded < 2 && gameState.enemyHand.length > 0) { var rIdx = Math.floor(Math.random() * gameState.enemyHand.length); var dCard = gameState.myHand.splice(rIdx, 1)[0]; discardCard(dCard); names.push(dCard.name); discarded++; }
         gameState.enemySkipNextDraw = true;
         if (discarded > 0) log('🌊 【放逐】发动！敌人弃置' + discarded + '张牌(' + names.join('、') + ')，且跳过下次摸牌阶段！');
         else log('🌊 【放逐】发动！敌人手牌为空无需弃牌，但仍跳过下次摸牌阶段！');
@@ -1521,14 +1715,16 @@ function checkWin() {
     if (gameOver) return true;
     if (gameState.enemyHp <= 0) {
         gameOver = true; 
-        // 【新增】胜利后保存战绩到云端
-        saveToCloud({ lastWin: true, winTime: new Date().toISOString(), hero: currentHero.name });
-        alert('🎉 恭喜！你击败了敌人！'); backToLobby(); return true;
+        saveRankToCloud(true);
+        alert('🎉 恭喜！你击败了敌人！段位 +1'); 
+        backToLobby(); 
+        return true;
     } else if (gameState.myHp <= 0) {
         gameOver = true; 
-        // 【新增】失败后保存战绩到云端
-        saveToCloud({ lastWin: false, loseTime: new Date().toISOString(), hero: currentHero.name });
-        alert('💀 你被打败了...'); backToLobby(); return true;
+        saveRankToCloud(false);
+        alert('💀 你被打败了... 段位 -1'); 
+        backToLobby(); 
+        return true;
     }
     return false;
 }
@@ -1553,8 +1749,9 @@ function renderBattle() {
 
     var passiveEl = document.getElementById('passive-skills-display');
     if (hero.id === 'liyucheng') passiveEl.innerHTML = '🔒 彦祖 | 🔥豪情 | 🎁好施 | 🗡️藏刀';
-    else if (hero.id === 'manhongyi') passiveEl.innerHTML = '🍯糖浆 | 🍬糖衣 | 📢举报 | 🚫禁桃';
-    else if (hero.id === 'default') passiveEl.innerHTML = '⚡英姿 | 💨飒爽';
+    else if (hero.id === 'manhongyi') passiveEl.innerHTML = '🍯糖浆 | 🍬糖衣 | 🗡️背刺 | 🚫禁桃';
+    // 【修改】初始英雄被动显示增加主角
+    else if (hero.id === 'default') passiveEl.innerHTML = '⚡英姿 | 💨飒爽 | 🌟主角';
     else if (hero.id === 'wangsheng') passiveEl.innerHTML = '🧠无谋 | 👻武魂 | 🦴狂骨 | ⚔️连斩 | 🔄反客';
     else if (hero.id === 'xuzongwei') passiveEl.innerHTML = '👑皇威 | ❤️归心 | 🌊放逐 | 🌟盛哉 | ⏳当先';
     else passiveEl.innerHTML = '';
@@ -1635,10 +1832,12 @@ function renderSkillButtons() {
     } else if (hero.id === 'manhongyi') {
         var b0 = document.createElement('button'); b0.className = 'skill-btn'; b0.style.background = '#e67e22'; b0.innerText = '🍯糖浆'; b0.disabled = true; b0.title = '锁定技：每回合摸牌+3（共摸5张）'; bar.appendChild(b0);
         var b1 = document.createElement('button'); b1.className = 'skill-btn'; b1.style.background = '#f39c12'; b1.innerText = '🍬糖衣'; b1.disabled = globalLock || (gameState.hasUsedTangyiA && gameState.hasUsedTangyiB); b1.title = '弃1牌得1甲，或掉1血得2甲（各限一次）'; b1.onclick = useSkill_Tangyi; bar.appendChild(b1);
-        var b2 = document.createElement('button'); b2.className = 'skill-btn'; b2.style.background = '#3498db'; b2.innerText = '📢举报'; b2.disabled = true; b2.title = '被动：出杀时若有护甲可触发'; bar.appendChild(b2);
+        var b2 = document.createElement('button'); b2.className = 'skill-btn'; b2.style.background = '#3498db'; b2.innerText = '🗡️背刺'; b2.disabled = true; b2.title = '被动：出杀时若有护甲可失去1甲夺牌+禁闪+额外杀'; bar.appendChild(b2);
     } else if (hero.id === 'default') {
         var b1 = document.createElement('button'); b1.className = 'skill-btn'; b1.style.background = '#9b59b6'; b1.innerText = '⚡英姿'; b1.disabled = true; b1.title = '锁定技：受到伤害时摸两张牌'; bar.appendChild(b1);
         var b2 = document.createElement('button'); b2.className = 'skill-btn'; b2.style.background = '#27ae60'; b2.innerText = '💨飒爽'; b2.disabled = true; b2.title = '锁定技：无手牌上限'; bar.appendChild(b2);
+        // 【新增】主角技能按钮
+        var b3 = document.createElement('button'); b3.className = 'skill-btn'; b3.style.background = '#f1c40f'; b3.style.color = '#2c3e50'; b3.innerText = '🌟主角'; b3.disabled = true; b3.title = '锁定技：受到非伤害类负面效果时，摸1牌且敌方掉1血'; bar.appendChild(b3);
     } else if (hero.id === 'wangsheng') {
         [{ n: '🧠无谋', c: '#8e44ad', t: '使用锦囊需弃杀或掉血' },{ n: '👻武魂', c: '#2c3e50', t: '失去杀时摸2牌' },{ n: '🦴狂骨', c: '#d35400', t: '造成伤害回血摸牌' },{ n: '⚔️连斩', c: '#c0392b', t: '每回合出4杀，禁连弩' },{ n: '🔄反客', c: '#16a085', t: '受杀伤时弃杀反伤' }].forEach(function(s) {
             var b = document.createElement('button'); b.className = 'skill-btn'; b.style.background = s.c; b.innerText = s.n; b.disabled = true; b.title = s.t; bar.appendChild(b);
