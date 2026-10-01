@@ -2,30 +2,83 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>面包杀 · 群雄争霸</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
-body{font-family:'Microsoft YaHei',sans-serif;margin:0;padding:0;background:#1a1a1a;color:#fff;height:100vh;width:100vw;overflow:hidden;user-select:none;position:relative}
-#auth-modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.9);display:flex;justify-content:center;align-items:center;z-index:99999}
-.auth-box{background:linear-gradient(135deg,#2c3e50,#34495e);padding:40px;border-radius:16px;width:340px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.8);border:2px solid #f1c40f}
-.auth-box h2{margin-bottom:24px;color:#f1c40f;font-size:28px}
-.auth-box input{width:100%;padding:12px;margin-bottom:16px;border:1px solid #7f8c8d;border-radius:8px;font-size:14px;background:#1a1a1a;color:#fff;outline:none;box-sizing:border-box}
-.auth-box input:focus{border-color:#f1c40f}
-.auth-box button{width:100%;padding:12px;border:none;border-radius:8px;font-size:16px;cursor:pointer;margin-bottom:10px;font-weight:bold;transition:.2s;color:#fff}
-.btn-login{background:linear-gradient(to bottom,#27ae60,#2ecc71)}
-.btn-register{background:linear-gradient(to bottom,#2980b9,#3498db)}
-.auth-msg{font-size:13px;margin-top:12px;min-height:20px}
-.auth-msg.error{color:#e74c3c}.auth-msg.success{color:#2ecc71}
-.auth-footer{position:fixed;left:16px;bottom:14px;font-size:12px;color:#636e72;letter-spacing:1px}
-.btn-logout{background:transparent;border:1px solid #e74c3c;color:#e74c3c;padding:4px 10px;font-size:11px;border-radius:4px;cursor:pointer;margin-left:10px}
-.btn-logout:hover{background:#e74c3c;color:#fff}
+/* === 移动端关键修复样式 === */
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { 
+    font-family: 'Microsoft YaHei', sans-serif; 
+    margin: 0; padding: 0; 
+    background: #1a1a1a; color: #fff; 
+    height: 100vh; width: 100vw; 
+    overflow: hidden; user-select: none; 
+    position: relative;
+    /* 防止iOS橡皮筋效果导致布局错乱 */
+    overscroll-behavior: none;
+    /* 安全区域适配 */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* 登录弹窗移动端优化 */
+#auth-modal {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,.9);
+    display: flex; justify-content: center; align-items: center;
+    z-index: 99999;
+    /* 允许弹窗内滚动，防止键盘遮挡 */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.auth-box {
+    background: linear-gradient(135deg,#2c3e50,#34495e);
+    padding: 30px 24px; border-radius: 16px;
+    width: min(340px, 90vw); text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,.8);
+    border: 2px solid #f1c40f;
+    margin: 20px 0;
+    flex-shrink: 0;
+}
+.auth-box input {
+    width: 100%; padding: 14px; margin-bottom: 14px;
+    border: 1px solid #7f8c8d; border-radius: 8px;
+    font-size: 16px !important; /* iOS防止自动缩放 */
+    background: #1a1a1a; color: #fff; outline: none;
+    box-sizing: border-box;
+    /* 移动端触摸优化 */
+    touch-action: manipulation;
+}
+.auth-box button {
+    width: 100%; padding: 14px; border: none; border-radius: 8px;
+    font-size: 16px; cursor: pointer; margin-bottom: 10px;
+    font-weight: bold; transition: .2s; color: #fff;
+    touch-action: manipulation;
+}
+.auth-box button:active { opacity: 0.8; transform: scale(0.98); }
+
+/* 全局按钮移动端优化 */
+button, .card, .hero-card, .nav-item, .tab {
+    touch-action: manipulation;
+    -webkit-user-select: none;
+}
+.big-btn:active { transform: translateY(5px) scale(0.98) !important; }
+
+/* 手牌区域移动端横向滚动优化 */
+#hand-area {
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+}
+.card { scroll-snap-align: center; }
+
+/* 原有样式保持不变... */
 .rank-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:bold;margin-left:6px;background:linear-gradient(135deg,#f39c12,#e67e22);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.3)}
 .rank-change{font-size:12px;margin-left:8px;animation:fadeIn 1s ease}
 .rank-up{color:#2ecc71}.rank-down{color:#e74c3c}
 @keyframes fadeIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
 #rename-modal,#uid-modal,#friends-modal,#remark-modal,#invite-modal,#receive-invite-modal,#room-lobby-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);justify-content:center;align-items:center;z-index:99998}
-.modal-box{background:linear-gradient(135deg,#2c3e50,#34495e);padding:30px;border-radius:16px;width:340px;max-width:90%;max-height:80vh;overflow-y:auto;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.8);border:2px solid #f1c40f}
+.modal-box{background:linear-gradient(135deg,#2c3e50,#34495e);padding:30px;border-radius:16px;width:min(340px,90vw);max-height:80vh;overflow-y:auto;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.8);border:2px solid #f1c40f}
 .modal-box h3{margin:0 0 16px;color:#f1c40f;font-size:20px}
 .modal-box input{width:100%;padding:12px;margin-bottom:12px;border:1px solid #7f8c8d;border-radius:8px;font-size:16px;background:#1a1a1a;color:#fff;outline:none;text-align:center;box-sizing:border-box}
 .modal-box input:focus{border-color:#f1c40f}
@@ -38,7 +91,7 @@ body{font-family:'Microsoft YaHei',sans-serif;margin:0;padding:0;background:#1a1
 .modal-msg{font-size:12px;margin-top:10px;min-height:18px}
 .uid-display{background:#1a1a1a;padding:12px;border-radius:8px;border:1px solid #7f8c8d;font-family:monospace;font-size:12px;color:#bdc3c7;word-break:break-all;margin-bottom:15px;display:flex;align-items:center;justify-content:space-between;gap:10px}
 .btn-copy{background:#f1c40f;color:#2c3e50;border:none;padding:6px 12px;border-radius:4px;font-weight:bold;cursor:pointer;font-size:12px;white-space:nowrap}
-.friend-list,.invite-list{text-align:left;margin-top:15px;max-height:300px;overflow-y:auto}
+.friend-list,.invite-list{text-align:left;margin-top:15px;max-height:300px;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .friend-item,.req-item,.invite-item{background:rgba(0,0,0,.3);padding:12px;border-radius:8px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;border:1px solid #444;transition:.2s}
 .friend-item:hover,.invite-item:hover{border-color:#f1c40f}
 .friend-info{flex:1;cursor:pointer}
@@ -82,7 +135,7 @@ body{font-family:'Microsoft YaHei',sans-serif;margin:0;padding:0;background:#1a1
 .big-btn:active{transform:translateY(5px);box-shadow:none}
 .btn-rank{background:linear-gradient(to bottom,#e74c3c,#c0392b);transform:scale(1.1);z-index:10;border:2px solid #ff7675}
 .btn-match{background:linear-gradient(to bottom,#3498db,#2980b9)}
-.bottom-nav{height:60px;background:rgba(0,0,0,.9);display:flex;justify-content:space-around;align-items:center;border-top:1px solid #444;flex-shrink:0}
+.bottom-nav{height:60px;background:rgba(0,0,0,.9);display:flex;justify-content:space-around;align-items:center;border-top:1px solid #444;flex-shrink:0;padding-bottom:env(safe-area-inset-bottom)}
 .nav-item{color:#7f8c8d;cursor:pointer;display:flex;flex-direction:column;align-items:center;font-size:12px;transition:color .2s;position:relative}
 .nav-item:hover{color:#f1c40f}
 .nav-item i{font-size:20px;margin-bottom:4px;font-style:normal}
@@ -92,8 +145,8 @@ body{font-family:'Microsoft YaHei',sans-serif;margin:0;padding:0;background:#1a1
 .heroes-header h2{margin:0;font-size:20px;color:#f1c40f}
 .btn-back{background:transparent;border:1px solid #7f8c8d;color:#bdc3c7;padding:6px 14px;border-radius:4px;cursor:pointer;font-size:13px}
 .btn-back:hover{border-color:#f1c40f;color:#f1c40f}
-.heroes-grid{flex:1;overflow-y:auto;padding:20px;display:flex;flex-wrap:wrap;gap:20px;justify-content:center;align-content:flex-start}
-.hero-card{width:280px;background:linear-gradient(135deg,#2c3e50,#34495e);border-radius:12px;border:2px solid #555;overflow:hidden;cursor:pointer;transition:all .3s;box-shadow:0 4px 15px rgba(0,0,0,.4);position:relative}
+.heroes-grid{flex:1;overflow-y:auto;padding:20px;display:flex;flex-wrap:wrap;gap:20px;justify-content:center;align-content:flex-start;-webkit-overflow-scrolling:touch}
+.hero-card{width:min(280px,90vw);background:linear-gradient(135deg,#2c3e50,#34495e);border-radius:12px;border:2px solid #555;overflow:hidden;cursor:pointer;transition:all .3s;box-shadow:0 4px 15px rgba(0,0,0,.4);position:relative}
 .hero-card:hover{transform:translateY(-5px);border-color:#f1c40f;box-shadow:0 8px 25px rgba(241,196,15,.3)}
 .hero-card.selected{border-color:#f1c40f;box-shadow:0 0 20px rgba(241,196,15,.5)}
 .hero-portrait{width:100%;height:200px;background:linear-gradient(180deg,#34495e,#2c3e50);display:flex;align-items:center;justify-content:center;font-size:80px;position:relative;overflow:hidden}
@@ -132,7 +185,7 @@ body{font-family:'Microsoft YaHei',sans-serif;margin:0;padding:0;background:#1a1
 .turn-counter{font-size:12px;color:#fff;text-align:center;font-weight:bold;flex-shrink:0;padding:2px 0;background:rgba(241,196,15,.15);border-radius:4px;margin-bottom:2px}
 .turn-counter span{color:#f1c40f;font-size:14px}
 #phase-indicator{text-align:center;font-size:12px;color:#f1c40f;font-weight:bold;flex-shrink:0}
-#log{flex:1;min-height:50px;overflow-y:auto;background:rgba(0,0,0,.6);padding:5px 7px;font-size:11px;border-radius:6px;border:1px solid #333;line-height:1.5}
+#log{flex:1;min-height:50px;overflow-y:auto;background:rgba(0,0,0,.6);padding:5px 7px;font-size:11px;border-radius:6px;border:1px solid #333;line-height:1.5;-webkit-overflow-scrolling:touch}
 #discard-tip{display:none;width:100%;text-align:center;padding:5px;background:#e74c3c;color:#fff;font-weight:bold;font-size:13px;border-radius:5px;animation:flash 1.5s infinite;flex-shrink:0}
 .player-zone-wrap{background:rgba(0,0,0,.4);border-radius:8px;border:1px solid #444;flex-shrink:0;overflow:hidden;margin-top:4px}
 .player-top-row{display:flex;gap:8px;padding:8px 10px;align-items:flex-start}
@@ -187,12 +240,12 @@ button.action-btn{padding:6px 14px;font-size:12px;border:none;border-radius:5px;
 #bottom-bar{display:flex;justify-content:flex-end;padding:2px 8px;flex-shrink:0}
 #btn-back-lobby{background:transparent;border:1px solid #7f8c8d;color:#bdc3c7;padding:4px 8px;font-size:10px;border-radius:4px;cursor:pointer}
 #response-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);justify-content:center;align-items:center;z-index:100}
-.modal-content{background:#34495e;padding:20px;border-radius:10px;text-align:center;border:2px solid #e74c3c;min-width:280px;max-width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 0 20px rgba(231,76,60,.5)}
+.modal-content{background:#34495e;padding:20px;border-radius:10px;text-align:center;border:2px solid #e74c3c;min-width:min(280px,85vw);max-width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 0 20px rgba(231,76,60,.5)}
 .modal-btn{margin:6px;padding:8px 16px;border:none;border-radius:5px;cursor:pointer;font-weight:bold;color:#fff;min-width:90px;font-size:13px}
 .card-grid{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:12px 0}
 .card-back{width:60px;height:84px;background:linear-gradient(135deg,#2c3e50,#34495e);border:2px solid #7f8c8d;border-radius:8px;cursor:pointer;display:flex;justify-content:center;align-items:center;font-size:22px;color:#95a5a6;transition:all .2s;box-shadow:0 4px 6px rgba(0,0,0,.3)}
 .card-back:hover{transform:translateY(-5px) scale(1.05);box-shadow:0 8px 15px rgba(241,196,15,.6);border-color:#f1c40f}
-#mulligan-panel{display:none;position:fixed;bottom:130px;left:50%;transform:translateX(-50%);background:rgba(20,20,30,.95);border:2px solid #f1c40f;border-radius:12px;padding:12px 20px;z-index:99997;text-align:center;box-shadow:0 -4px 20px rgba(0,0,0,.6);backdrop-filter:blur(8px);min-width:280px;animation:slideUp .3s ease-out}
+#mulligan-panel{display:none;position:fixed;bottom:130px;left:50%;transform:translateX(-50%);background:rgba(20,20,30,.95);border:2px solid #f1c40f;border-radius:12px;padding:12px 20px;z-index:99997;text-align:center;box-shadow:0 -4px 20px rgba(0,0,0,.6);backdrop-filter:blur(8px);min-width:min(280px,90vw);animation:slideUp .3s ease-out}
 @keyframes slideUp{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 #mulligan-panel .mulligan-title{font-size:16px;font-weight:bold;color:#f1c40f;margin-bottom:6px}
 #mulligan-panel .mulligan-desc{font-size:12px;color:#bdc3c7;margin-bottom:10px;line-height:1.4}
@@ -203,7 +256,6 @@ button.action-btn{padding:6px 14px;font-size:12px;border:none;border-radius:5px;
 .btn-mulligan-redraw{background:linear-gradient(to bottom,#e67e22,#f39c12)}
 @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
 @keyframes flash{0%,100%{opacity:1}50%{opacity:.7}}
-/* Room Lobby Styles */
 .room-lobby-content{text-align:left;padding:10px 0}
 .room-role{display:flex;align-items:center;gap:12px;padding:12px;background:rgba(0,0,0,.3);border-radius:8px;margin-bottom:8px;border:1px solid #444}
 .room-role .role-icon{font-size:28px;width:40px;text-align:center}
@@ -214,23 +266,26 @@ button.action-btn{padding:6px 14px;font-size:12px;border:none;border-radius:5px;
 .role-status.ready{color:#2ecc71}.role-status.waiting{color:#e67e22}.role-status.offline{color:#e74c3c}
 .room-lobby-actions{margin-top:15px;display:flex;gap:10px}
 .room-lobby-actions button{flex:1;padding:12px;border:none;border-radius:8px;font-size:15px;font-weight:bold;cursor:pointer;color:#fff}
+.auth-footer{position:fixed;left:16px;bottom:max(14px, env(safe-area-inset-bottom));font-size:12px;color:#636e72;letter-spacing:1px}
+.btn-logout{background:transparent;border:1px solid #e74c3c;color:#e74c3c;padding:4px 10px;font-size:11px;border-radius:4px;cursor:pointer;margin-left:10px}
+.btn-logout:hover{background:#e74c3c;color:#fff}
 </style>
 </head>
 <body>
-<div id="auth-modal"><div class="auth-box"><h2>🍞 面包杀</h2><input type="email" id="email" placeholder="邮箱" autocomplete="email"><input type="password" id="password" placeholder="密码（至少6位）" autocomplete="current-password"><button class="btn-login" onclick="handleLogin()">登 录</button><button class="btn-register" onclick="handleRegister()">注 册</button><div style="margin-top:8px;"><a href="javascript:void(0)" onclick="handleForgotPassword()" style="color:#bdc3c7;font-size:13px;text-decoration:underline;cursor:pointer;">忘记密码？点击找回</a></div><div class="auth-msg" id="auth-msg"></div></div><div class="auth-footer">🍞 面包护卫队出品</div></div>
+<div id="auth-modal"><div class="auth-box"><h2>🍞 面包杀</h2><input type="email" id="email" placeholder="邮箱" autocomplete="email" inputmode="email"><input type="password" id="password" placeholder="密码（至少6位）" autocomplete="current-password"><button class="btn-login" onclick="handleLogin()">登 录</button><button class="btn-register" onclick="handleRegister()">注 册</button><div style="margin-top:8px;"><a href="javascript:void(0)" onclick="handleForgotPassword()" style="color:#bdc3c7;font-size:13px;text-decoration:underline;cursor:pointer;">忘记密码？点击找回</a></div><div class="auth-msg" id="auth-msg"></div></div><div class="auth-footer">🍞 面包护卫队出品</div></div>
 <div id="rename-modal"><div class="modal-box"><h3>✏️ 修改游戏昵称</h3><input type="text" id="rename-input" placeholder="输入新昵称" maxlength="12"><div style="font-size:11px;color:#95a5a6;margin-bottom:14px;">1~12个字符，支持中文/英文/数字</div><div class="modal-btns"><button class="btn-cancel" onclick="closeModalEl('rename-modal')">取消</button><button class="btn-confirm" onclick="confirmRename()">确认修改</button></div><div class="modal-msg" id="rename-msg"></div></div></div>
 <div id="uid-modal"><div class="modal-box"><h3>🆔 我的 UID</h3><div class="uid-display"><span id="uid-text">加载中...</span><button class="btn-copy" onclick="copyUID()">📋 复制</button></div><div class="modal-msg" id="uid-msg" style="color:#2ecc71;"></div><div class="modal-btns"><button class="btn-cancel" onclick="closeModalEl('uid-modal')">关闭</button></div></div></div>
 <div id="remark-modal"><div class="modal-box"><h3>📝 修改备注</h3><input type="text" id="remark-input" placeholder="输入新备注" maxlength="12"><div class="modal-btns"><button class="btn-cancel" onclick="closeModalEl('remark-modal')">取消</button><button class="btn-confirm" onclick="saveRemark()">保存</button></div></div></div>
-<div id="friends-modal"><div class="modal-box" style="width:380px;"><h3>🤝 好友系统</h3><div class="tabs"><div class="tab active" id="tab-list" onclick="switchFriendTab('list')">好友列表</div><div class="tab" id="tab-req" onclick="switchFriendTab('req')">好友申请 <span id="req-badge-tab" style="color:#e74c3c;display:none;">(0)</span></div><div class="tab" id="tab-add" onclick="switchFriendTab('add')">添加好友</div></div><div id="panel-list"><div class="friend-list" id="friend-list-container"><div style="color:#7f8c8d;text-align:center;padding:20px;">加载中...</div></div></div><div id="panel-req" style="display:none;"><div class="friend-list" id="req-list-container"><div style="color:#7f8c8d;text-align:center;padding:20px;">加载中...</div></div></div><div id="panel-add" style="display:none;"><input type="text" id="add-uid-input" placeholder="输入对方的完整 UID" style="font-size:13px;text-align:left;"><div class="modal-btns"><button class="btn-primary" onclick="sendFriendRequest()">发送申请</button></div><div class="modal-msg" id="add-msg"></div></div><div class="modal-btns" style="margin-top:20px;"><button class="btn-cancel" onclick="closeModalEl('friends-modal')">关闭</button></div></div></div>
+<div id="friends-modal"><div class="modal-box" style="width:min(380px,90vw);"><h3>🤝 好友系统</h3><div class="tabs"><div class="tab active" id="tab-list" onclick="switchFriendTab('list')">好友列表</div><div class="tab" id="tab-req" onclick="switchFriendTab('req')">好友申请 <span id="req-badge-tab" style="color:#e74c3c;display:none;">(0)</span></div><div class="tab" id="tab-add" onclick="switchFriendTab('add')">添加好友</div></div><div id="panel-list"><div class="friend-list" id="friend-list-container"><div style="color:#7f8c8d;text-align:center;padding:20px;">加载中...</div></div></div><div id="panel-req" style="display:none;"><div class="friend-list" id="req-list-container"><div style="color:#7f8c8d;text-align:center;padding:20px;">加载中...</div></div></div><div id="panel-add" style="display:none;"><input type="text" id="add-uid-input" placeholder="输入对方的完整 UID" style="font-size:13px;text-align:left;"><div class="modal-btns"><button class="btn-primary" onclick="sendFriendRequest()">发送申请</button></div><div class="modal-msg" id="add-msg"></div></div><div class="modal-btns" style="margin-top:20px;"><button class="btn-cancel" onclick="closeModalEl('friends-modal')">关闭</button></div></div></div>
 
 <!-- 2v2 邀请弹窗 -->
-<div id="invite-modal"><div class="modal-box" style="width:400px;"><h3>⚔️ 2v2 邀请好友</h3><p style="font-size:12px;color:#aaa;margin-bottom:10px;">仅显示在线好友</p><div class="invite-list" id="invite-friend-list"><div style="text-align:center;padding:20px;color:#7f8c8d;">加载中...</div></div><div class="modal-btns" style="margin-top:15px;"><button class="btn-cancel" onclick="closeModalEl('invite-modal')">取消</button></div></div></div>
+<div id="invite-modal"><div class="modal-box" style="width:min(400px,90vw);"><h3>⚔️ 2v2 邀请好友</h3><p style="font-size:12px;color:#aaa;margin-bottom:10px;">实时在线检测中...</p><div class="invite-list" id="invite-friend-list"><div style="text-align:center;padding:20px;color:#7f8c8d;">加载中...</div></div><div class="modal-btns" style="margin-top:15px;"><button class="btn-cancel" onclick="closeModalEl('invite-modal')">取消</button></div></div></div>
 
 <!-- 2v2 收到邀请弹窗 -->
 <div id="receive-invite-modal" style="z-index:99999;"><div class="modal-box"><h3 style="color:#f1c40f;">📩 收到2v2邀请</h3><p id="invite-from-name" style="font-size:16px;margin:20px 0;">好友邀请你进行2v2对战！</p><div class="modal-btns"><button class="btn-cancel" onclick="reject2v2Invite()">拒绝</button><button class="btn-confirm" onclick="accept2v2Invite()">接受</button></div></div></div>
 
 <!-- 2v2 房间大厅 -->
-<div id="room-lobby-modal" style="z-index:99998;"><div class="modal-box" style="width:420px;">
+<div id="room-lobby-modal" style="z-index:99998;"><div class="modal-box" style="width:min(420px,90vw);">
     <h3>⚔️ 2v2 房间</h3>
     <div class="room-lobby-content">
         <div class="room-role" id="room-host-row">
@@ -273,99 +328,433 @@ button.action-btn{padding:6px 14px;font-size:12px;border:none;border-radius:5px;
 </div>
 <div id="response-modal"><div class="modal-content"><h2 id="modal-title" style="color:#e74c3c;margin-top:0;">提示</h2><p id="modal-desc">描述信息</p><div id="modal-buttons"></div><div id="modal-card-grid" class="card-grid"></div></div></div>
 <script>
-/* ========== Supabase & Auth ========== */
+/* ========== Supabase & Auth (移动端修复版) ========== */
 var SUPABASE_URL='https://xhehybtjnvyksjaznlla.supabase.co';
 var SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoZWh5YnRqbnZ5a3NqYXpubGxhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAzMTEzMzMsImV4cCI6MjEwNTg4NzMzM30.-muF-1xOuKaAjHY0BYPgQpm2GFi62rPb0Fx33yYPbRM';
-var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:false,detectSessionInUrl:false}});
+
+// 【修复】移动端Session持久化配置优化
+var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{
+    auth:{
+        persistSession:true,
+        autoRefreshToken:true,
+        detectSessionInUrl:true,
+        storageKey:'bread-kill-auth'
+    },
+    realtime:{
+        params:{eventsPerSecond:10}
+    }
+});
+
 var currentUserId=null,authModal=document.getElementById('auth-modal'),gameWrapper=document.getElementById('game-wrapper'),authMsgEl=document.getElementById('auth-msg');
 var userProfile={level:1,wins:0,losses:0,nickname:'',friends_remark:{}};
 var isSavingProfile=false,currentRemarkUid='',isDataLoaded=false;
+
 function openModalEl(id){document.getElementById(id).style.display='flex';}
 function closeModalEl(id){document.getElementById(id).style.display='none';}
 function showAuthMsg(t,tp){authMsgEl.textContent=t;authMsgEl.className='auth-msg '+tp;}
-async function handleLogin(){var e=document.getElementById('email').value.trim(),p=document.getElementById('password').value;if(!e||!p)return showAuthMsg('请填写邮箱和密码','error');showAuthMsg('⏳ 登录中...','');try{var r=await sb.auth.signInWithPassword({email:e,password:p});if(r.error)return showAuthMsg('❌ '+r.error.message,'error');showAuthMsg('✅ 登录成功！','success');}catch(err){console.error(err);showAuthMsg('❌ '+(err.message||String(err)),'error');}}
-async function handleRegister(){var e=document.getElementById('email').value.trim(),p=document.getElementById('password').value;if(!e||!p)return showAuthMsg('请填写邮箱和密码','error');if(p.length<6)return showAuthMsg('密码至少6位','error');showAuthMsg('⏳ 注册中...','');try{var r=await sb.auth.signUp({email:e,password:p});if(r.error)return showAuthMsg('❌ '+r.error.message,'error');showAuthMsg('✅ 注册成功！请登录','success');}catch(err){console.error(err);showAuthMsg('❌ '+(err.message||String(err)),'error');}}
-async function handleForgotPassword(){var e=document.getElementById('email').value.trim();if(!e)return showAuthMsg('请先填写注册时使用的邮箱','error');showAuthMsg('⏳ 正在发送重置邮件...','');try{var r=await sb.auth.resetPasswordForEmail(e);if(r.error)return showAuthMsg('❌ '+r.error.message,'error');showAuthMsg('✅ 重置邮件已发送！请查收邮箱','success');}catch(err){showAuthMsg('❌ '+(err.message||String(err)),'error');}}
-async function handleLogout(){if(!isDataLoaded){alert('⚠️ 数据尚未加载完成，为防止数据丢失，请稍后再退出！');return;}var saved=await saveProfileToCloud();if(!saved){alert('⚠️ 保存失败，请重试！');return;}await sb.auth.signOut();}
-sb.auth.onAuthStateChange(function(ev,ses){if(ev==='SIGNED_IN'&&ses){currentUserId=ses.user.id;isDataLoaded=false;authModal.style.display='none';gameWrapper.style.display='block';var ep=ses.user.email.split('@')[0];document.getElementById('lobby-player-name').setAttribute('data-email-prefix',ep);document.getElementById('lobby-player-name').innerText=ep;loadSaveFromCloud().then(function(){loadPendingRequests();initPresence();try{sb.channel('friends-'+currentUserId).on('postgres_changes',{event:'*',schema:'public',table:'friend_requests',filter:'receiver_id=eq.'+currentUserId},function(){loadPendingRequests();}).subscribe();}catch(e){}});}else if(ev==='SIGNED_OUT'){currentUserId=null;isDataLoaded=false;userProfile={level:1,wins:0,losses:0,nickname:'',friends_remark:{}};updateLobbyRankUI();authModal.style.display='flex';gameWrapper.style.display='none';if(presenceChannel){presenceChannel.unsubscribe();presenceChannel=null;}}});
-async function saveProfileToCloud(){if(!currentUserId)return false;if(!isDataLoaded){console.warn('⚠️ 阻止保存：云端数据尚未加载完成，防止覆盖！');return false;}isSavingProfile=true;try{var res=await sb.from('user_saves').upsert({user_id:currentUserId,save_data:userProfile,updated_at:new Date().toISOString()},{onConflict:'user_id'});return !res.error;}catch(e){console.error('保存失败:',e);return false;}finally{isSavingProfile=false;}}
-async function loadSaveFromCloud(){try{var r=await sb.from('user_saves').select('save_data').eq('user_id',currentUserId).maybeSingle();if(r.data&&r.data.save_data){var d=r.data.save_data;userProfile.level=typeof d.level==='number'?d.level:1;userProfile.wins=typeof d.wins==='number'?d.wins:0;userProfile.losses=typeof d.losses==='number'?d.losses:0;userProfile.nickname=typeof d.nickname==='string'?d.nickname:'';userProfile.friends_remark=typeof d.friends_remark==='object'&&d.friends_remark!==null?d.friends_remark:{};console.log('✅ 云端数据加载成功');}else{console.log('ℹ️ 云端无存档，使用默认数据');}}catch(e){console.error('❌ 加载云端数据失败:',e);return;}isDataLoaded=true;updateLobbyRankUI();updateAllNicknameDisplays();renderHeroesGrid();}
-async function saveRankToCloud(w){if(!currentUserId)return;var ol=userProfile.level;if(w){userProfile.wins++;if(userProfile.level<100)userProfile.level++;}else{userProfile.losses++;if(userProfile.level>1)userProfile.level--;}updateLobbyRankUI(w?'+'+(userProfile.level-ol)+' 级':'-'+(ol-userProfile.level)+' 级');await saveProfileToCloud();}
-function getDisplayNickname(){if(userProfile.nickname&&userProfile.nickname.trim())return userProfile.nickname.trim();var el=document.getElementById('lobby-player-name');return el?el.getAttribute('data-email-prefix')||'玩家':'玩家';}
-function updateAllNicknameDisplays(){var name=getDisplayNickname();document.getElementById('lobby-player-name').innerText=name;var heroName=currentHero?currentHero.name:'';document.getElementById('my-hero-name').innerText=name+(heroName?' ('+heroName+')':'');}
-function openAvatarMenu(){showModal('👤 账号管理','选择你要进行的操作：',[{text:'✏️ 修改昵称',color:'#3498db',action:function(){closeModal();openRenameModal();}},{text:'🆔 查看 UID',color:'#f39c12',action:function(){closeModal();openUIDModal();}},{text:'取消',color:'#7f8c8d',action:function(){closeModal();}}]);}
+
+// 【修复】移动端登录 - 增加错误处理和重试机制
+async function handleLogin(){
+    var e=document.getElementById('email').value.trim(),p=document.getElementById('password').value;
+    if(!e||!p)return showAuthMsg('请填写邮箱和密码','error');
+    showAuthMsg('⏳ 登录中...','');
+    try{
+        var r=await sb.auth.signInWithPassword({email:e,password:p});
+        if(r.error)return showAuthMsg('❌ '+r.error.message,'error');
+        showAuthMsg('✅ 登录成功！','success');
+        // 【修复】确保session写入后再隐藏弹窗
+        setTimeout(function(){
+            authModal.style.display='none';
+            gameWrapper.style.display='block';
+        },300);
+    }catch(err){
+        console.error('Login error:',err);
+        showAuthMsg('❌ 网络错误，请检查网络后重试','error');
+    }
+}
+
+async function handleRegister(){
+    var e=document.getElementById('email').value.trim(),p=document.getElementById('password').value;
+    if(!e||!p)return showAuthMsg('请填写邮箱和密码','error');
+    if(p.length<6)return showAuthMsg('密码至少6位','error');
+    showAuthMsg('⏳ 注册中...','');
+    try{
+        var r=await sb.auth.signUp({email:e,password:p});
+        if(r.error)return showAuthMsg('❌ '+r.error.message,'error');
+        showAuthMsg('✅ 注册成功！请登录','success');
+    }catch(err){
+        console.error(err);
+        showAuthMsg('❌ '+(err.message||String(err)),'error');
+    }
+}
+
+async function handleForgotPassword(){
+    var e=document.getElementById('email').value.trim();
+    if(!e)return showAuthMsg('请先填写注册时使用的邮箱','error');
+    showAuthMsg('⏳ 正在发送重置邮件...','');
+    try{
+        var r=await sb.auth.resetPasswordForEmail(e);
+        if(r.error)return showAuthMsg('❌ '+r.error.message,'error');
+        showAuthMsg('✅ 重置邮件已发送！请查收邮箱','success');
+    }catch(err){showAuthMsg('❌ '+(err.message||String(err)),'error');}
+}
+
+async function handleLogout(){
+    if(!isDataLoaded){alert('⚠️ 数据尚未加载完成，为防止数据丢失，请稍后再退出！');return;}
+    var saved=await saveProfileToCloud();
+    if(!saved){alert('⚠️ 保存失败，请重试！');return;}
+    await sb.auth.signOut();
+}
+
+// 【修复】移动端键盘弹出时自动调整布局
+if(window.visualViewport){
+    window.visualViewport.addEventListener('resize',function(){
+        document.body.style.height=window.visualViewport.height+'px';
+    });
+    window.visualViewport.addEventListener('scroll',function(){
+        window.scrollTo(0,0);
+    });
+}
+
+// 【修复】Auth状态变更 - 增加初始Session检查
+sb.auth.onAuthStateChange(function(ev,ses){
+    console.log('Auth state:',ev,ses?ses.user?.id:'null');
+    if(ev==='SIGNED_IN'&&ses){
+        currentUserId=ses.user.id;
+        isDataLoaded=false;
+        authModal.style.display='none';
+        gameWrapper.style.display='block';
+        var ep=ses.user.email.split('@')[0];
+        document.getElementById('lobby-player-name').setAttribute('data-email-prefix',ep);
+        document.getElementById('lobby-player-name').innerText=ep;
+        loadSaveFromCloud().then(function(){
+            loadPendingRequests();
+            initBroadcastPresence(); // 【修复】使用Broadcast替代Presence
+            startInviteListener();
+            try{
+                sb.channel('friends-'+currentUserId).on('postgres_changes',{event:'*',schema:'public',table:'friend_requests',filter:'receiver_id=eq.'+currentUserId},function(){loadPendingRequests();}).subscribe();
+            }catch(e){console.error('Friends channel error:',e);}
+        });
+    }else if(ev==='SIGNED_OUT'){
+        currentUserId=null;
+        isDataLoaded=false;
+        userProfile={level:1,wins:0,losses:0,nickname:'',friends_remark:{}};
+        updateLobbyRankUI();
+        authModal.style.display='flex';
+        gameWrapper.style.display='none';
+        if(broadcastChannel){broadcastChannel.unsubscribe();broadcastChannel=null;}
+    }
+});
+
+// 【修复】页面加载时主动检查已有Session（解决移动端刷新后白屏）
+(async function checkInitialSession(){
+    try{
+        var {data:{session}}=await sb.auth.getSession();
+        if(session&&session.user){
+            console.log('✅ 检测到已有Session，自动恢复登录');
+            // onAuthStateChange会自动触发SIGNED_IN
+        }
+    }catch(e){
+        console.warn('Session check failed:',e);
+    }
+})();
+
+async function saveProfileToCloud(){
+    if(!currentUserId)return false;
+    if(!isDataLoaded){console.warn('⚠️ 阻止保存：云端数据尚未加载完成');return false;}
+    isSavingProfile=true;
+    try{
+        var res=await sb.from('user_saves').upsert({user_id:currentUserId,save_data:userProfile,updated_at:new Date().toISOString()},{onConflict:'user_id'});
+        return !res.error;
+    }catch(e){console.error('保存失败:',e);return false;}
+    finally{isSavingProfile=false;}
+}
+
+async function loadSaveFromCloud(){
+    try{
+        var r=await sb.from('user_saves').select('save_data').eq('user_id',currentUserId).maybeSingle();
+        if(r.data&&r.data.save_data){
+            var d=r.data.save_data;
+            userProfile.level=typeof d.level==='number'?d.level:1;
+            userProfile.wins=typeof d.wins==='number'?d.wins:0;
+            userProfile.losses=typeof d.losses==='number'?d.losses:0;
+            userProfile.nickname=typeof d.nickname==='string'?d.nickname:'';
+            userProfile.friends_remark=typeof d.friends_remark==='object'&&d.friends_remark!==null?d.friends_remark:{};
+            console.log('✅ 云端数据加载成功');
+        }else{console.log('ℹ️ 云端无存档，使用默认数据');}
+    }catch(e){console.error('❌ 加载云端数据失败:',e);return;}
+    isDataLoaded=true;
+    updateLobbyRankUI();
+    updateAllNicknameDisplays();
+    renderHeroesGrid();
+}
+
+async function saveRankToCloud(w){
+    if(!currentUserId)return;
+    var ol=userProfile.level;
+    if(w){userProfile.wins++;if(userProfile.level<100)userProfile.level++;}
+    else{userProfile.losses++;if(userProfile.level>1)userProfile.level--;}
+    updateLobbyRankUI(w?'+'+(userProfile.level-ol)+' 级':'-'+(ol-userProfile.level)+' 级');
+    await saveProfileToCloud();
+}
+
+function getDisplayNickname(){
+    if(userProfile.nickname&&userProfile.nickname.trim())return userProfile.nickname.trim();
+    var el=document.getElementById('lobby-player-name');
+    return el?el.getAttribute('data-email-prefix')||'玩家':'玩家';
+}
+
+function updateAllNicknameDisplays(){
+    var name=getDisplayNickname();
+    document.getElementById('lobby-player-name').innerText=name;
+    var heroName=currentHero?currentHero.name:'';
+    document.getElementById('my-hero-name').innerText=name+(heroName?' ('+heroName+')':'');
+}
+
+function openAvatarMenu(){
+    showModal('👤 账号管理','选择你要进行的操作：',[
+        {text:'✏️ 修改昵称',color:'#3498db',action:function(){closeModal();openRenameModal();}},
+        {text:'🆔 查看 UID',color:'#f39c12',action:function(){closeModal();openUIDModal();}},
+        {text:'取消',color:'#7f8c8d',action:function(){closeModal();}}
+    ]);
+}
+
 function openUIDModal(){document.getElementById('uid-text').innerText=currentUserId||'未登录';document.getElementById('uid-msg').innerText='';openModalEl('uid-modal');}
-function copyUID(){if(!currentUserId)return;navigator.clipboard.writeText(currentUserId).then(function(){document.getElementById('uid-msg').innerText='✅ 已复制！';setTimeout(function(){document.getElementById('uid-msg').innerText='';},2000);}).catch(function(){});}
+function copyUID(){
+    if(!currentUserId)return;
+    navigator.clipboard.writeText(currentUserId).then(function(){
+        document.getElementById('uid-msg').innerText='✅ 已复制！';
+        setTimeout(function(){document.getElementById('uid-msg').innerText='';},2000);
+    }).catch(function(){
+        // 【修复】移动端clipboard API可能不可用，降级方案
+        var ta=document.createElement('textarea');
+        ta.value=currentUserId;ta.style.position='fixed';ta.style.left='-9999px';
+        document.body.appendChild(ta);ta.select();
+        try{document.execCommand('copy');document.getElementById('uid-msg').innerText='✅ 已复制！';}
+        catch(e){document.getElementById('uid-msg').innerText='❌ 复制失败，请手动复制';}
+        document.body.removeChild(ta);
+        setTimeout(function(){document.getElementById('uid-msg').innerText='';},2000);
+    });
+}
+
 function openRenameModal(){document.getElementById('rename-input').value=userProfile.nickname||'';document.getElementById('rename-msg').innerText='';openModalEl('rename-modal');}
-async function confirmRename(){var input=document.getElementById('rename-input');var msg=document.getElementById('rename-msg');var newName=input.value.trim();if(!newName){msg.innerText='❌ 昵称不能为空';msg.style.color='#e74c3c';return;}if(newName.length>12){msg.innerText='❌ 昵称最多12个字符';msg.style.color='#e74c3c';return;}msg.innerText='⏳ 保存中...';msg.style.color='#f1c40f';var old=userProfile.nickname;userProfile.nickname=newName;var ok=await saveProfileToCloud();if(!ok){userProfile.nickname=old;msg.innerText='❌ 保存失败';msg.style.color='#e74c3c';return;}msg.innerText='✅ 修改成功！';msg.style.color='#2ecc71';updateAllNicknameDisplays();setTimeout(function(){closeModalEl('rename-modal');},600);}
+async function confirmRename(){
+    var input=document.getElementById('rename-input');var msg=document.getElementById('rename-msg');
+    var newName=input.value.trim();
+    if(!newName){msg.innerText='❌ 昵称不能为空';msg.style.color='#e74c3c';return;}
+    if(newName.length>12){msg.innerText='❌ 昵称最多12个字符';msg.style.color='#e74c3c';return;}
+    msg.innerText='⏳ 保存中...';msg.style.color='#f1c40f';
+    var old=userProfile.nickname;userProfile.nickname=newName;
+    var ok=await saveProfileToCloud();
+    if(!ok){userProfile.nickname=old;msg.innerText='❌ 保存失败';msg.style.color='#e74c3c';return;}
+    msg.innerText='✅ 修改成功！';msg.style.color='#2ecc71';
+    updateAllNicknameDisplays();
+    setTimeout(function(){closeModalEl('rename-modal');},600);
+}
 document.getElementById('rename-input').addEventListener('keydown',function(e){if(e.key==='Enter')confirmRename();});
+
 function openFriendsModal(){openModalEl('friends-modal');switchFriendTab('list');loadPendingRequests();}
-function switchFriendTab(tab){document.querySelectorAll('.tabs .tab').forEach(function(t){t.classList.remove('active');});document.getElementById('tab-'+tab).classList.add('active');document.getElementById('panel-list').style.display=tab==='list'?'block':'none';document.getElementById('panel-req').style.display=tab==='req'?'block':'none';document.getElementById('panel-add').style.display=tab==='add'?'block':'none';if(tab==='list')loadFriendList();if(tab==='req')loadReceivedRequests();}
-async function loadFriendList(){var c=document.getElementById('friend-list-container');c.innerHTML='<div style="color:#7f8c8d;text-align:center;padding:20px;">加载中...</div>';var res=await sb.from('friend_requests').select('id,sender_id,receiver_id').eq('status','accepted').or('sender_id.eq.'+currentUserId+',receiver_id.eq.'+currentUserId);if(res.error||!res.data||res.data.length===0){c.innerHTML='<div style="color:#7f8c8d;text-align:center;padding:20px;">暂无好友</div>';return;}var friendIds=res.data.map(function(r){return r.sender_id===currentUserId?r.receiver_id:r.sender_id;});var profilesRes=await sb.from('user_saves').select('user_id,save_data').in('user_id',friendIds);var pm={};if(profilesRes.data)profilesRes.data.forEach(function(p){pm[p.user_id]=p.save_data&&p.save_data.nickname?p.save_data.nickname:'';});var html='';res.data.forEach(function(r,i){var fid=friendIds[i],rid=r.id,gn=pm[fid]||'玩家',rm=(userProfile.friends_remark&&userProfile.friends_remark[fid])?userProfile.friends_remark[fid]:gn;html+='<div class="friend-item"><div class="friend-info" onclick="openRemarkModal(\''+fid+'\',\''+rm.replace(/'/g,"\\'")+'\')"><div class="name">👤 '+rm+'</div>'+(rm!==gn?'<div class="game-name">游戏名: '+gn+'</div>':'')+'</div><div class="friend-actions"><button class="btn-primary" onclick="openRemarkModal(\''+fid+'\',\''+rm.replace(/'/g,"\\'")+'\')">备注</button><button class="btn-danger" onclick="deleteFriend(\''+rid+'\',\''+fid+'\')">删除</button></div></div>';});c.innerHTML=html;}
+function switchFriendTab(tab){
+    document.querySelectorAll('.tabs .tab').forEach(function(t){t.classList.remove('active');});
+    document.getElementById('tab-'+tab).classList.add('active');
+    document.getElementById('panel-list').style.display=tab==='list'?'block':'none';
+    document.getElementById('panel-req').style.display=tab==='req'?'block':'none';
+    document.getElementById('panel-add').style.display=tab==='add'?'block':'none';
+    if(tab==='list')loadFriendList();if(tab==='req')loadReceivedRequests();
+}
+
+async function loadFriendList(){
+    var c=document.getElementById('friend-list-container');
+    c.innerHTML='<div style="color:#7f8c8d;text-align:center;padding:20px;">加载中...</div>';
+    var res=await sb.from('friend_requests').select('id,sender_id,receiver_id').eq('status','accepted').or('sender_id.eq.'+currentUserId+',receiver_id.eq.'+currentUserId);
+    if(res.error||!res.data||res.data.length===0){c.innerHTML='<div style="color:#7f8c8d;text-align:center;padding:20px;">暂无好友</div>';return;}
+    var friendIds=res.data.map(function(r){return r.sender_id===currentUserId?r.receiver_id:r.sender_id;});
+    var profilesRes=await sb.from('user_saves').select('user_id,save_data').in('user_id',friendIds);
+    var pm={};
+    if(profilesRes.data)profilesRes.data.forEach(function(p){pm[p.user_id]=p.save_data&&p.save_data.nickname?p.save_data.nickname:'';});
+    var html='';
+    res.data.forEach(function(r,i){
+        var fid=friendIds[i],rid=r.id,gn=pm[fid]||'玩家',rm=(userProfile.friends_remark&&userProfile.friends_remark[fid])?userProfile.friends_remark[fid]:gn;
+        html+='<div class="friend-item"><div class="friend-info" onclick="openRemarkModal(\''+fid+'\',\''+rm.replace(/'/g,"\\'")+'\')"><div class="name">👤 '+rm+'</div>'+(rm!==gn?'<div class="game-name">游戏名: '+gn+'</div>':'')+'</div><div class="friend-actions"><button class="btn-primary" onclick="openRemarkModal(\''+fid+'\',\''+rm.replace(/'/g,"\\'")+'\')">备注</button><button class="btn-danger" onclick="deleteFriend(\''+rid+'\',\''+fid+'\')">删除</button></div></div>';
+    });
+    c.innerHTML=html;
+}
+
 function openRemarkModal(uid,cr){currentRemarkUid=uid;document.getElementById('remark-input').value=cr;openModalEl('remark-modal');}
-async function saveRemark(){var nr=document.getElementById('remark-input').value.trim();if(!nr){alert('备注不能为空');return;}if(!userProfile.friends_remark)userProfile.friends_remark={};userProfile.friends_remark[currentRemarkUid]=nr;await saveProfileToCloud();closeModalEl('remark-modal');loadFriendList();}
-async function deleteFriend(reqId,fid){if(!confirm('确定删除该好友吗？'))return;await sb.from('friend_requests').delete().eq('id',reqId);if(userProfile.friends_remark&&userProfile.friends_remark[fid]){delete userProfile.friends_remark[fid];await saveProfileToCloud();}loadFriendList();}
-async function loadReceivedRequests(){var c=document.getElementById('req-list-container');c.innerHTML='<div style="color:#7f8c8d;text-align:center;padding:20px;">加载中...</div>';var res=await sb.from('friend_requests').select('id,sender_id').eq('receiver_id',currentUserId).eq('status','pending');if(res.error||!res.data||res.data.length===0){c.innerHTML='<div style="color:#7f8c8d;text-align:center;padding:20px;">暂无新申请</div>';return;}var sids=res.data.map(function(r){return r.sender_id;});var pr=await sb.from('user_saves').select('user_id,save_data').in('user_id',sids);var pm={};if(pr.data)pr.data.forEach(function(p){pm[p.user_id]=p.save_data&&p.save_data.nickname?p.save_data.nickname:'玩家';});var html='';res.data.forEach(function(r){var n=pm[r.sender_id]||'玩家';html+='<div class="req-item"><div>👤 <span style="color:#f1c40f;">'+n+'</span></div><div class="req-actions"><button class="btn-accept" onclick="handleReq(\''+r.id+'\',\'accepted\',\''+r.sender_id+'\',\''+n.replace(/'/g,"\\'")+'\')">同意</button><button class="btn-reject" onclick="handleReq(\''+r.id+'\',\'rejected\')">拒绝</button></div></div>';});c.innerHTML=html;}
-async function loadPendingRequests(){if(!currentUserId)return;var res=await sb.from('friend_requests').select('id',{count:'exact'}).eq('receiver_id',currentUserId).eq('status','pending');var count=res.count||0;var nb=document.getElementById('req-badge-nav'),tb=document.getElementById('req-badge-tab');if(count>0){nb.innerText=count;nb.style.display='block';tb.innerText='('+count+')';tb.style.display='inline';}else{nb.style.display='none';tb.style.display='none';}}
-async function sendFriendRequest(){var uid=document.getElementById('add-uid-input').value.trim(),msg=document.getElementById('add-msg');msg.innerText='';msg.style.color='';if(!uid){msg.innerText='❌ 请输入UID';msg.style.color='#e74c3c';return;}if(uid===currentUserId){msg.innerText='❌ 不能添加自己';msg.style.color='#e74c3c';return;}if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(uid)){msg.innerText='❌ UID格式不正确';msg.style.color='#e74c3c';return;}msg.innerText='⏳ 发送中...';msg.style.color='#f1c40f';var res=await sb.from('friend_requests').insert({sender_id:currentUserId,receiver_id:uid});if(res.error){msg.innerText=res.error.code==='23505'?'⚠️ 已发送过或已是好友':'❌ '+res.error.message;msg.style.color='#e74c3c';}else{msg.innerText='✅ 申请已发送！';msg.style.color='#2ecc71';document.getElementById('add-uid-input').value='';}}
-async function handleReq(id,status,sid,sn){await sb.from('friend_requests').update({status:status}).eq('id',id);if(status==='accepted'&&sid&&sn){if(!userProfile.friends_remark)userProfile.friends_remark={};userProfile.friends_remark[sid]=sn;await saveProfileToCloud();}loadReceivedRequests();loadPendingRequests();if(status==='accepted')loadFriendList();}
+async function saveRemark(){
+    var nr=document.getElementById('remark-input').value.trim();
+    if(!nr){alert('备注不能为空');return;}
+    if(!userProfile.friends_remark)userProfile.friends_remark={};
+    userProfile.friends_remark[currentRemarkUid]=nr;
+    await saveProfileToCloud();closeModalEl('remark-modal');loadFriendList();
+}
+async function deleteFriend(reqId,fid){
+    if(!confirm('确定删除该好友吗？'))return;
+    await sb.from('friend_requests').delete().eq('id',reqId);
+    if(userProfile.friends_remark&&userProfile.friends_remark[fid]){delete userProfile.friends_remark[fid];await saveProfileToCloud();}
+    loadFriendList();
+}
+async function loadReceivedRequests(){
+    var c=document.getElementById('req-list-container');
+    c.innerHTML='<div style="color:#7f8c8d;text-align:center;padding:20px;">加载中...</div>';
+    var res=await sb.from('friend_requests').select('id,sender_id').eq('receiver_id',currentUserId).eq('status','pending');
+    if(res.error||!res.data||res.data.length===0){c.innerHTML='<div style="color:#7f8c8d;text-align:center;padding:20px;">暂无新申请</div>';return;}
+    var sids=res.data.map(function(r){return r.sender_id;});
+    var pr=await sb.from('user_saves').select('user_id,save_data').in('user_id',sids);
+    var pm={};if(pr.data)pr.data.forEach(function(p){pm[p.user_id]=p.save_data&&p.save_data.nickname?p.save_data.nickname:'玩家';});
+    var html='';
+    res.data.forEach(function(r){
+        var n=pm[r.sender_id]||'玩家';
+        html+='<div class="req-item"><div>👤 <span style="color:#f1c40f;">'+n+'</span></div><div class="req-actions"><button class="btn-accept" onclick="handleReq(\''+r.id+'\',\'accepted\',\''+r.sender_id+'\',\''+n.replace(/'/g,"\\'")+'\')">同意</button><button class="btn-reject" onclick="handleReq(\''+r.id+'\',\'rejected\')">拒绝</button></div></div>';
+    });
+    c.innerHTML=html;
+}
+async function loadPendingRequests(){
+    if(!currentUserId)return;
+    var res=await sb.from('friend_requests').select('id',{count:'exact'}).eq('receiver_id',currentUserId).eq('status','pending');
+    var count=res.count||0;
+    var nb=document.getElementById('req-badge-nav'),tb=document.getElementById('req-badge-tab');
+    if(count>0){nb.innerText=count;nb.style.display='block';tb.innerText='('+count+')';tb.style.display='inline';}
+    else{nb.style.display='none';tb.style.display='none';}
+}
+async function sendFriendRequest(){
+    var uid=document.getElementById('add-uid-input').value.trim(),msg=document.getElementById('add-msg');
+    msg.innerText='';msg.style.color='';
+    if(!uid){msg.innerText='❌ 请输入UID';msg.style.color='#e74c3c';return;}
+    if(uid===currentUserId){msg.innerText='❌ 不能添加自己';msg.style.color='#e74c3c';return;}
+    if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(uid)){msg.innerText='❌ UID格式不正确';msg.style.color='#e74c3c';return;}
+    msg.innerText='⏳ 发送中...';msg.style.color='#f1c40f';
+    var res=await sb.from('friend_requests').insert({sender_id:currentUserId,receiver_id:uid});
+    if(res.error){msg.innerText=res.error.code==='23505'?'⚠️ 已发送过或已是好友':'❌ '+res.error.message;msg.style.color='#e74c3c';}
+    else{msg.innerText='✅ 申请已发送！';msg.style.color='#2ecc71';document.getElementById('add-uid-input').value='';}
+}
+async function handleReq(id,status,sid,sn){
+    await sb.from('friend_requests').update({status:status}).eq('id',id);
+    if(status==='accepted'&&sid&&sn){if(!userProfile.friends_remark)userProfile.friends_remark={};userProfile.friends_remark[sid]=sn;await saveProfileToCloud();}
+    loadReceivedRequests();loadPendingRequests();if(status==='accepted')loadFriendList();
+}
 
-/* ========== Presence System (Real-time Online Status) ========== */
-var presenceChannel=null;
-var onlineUsers={};
+/* ========== 【修复】Broadcast Presence System (替代原Presence) ========== */
+var broadcastChannel=null;
+var onlineUsers={}; // {uid: {nickname, ts, online}}
+var ONLINE_TIMEOUT=8000; // 8秒超时判定离线
+var presenceTimer=null;
 
-function initPresence(){
-    if(presenceChannel)presenceChannel.unsubscribe();
-    presenceChannel=sb.channel('global-presence',{presence:{key:currentUserId}});
-    presenceChannel.on('presence',{event:'sync'},function(){
-        var state=presenceChannel.presenceState();
-        onlineUsers={};
-        for(var key in state){
-            if(state[key]&&state[key].length>0){
-                onlineUsers[key]=state[key][0];
-            }
+function initBroadcastPresence(){
+    if(broadcastChannel)broadcastChannel.unsubscribe();
+    
+    // 使用Broadcast频道实现毫秒级在线状态同步
+    broadcastChannel=sb.channel('global-broadcast-presence');
+    
+    // 接收其他用户的在线广播
+    broadcastChannel.on('broadcast',{event:'heartbeat'},function(payload){
+        if(payload.uid&&payload.uid!==currentUserId){
+            onlineUsers[payload.uid]={
+                nickname:payload.nickname||'玩家',
+                ts:Date.now(),
+                online:true
+            };
         }
     });
-    presenceChannel.on('presence',{event:'join'},function(payload){
-        onlineUsers[payload.key]=payload;
+    
+    // 接收用户离开广播
+    broadcastChannel.on('broadcast',{event:'leave'},function(payload){
+        if(payload.uid){
+            delete onlineUsers[payload.uid];
+        }
     });
-    presenceChannel.on('presence',{event:'leave'},function(payload){
-        delete onlineUsers[payload.key];
-    });
-    presenceChannel.subscribe(function(status){
+    
+    broadcastChannel.subscribe(function(status){
         if(status==='SUBSCRIBED'){
-            presenceChannel.track({user_id:currentUserId,nickname:getDisplayNickname(),ts:Date.now()});
+            // 立即发送一次心跳
+            sendHeartbeat();
+            // 每3秒发送心跳（比原Presence的默认间隔更快）
+            if(presenceTimer)clearInterval(presenceTimer);
+            presenceTimer=setInterval(sendHeartbeat,3000);
         }
     });
 }
 
-function isUserOnline(uid){return !!onlineUsers[uid];}
+function sendHeartbeat(){
+    if(!currentUserId||!broadcastChannel)return;
+    broadcastChannel.send({
+        type:'broadcast',
+        event:'heartbeat',
+        payload:{uid:currentUserId,nickname:getDisplayNickname(),ts:Date.now()}
+    });
+    // 同时更新数据库last_seen作为兜底
+    sb.from('user_saves').update({updated_at:new Date().toISOString()}).eq('user_id',currentUserId);
+}
 
-/* ========== 2v2 Room System ========== */
+function isUserOnline(uid){
+    if(!uid)return false;
+    var u=onlineUsers[uid];
+    if(!u)return false;
+    // 检查心跳是否超时
+    return (Date.now()-u.ts)<ONLINE_TIMEOUT;
+}
+
+// 页面关闭时发送离开信号
+window.addEventListener('beforeunload',function(){
+    if(broadcastChannel&&currentUserId){
+        broadcastChannel.send({type:'broadcast',event:'leave',payload:{uid:currentUserId}});
+    }
+});
+
+/* ========== 2v2 Room System (延迟优化版) ========== */
 var currentRoomId=null,roomChannel=null,mySeatIndex=0,is2v2Mode=false,pendingInviteRoomId=null;
 var seats=[],currentTurnSeat=0;
 var roomState={host_ready:false,guest_ready:false,host_hero:null,guest_hero:null,phase:'lobby'};
-var myRoomRole=''; // 'host' or 'guest'
+var myRoomRole='';
 
 async function open2v2Invite(){
     openModalEl('invite-modal');
     var list=document.getElementById('invite-friend-list');
-    list.innerHTML='<div style="text-align:center;padding:20px;color:#7f8c8d;">加载好友中...</div>';
-    var res=await sb.from('friend_requests').select('sender_id,receiver_id').eq('status','accepted').or('sender_id.eq.'+currentUserId+',receiver_id.eq.'+currentUserId);
-    if(!res.data||res.data.length===0){list.innerHTML='<div style="text-align:center;padding:20px;color:#e74c3c;">暂无好友</div>';return;}
-    var friendIds=res.data.map(function(r){return r.sender_id===currentUserId?r.receiver_id:r.sender_id;});
-    var profiles=await sb.from('user_saves').select('user_id,save_data').in('user_id',friendIds);
-    var pm={};
-    if(profiles.data)profiles.data.forEach(function(p){pm[p.user_id]=p.save_data&&p.save_data.nickname?p.save_data.nickname:'玩家';});
-    var html='';
-    friendIds.forEach(function(fid){
-        var name=pm[fid]||'玩家';
-        var on=isUserOnline(fid);
-        var statusClass=on?'on':'off';
-        var btnHtml=on?'<button class="btn-primary" style="padding:4px 12px;font-size:12px;" onclick="send2v2Invite(\''+fid+'\',\''+name.replace(/'/g,"\\'")+'\')">邀请</button>':'<button disabled style="padding:4px 12px;font-size:12px;background:#555;border:none;border-radius:4px;color:#999;">离线</button>';
-        html+='<div class="invite-item"><div><span class="online-dot '+statusClass+'"></span>'+name+'</div><div>'+btnHtml+'</div></div>';
-    });
-    list.innerHTML=html||'<div style="text-align:center;padding:20px;color:#7f8c8d;">无可用好友</div>';
+    list.innerHTML='<div style="text-align:center;padding:20px;color:#7f8c8d;">🔍 检测好友在线状态...</div>';
+    
+    // 【修复】打开邀请列表时主动发送ping，触发好友端响应
+    if(broadcastChannel){
+        broadcastChannel.send({
+            type:'broadcast',
+            event:'heartbeat',
+            payload:{uid:currentUserId,nickname:getDisplayNickname(),ts:Date.now(),ping:true}
+        });
+    }
+    
+    // 【修复】等待500ms让心跳响应到达后再渲染列表
+    setTimeout(async function(){
+        var res=await sb.from('friend_requests').select('sender_id,receiver_id').eq('status','accepted').or('sender_id.eq.'+currentUserId+',receiver_id.eq.'+currentUserId);
+        if(!res.data||res.data.length===0){list.innerHTML='<div style="text-align:center;padding:20px;color:#e74c3c;">暂无好友</div>';return;}
+        var friendIds=res.data.map(function(r){return r.sender_id===currentUserId?r.receiver_id:r.sender_id;});
+        var profiles=await sb.from('user_saves').select('user_id,save_data,updated_at').in('user_id',friendIds);
+        var pm={};
+        if(profiles.data)profiles.data.forEach(function(p){
+            pm[p.user_id]={
+                nickname:p.save_data&&p.save_data.nickname?p.save_data.nickname:'玩家',
+                updatedAt:p.updated_at
+            };
+        });
+        var html='';
+        friendIds.forEach(function(fid){
+            var info=pm[fid]||{nickname:'玩家',updatedAt:null};
+            var name=info.nickname;
+            var on=isUserOnline(fid);
+            
+            // 【修复】双重验证：Broadcast在线 OR 数据库最近8秒内活跃
+            if(!on&&info.updatedAt){
+                var lastSeen=new Date(info.updatedAt).getTime();
+                if(Date.now()-lastSeen<ONLINE_TIMEOUT)on=true;
+            }
+            
+            var statusClass=on?'on':'off';
+            var statusText=on?'在线':'离线';
+            var btnHtml=on
+                ?'<button class="btn-primary" style="padding:4px 12px;font-size:12px;" onclick="send2v2Invite(\''+fid+'\',\''+name.replace(/'/g,"\\'")+'\')">邀请</button>'
+                :'<button disabled style="padding:4px 12px;font-size:12px;background:#555;border:none;border-radius:4px;color:#999;">离线</button>';
+            html+='<div class="invite-item"><div><span class="online-dot '+statusClass+'"></span>'+name+' <span style="font-size:10px;color:'+(on?'#2ecc71':'#7f8c8d')+';">'+statusText+'</span></div><div>'+btnHtml+'</div></div>';
+        });
+        list.innerHTML=html||'<div style="text-align:center;padding:20px;color:#7f8c8d;">无可用好友</div>';
+    },500);
 }
 
 async function send2v2Invite(friendId,friendName){
@@ -373,14 +762,12 @@ async function send2v2Invite(friendId,friendName){
     var room=await sb.from('game_rooms').insert({host_id:currentUserId,guest_id:friendId,status:'lobby',game_data:{phase:'lobby',host_ready:false,guest_ready:false}}).select().single();
     if(room.error){alert('创建房间失败:'+room.error.message);return;}
     currentRoomId=room.data.id;
-    mySeatIndex=0;
-    myRoomRole='host';
+    mySeatIndex=0;myRoomRole='host';
     closeModalEl('invite-modal');
     enterRoomLobby();
     subscribeToRoom(currentRoomId);
 }
 
-// Listen for invites via Realtime on game_rooms table
 function startInviteListener(){
     if(!currentUserId)return;
     try{
@@ -392,7 +779,6 @@ function startInviteListener(){
                 }
             })
             .on('postgres_changes',{event:'UPDATE',schema:'public',table:'game_rooms',filter:'guest_id=eq.'+currentUserId},function(payload){
-                // If host cancelled or room changed while we have pending invite
                 if(payload.new&&payload.new.status==='cancelled'&&pendingInviteRoomId===payload.new.id){
                     pendingInviteRoomId=null;
                     closeModalEl('receive-invite-modal');
@@ -413,8 +799,7 @@ async function accept2v2Invite(){
     if(!pendingInviteRoomId)return;
     closeModalEl('receive-invite-modal');
     currentRoomId=pendingInviteRoomId;
-    mySeatIndex=1;
-    myRoomRole='guest';
+    mySeatIndex=1;myRoomRole='guest';
     pendingInviteRoomId=null;
     enterRoomLobby();
     subscribeToRoom(currentRoomId);
@@ -422,9 +807,7 @@ async function accept2v2Invite(){
 
 function reject2v2Invite(){
     closeModalEl('receive-invite-modal');
-    if(pendingInviteRoomId){
-        sb.from('game_rooms').update({status:'cancelled'}).eq('id',pendingInviteRoomId);
-    }
+    if(pendingInviteRoomId){sb.from('game_rooms').update({status:'cancelled'}).eq('id',pendingInviteRoomId);}
     pendingInviteRoomId=null;
 }
 
@@ -435,7 +818,6 @@ function subscribeToRoom(roomId){
             handleRoomUpdate(payload.new);
         })
         .subscribe();
-    // Fetch initial state
     sb.from('game_rooms').select('*').eq('id',roomId).single().then(function(res){
         if(res.data)handleRoomUpdate(res.data);
     });
@@ -445,41 +827,27 @@ async function handleRoomUpdate(room){
     if(!room)return;
     var gd=room.game_data||{};
     roomState=gd;
-
-    if(room.status==='cancelled'){
-        alert('对方已取消房间');
-        leaveRoom();
-        return;
-    }
-
+    if(room.status==='cancelled'){alert('对方已取消房间');leaveRoom();return;}
     if(room.status==='lobby'||gd.phase==='lobby'){
-        // Show/update room lobby
-        if(document.getElementById('room-lobby-modal').style.display!=='flex'){
-            enterRoomLobby();
-        }
+        if(document.getElementById('room-lobby-modal').style.display!=='flex')enterRoomLobby();
         updateRoomLobbyUI(room);
     }else if(gd.phase==='selecting'){
-        // Both ready, enter hero select
         closeModalEl('room-lobby-modal');
-        if(document.getElementById('heroes-page').style.display!=='flex'&&document.getElementById('battle-page').style.display!=='flex'){
-            enterHeroSelect('rank');
-        }
+        if(document.getElementById('heroes-page').style.display!=='flex'&&document.getElementById('battle-page').style.display!=='flex')enterHeroSelect('rank');
     }else if(gd.phase==='playing'){
         closeModalEl('room-lobby-modal');
         if(document.getElementById('battle-page').style.display!=='flex'){
             document.getElementById('heroes-page').classList.remove('active');
             document.getElementById('battle-page').classList.add('active');
         }
-        if(gd.seats){syncGameState(gd);}
+        if(gd.seats)syncGameState(gd);
     }else if(room.status==='finished'){
-        alert(gd.result||'游戏结束');
-        leaveRoom();
+        alert(gd.result||'游戏结束');leaveRoom();
     }
 }
 
 function updateRoomLobbyUI(room){
     var gd=room.game_data||{};
-    // Fetch names
     Promise.all([
         sb.from('user_saves').select('save_data').eq('user_id',room.host_id).single(),
         sb.from('user_saves').select('save_data').eq('user_id',room.guest_id).single()
@@ -488,108 +856,53 @@ function updateRoomLobbyUI(room){
         var guestName=results[1].data&&results[1].data.save_data&&results[1].data.save_data.nickname?results[1].data.save_data.nickname:'队员';
         document.getElementById('room-host-name').innerText=hostName;
         document.getElementById('room-guest-name').innerText=guestName;
-
-        var hostReady=!!gd.host_ready;
-        var guestReady=!!gd.guest_ready;
-        var hostOnline=isUserOnline(room.host_id);
-        var guestOnline=isUserOnline(room.guest_id);
-
-        var hsEl=document.getElementById('room-host-status');
-        var gsEl=document.getElementById('room-guest-status');
-
+        var hostReady=!!gd.host_ready,guestReady=!!gd.guest_ready;
+        var hostOnline=isUserOnline(room.host_id),guestOnline=isUserOnline(room.guest_id);
+        var hsEl=document.getElementById('room-host-status'),gsEl=document.getElementById('room-guest-status');
         if(hostReady){hsEl.innerText='✅ 已准备';hsEl.className='role-status ready';}
         else if(!hostOnline){hsEl.innerText='🔴 离线';hsEl.className='role-status offline';}
         else{hsEl.innerText='⏳ 等待中';hsEl.className='role-status waiting';}
-
         if(guestReady){gsEl.innerText='✅ 已准备';gsEl.className='role-status ready';}
         else if(!guestOnline){gsEl.innerText='🔴 离线';gsEl.className='role-status offline';}
         else{gsEl.innerText='⏳ 等待中';gsEl.className='role-status waiting';}
-
-        // Render action buttons based on role
-        var actionsDiv=document.getElementById('room-lobby-actions');
-        actionsDiv.innerHTML='';
-        var msgEl=document.getElementById('room-lobby-msg');
-        msgEl.innerText='';
-
+        var actionsDiv=document.getElementById('room-lobby-actions');actionsDiv.innerHTML='';
+        var msgEl=document.getElementById('room-lobby-msg');msgEl.innerText='';
         if(myRoomRole==='guest'){
             if(!guestReady){
-                var btn=document.createElement('button');
-                btn.className='btn-confirm';
-                btn.innerText='✅ 准备';
-                btn.onclick=function(){
-                    var newGd=Object.assign({},gd,{guest_ready:true});
-                    sb.from('game_rooms').update({game_data:newGd}).eq('id',currentRoomId);
-                };
+                var btn=document.createElement('button');btn.className='btn-confirm';btn.innerText='✅ 准备';
+                btn.onclick=function(){var newGd=Object.assign({},gd,{guest_ready:true});sb.from('game_rooms').update({game_data:newGd}).eq('id',currentRoomId);};
                 actionsDiv.appendChild(btn);
-            }else{
-                msgEl.innerText='✅ 你已准备，等待队长开始...';
-                msgEl.style.color='#2ecc71';
-            }
-            var leaveBtn=document.createElement('button');
-            leaveBtn.className='btn-danger';
-            leaveBtn.innerText='离开房间';
-            leaveBtn.onclick=function(){leaveRoom();};
-            actionsDiv.appendChild(leaveBtn);
+            }else{msgEl.innerText='✅ 你已准备，等待队长开始...';msgEl.style.color='#2ecc71';}
+            var leaveBtn=document.createElement('button');leaveBtn.className='btn-danger';leaveBtn.innerText='离开房间';
+            leaveBtn.onclick=function(){leaveRoom();};actionsDiv.appendChild(leaveBtn);
         }else if(myRoomRole==='host'){
             if(hostReady&&guestReady){
-                var startBtn=document.createElement('button');
-                startBtn.className='btn-confirm';
-                startBtn.innerText='⚔️ 选择武将并开始';
-                startBtn.onclick=function(){
-                    var newGd=Object.assign({},gd,{phase:'selecting'});
-                    sb.from('game_rooms').update({game_data:newGd,status:'selecting'}).eq('id',currentRoomId);
-                };
+                var startBtn=document.createElement('button');startBtn.className='btn-confirm';startBtn.innerText='⚔️ 选择武将并开始';
+                startBtn.onclick=function(){var newGd=Object.assign({},gd,{phase:'selecting'});sb.from('game_rooms').update({game_data:newGd,status:'selecting'}).eq('id',currentRoomId);};
                 actionsDiv.appendChild(startBtn);
             }else if(!hostReady){
-                var readyBtn=document.createElement('button');
-                readyBtn.className='btn-primary';
-                readyBtn.innerText='✅ 准备';
-                readyBtn.onclick=function(){
-                    var newGd=Object.assign({},gd,{host_ready:true});
-                    sb.from('game_rooms').update({game_data:newGd}).eq('id',currentRoomId);
-                };
+                var readyBtn=document.createElement('button');readyBtn.className='btn-primary';readyBtn.innerText='✅ 准备';
+                readyBtn.onclick=function(){var newGd=Object.assign({},gd,{host_ready:true});sb.from('game_rooms').update({game_data:newGd}).eq('id',currentRoomId);};
                 actionsDiv.appendChild(readyBtn);
-            }else{
-                msgEl.innerText='⏳ 等待队员准备...';
-                msgEl.style.color='#e67e22';
-            }
-            var cancelBtn=document.createElement('button');
-            cancelBtn.className='btn-danger';
-            cancelBtn.innerText='取消房间';
-            cancelBtn.onclick=function(){
-                sb.from('game_rooms').update({status:'cancelled'}).eq('id',currentRoomId);
-                leaveRoom();
-            };
+            }else{msgEl.innerText='⏳ 等待队员准备...';msgEl.style.color='#e67e22';}
+            var cancelBtn=document.createElement('button');cancelBtn.className='btn-danger';cancelBtn.innerText='取消房间';
+            cancelBtn.onclick=function(){sb.from('game_rooms').update({status:'cancelled'}).eq('id',currentRoomId);leaveRoom();};
             actionsDiv.appendChild(cancelBtn);
         }
     });
 }
 
-function enterRoomLobby(){
-    closeModalEl('invite-modal');
-    closeModalEl('receive-invite-modal');
-    openModalEl('room-lobby-modal');
-}
-
+function enterRoomLobby(){closeModalEl('invite-modal');closeModalEl('receive-invite-modal');openModalEl('room-lobby-modal');}
 function leaveRoom(){
     closeModalEl('room-lobby-modal');
     if(roomChannel){sb.removeChannel(roomChannel);roomChannel=null;}
-    currentRoomId=null;
-    is2v2Mode=false;
-    myRoomRole='';
+    currentRoomId=null;is2v2Mode=false;myRoomRole='';
     roomState={host_ready:false,guest_ready:false,host_hero:null,guest_hero:null,phase:'lobby'};
     document.getElementById('heroes-page').classList.remove('active');
     document.getElementById('battle-page').classList.remove('active');
     document.getElementById('lobby-page').classList.add('active');
 }
-
-function syncGameState(data){
-    if(data.seats)seats=data.seats;
-    if(data.turn!==undefined)currentTurnSeat=data.turn;
-    if(data.turnNum)gameState.turnNumber=data.turnNum;
-    render2v2Battle();
-}
-
+function syncGameState(data){if(data.seats)seats=data.seats;if(data.turn!==undefined)currentTurnSeat=data.turn;if(data.turnNum)gameState.turnNumber=data.turnNum;render2v2Battle();}
 function sync2v2State(){
     if(!currentRoomId)return;
     sb.from('game_rooms').update({game_data:Object.assign({},roomState,{seats:seats,turn:currentTurnSeat,turnNum:gameState.turnNumber}),status:'playing'}).eq('id',currentRoomId);
@@ -615,7 +928,7 @@ function ensureLocalHeroes(){LOCAL_HEROES.forEach(function(lh){var found=false;f
 function applyHeroOverrides(heroes){var ov={'default':{name:'初始英雄',title:'梦的开始',hp:5,maxHp:5,faction:''},'wangsheng':{title:'奇怪的鸭子',faction:'面'},'manhongyi':{title:'糖王大人',faction:'群'},'liyucheng':{title:'彦祖',faction:'面'},'xuzongwei':{title:'帝国之主',faction:'马'},'yuchengxiao':{title:'一条鱼',faction:'面',hp:4,maxHp:4},'xuyifeng':{title:'小啊小蜜蜂呀',faction:'面',hp:4,maxHp:4},'sunliangcheng':{title:'小小的猫娘',faction:'面',hp:5,maxHp:5}};heroes.forEach(function(h){if(ov[h.id]){if(ov[h.id].name)h.name=ov[h.id].name;if(ov[h.id].title)h.title=ov[h.id].title;if(ov[h.id].hp!==undefined){h.hp=ov[h.id].hp;h.maxHp=ov[h.id].maxHp;}if(ov[h.id].faction!==undefined)h.faction=ov[h.id].faction;}});return heroes;}
 var CARD_DESC={'damage':'对目标造成1点普通伤害。每回合限出1张(有武器除外)。','fire_damage':'对目标造成1点火焰伤害。对【藤甲】伤害+1。','thunder_damage':'对目标造成1点雷电伤害。','dodge':'被动使用。抵消一张【杀】的伤害。','heal':'回复1点体力。濒死时也可自救。','wine':'出牌阶段使用，下次【杀】伤害+1。濒死可自救回1血。每回合限1张。','dismantle':'弃置目标一张手牌、装备或判定区延时锦囊。','snatch':'获得目标一张手牌、装备或收回自己判定区延时锦囊。','duel':'与目标决斗，轮流打出【杀】，未打出者受1点伤害。','nanman':'全场除你外需打出【杀】，否则受1伤。【藤甲】免疫。','wanjian':'全场除你外需打出【闪】，否则受1伤。【藤甲】免疫。','taoyuan':'全场所有角色各回复1点体力。','harvest':'亮出两张牌，按顺序每人挑选一张。','wuzhong':'出牌阶段使用，摸两张牌。','wuxie':'在锦囊牌生效前使用，抵消该锦囊的效果。','lightning':'延时锦囊。置于判定区，下回合判定：♠2~9受3点雷电伤害，否则传给下家。','indulgence':'延时锦囊。目标下回合判定：非♥跳过出牌阶段。','supply':'延时锦囊。目标下回合判定：非♣跳过摸牌阶段。','weapon_zhuge':'武器·射程1。出【杀】无次数限制。','weapon_qinggang':'武器·射程2。【杀】无视目标防具。','weapon_hanbing':'武器·射程2。【杀】命中可改为弃目标两张牌。','weapon_guding':'武器·射程2。对无手牌角色出【杀】伤害+1。','weapon_zhangba':'武器·射程3。可将两张手牌当【杀】使用。','weapon_guanshi':'武器·射程3。【杀】被闪避时可弃两牌强制命中。','weapon_qinglong':'武器·射程3。【杀】被闪避时可追加一张【杀】。','weapon_zhuque':'武器·射程4。可将普通【杀】当【火杀】使用。','armor_renwang':'防具。黑色【杀】对你无效。','armor_bagua':'防具。需出【闪】时可判定：红色视为出【闪】。','armor_tengjia':'防具。普通【杀】和【南蛮】【万箭】对你无效；受火焰伤害+1。'};
 var FALLBACK_CARD_EFFECTS={kill:{name:'杀',class:'kill',effect:'damage'},fire_kill:{name:'火杀',class:'fire_kill',effect:'fire_damage'},thunder_kill:{name:'雷杀',class:'thunder_kill',effect:'thunder_damage'},dodge:{name:'闪',class:'dodge',effect:'dodge'},peach:{name:'桃',class:'peach',effect:'heal'},wine:{name:'酒',class:'wine',effect:'wine'},dismantle:{name:'过河拆桥',class:'dismantle',effect:'dismantle'},snatch:{name:'顺手牵羊',class:'snatch',effect:'snatch'},duel:{name:'决斗',class:'duel',effect:'duel'},lightning:{name:'闪电',class:'lightning',effect:'lightning'},indulgence:{name:'乐不思蜀',class:'indulgence',effect:'indulgence'},supply:{name:'兵粮寸断',class:'supply',effect:'supply'},nanman:{name:'南蛮入侵',class:'nanman',effect:'nanman'},wanjian:{name:'万箭齐发',class:'wanjian',effect:'wanjian'},taoyuan:{name:'桃园结义',class:'taoyuan',effect:'taoyuan'},harvest:{name:'五谷丰登',class:'harvest',effect:'harvest'},wuzhongshengyou:{name:'无中生有',class:'wuzhongshengyou',effect:'wuzhong'},wuxiekeji:{name:'无懈可击',class:'wuxiekeji',effect:'wuxie'},zhugeliannu:{name:'诸葛连弩',class:'zhugeliannu',effect:'weapon_zhuge',range:1},qinggang:{name:'青釭剑',class:'qinggang',effect:'weapon_qinggang',range:2},hanbing:{name:'寒冰剑',class:'hanbing',effect:'weapon_hanbing',range:2},guding:{name:'古锭刀',class:'guding',effect:'weapon_guding',range:2},zhangba:{name:'丈八蛇矛',class:'zhangba',effect:'weapon_zhangba',range:3},guanshi:{name:'贯石斧',class:'guanshi',effect:'weapon_guanshi',range:3},qinglong:{name:'青龙偃月刀',class:'qinglong',effect:'weapon_qinglong',range:3},zhuque:{name:'朱雀羽扇',class:'zhuque',effect:'weapon_zhuque',range:4},renwangdun:{name:'仁王盾',class:'renwangdun',effect:'armor_renwang'},baguazhen:{name:'八卦阵',class:'baguazhen',effect:'armor_bagua'},tengjia:{name:'藤甲',class:'tengjia',effect:'armor_tengjia'}};
-async function loadGameData(){var le=document.getElementById('log');if(le)le.innerHTML='⏳ 正在连接服务器...';try{var r=await fetch(SUPABASE_URL+'/rest/v1/game_config?id=eq.1&select=*',{headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+SUPABASE_ANON_KEY}});if(!r.ok)throw new Error('HTTP '+r.status);var d=await r.json();if(!d.length)throw new Error('未找到配置');HEROES=d[0].heroes_data||[];cardEffects=d[0].cards_data||{};}catch(e){console.warn('服务端数据加载失败:',e.message);HEROES=[];cardEffects=FALLBACK_CARD_EFFECTS;}ensureLocalHeroes();applyHeroOverrides(HEROES);if(!cardEffects.wuzhongshengyou)cardEffects.wuzhongshengyou={name:'无中生有',class:'wuzhongshengyou',effect:'wuzhong'};if(!cardEffects.wuxiekeji)cardEffects.wuxiekeji={name:'无懈可击',class:'wuxiekeji',effect:'wuxie'};initGameUI();startInviteListener();}
+async function loadGameData(){var le=document.getElementById('log');if(le)le.innerHTML='⏳ 正在连接服务器...';try{var r=await fetch(SUPABASE_URL+'/rest/v1/game_config?id=eq.1&select=*',{headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+SUPABASE_ANON_KEY}});if(!r.ok)throw new Error('HTTP '+r.status);var d=await r.json();if(!d.length)throw new Error('未找到配置');HEROES=d[0].heroes_data||[];cardEffects=d[0].cards_data||{};}catch(e){console.warn('服务端数据加载失败:',e.message);HEROES=[];cardEffects=FALLBACK_CARD_EFFECTS;}ensureLocalHeroes();applyHeroOverrides(HEROES);if(!cardEffects.wuzhongshengyou)cardEffects.wuzhongshengyou={name:'无中生有',class:'wuzhongshengyou',effect:'wuzhong'};if(!cardEffects.wuxiekeji)cardEffects.wuxiekeji={name:'无懈可击',class:'wuxiekeji',effect:'wuxie'};initGameUI();}
 function initGameUI(){if(HEROES.length>0){selectedHeroId=HEROES[0].id;currentHero=HEROES[0];}renderHeroesGrid();var le=document.getElementById('log');if(le)le.innerHTML='--- 欢迎来到战场 ---';}
 window.addEventListener('DOMContentLoaded',loadGameData);
 function enterHeroSelect(m){currentGameMode=m;document.getElementById('lobby-page').classList.remove('active');document.getElementById('heroes-page').classList.add('active');document.getElementById('heroes-page-title').innerText=m==='rank'?'2v2 · 选择武将':'主线 · 选择武将';document.getElementById('heroes-footer').style.display='flex';var cb=document.getElementById('btn-confirm-game');cb.innerText=m==='rank'?'确认选择':'开始主线';cb.className='btn-confirm-game '+(m==='rank'?'btn-confirm-rank':'btn-confirm-match');renderHeroesGrid();}
@@ -625,31 +938,16 @@ function confirmStartGame(){
     if(!currentHero){alert('请先选择一个武将！');return;}
     if(!isHeroUnlocked(currentHero.id)){alert('该武将尚未解锁！需要达到 LV.'+HERO_UNLOCK_LEVELS[currentHero.id]);return;}
     if(currentGameMode==='rank'&&currentRoomId){
-        // Save hero choice
         var heroKey=mySeatIndex===0?'host_hero':'guest_hero';
-        var newGd=Object.assign({},roomState);
-        newGd[heroKey]=currentHero.id;
+        var newGd=Object.assign({},roomState);newGd[heroKey]=currentHero.id;
         sb.from('game_rooms').update({game_data:newGd}).eq('id',currentRoomId).then(function(){
-            // Check if both heroes selected
             sb.from('game_rooms').select('game_data').eq('id',currentRoomId).single().then(function(res){
                 var gd=res.data?res.data.game_data:{};
-                if(gd.host_hero&&gd.guest_hero){
-                    // Both selected, host starts game
-                    if(mySeatIndex===0){
-                        init2v2Battle(gd.host_hero,gd.guest_hero);
-                    }else{
-                        alert('已选择武将！等待队长开始游戏...');
-                    }
-                }else{
-                    alert('已选择武将！等待对方选择...');
-                }
+                if(gd.host_hero&&gd.guest_hero){if(mySeatIndex===0)init2v2Battle(gd.host_hero,gd.guest_hero);else alert('已选择武将！等待队长开始游戏...');}
+                else alert('已选择武将！等待对方选择...');
             });
         });
-    }else{
-        document.getElementById('heroes-page').classList.remove('active');
-        document.getElementById('battle-page').classList.add('active');
-        initBattle();
-    }
+    }else{document.getElementById('heroes-page').classList.remove('active');document.getElementById('battle-page').classList.add('active');initBattle();}
 }
 function backToLobby(){if(gameOver||confirm('确定要退出当前对局吗？')){gameOver=false;closeModal();leaveRoom();updateLobbyRankUI();}}
 function selectHero(id){if(!isHeroUnlocked(id)){var r=HERO_UNLOCK_LEVELS[id]||1;var h=HEROES.find(function(x){return x.id===id;});alert('🔒 '+(h?h.name:id)+' 尚未解锁！\n需要 LV.'+r+'（当前 LV.'+userProfile.level+'）');return;}selectedHeroId=id;currentHero=HEROES.find(function(h){return h.id===id;});renderHeroesGrid();}
@@ -669,7 +967,6 @@ function hideTooltip(){document.getElementById('card-tooltip').style.display='no
 function showModal(title,desc,buttons){var m=document.getElementById('response-modal');document.getElementById('modal-title').innerText=title;document.getElementById('modal-desc').innerText=desc;var bc=document.getElementById('modal-buttons');bc.innerHTML='';document.getElementById('modal-card-grid').innerHTML='';if(buttons)buttons.forEach(function(b){var btn=document.createElement('button');btn.className='modal-btn';btn.style.background=b.color||'#7f8c8d';btn.innerText=b.text;btn.onclick=b.action;bc.appendChild(btn);});m.style.display='flex';}
 function closeModal(){document.getElementById('response-modal').style.display='none';}
 function checkWin(){if(gameOver)return true;if(is2v2Mode)return false;if(gameState.enemyHp<=0){gameOver=true;log('🎉 胜利！');saveRankToCloud(true);setTimeout(function(){alert('🎉 恭喜获胜！');backToLobby();},1000);return true;}if(gameState.myHp<=0){gameOver=true;log('💀 败北...');saveRankToCloud(false);setTimeout(function(){alert('💀 遗憾落败...');backToLobby();},1000);return true;}return false;}
-
 function triggerSkill_Chongsheng_AI(){if(gameState.hasUsedEnemyChongsheng)return;gameState.hasUsedEnemyChongsheng=true;var ph=HEROES.find(function(h){return h.id===gameState.heroId;});var ps=ph?ph.skills.filter(function(sk){return sk.name!=='重生'&&sk.name!=='超载模式';}):[];var banName='无';if(ps.length>0){var targetSkill=ps[Math.floor(Math.random()*ps.length)];banName=targetSkill.name;gameState.playerDisabledSkills.push(banName);}log('🔥 敌人【重生】发动！封禁你的 ['+banName+']！');gameState.enemyMaxHp-=1;if(gameState.enemyHp>gameState.enemyMaxHp)gameState.enemyHp=gameState.enemyMaxHp;gameState.enemyHp=gameState.enemyMaxHp;gameState.enemyHasXianshangZuozhe=false;gameState.enemyHasChaozaiMoshi=true;log('🔥 敌人失去[线上作者]，获得[超载模式]！');renderBattle();}
 function triggerSkill_Chongsheng(){if(gameState.hasUsedChongsheng)return;gameState.hasUsedChongsheng=true;var eh=HEROES.find(function(h){return h.id===gameState.enemyHeroId;});var es=eh?eh.skills.filter(function(sk){return sk.name!=='重生'&&sk.name!=='超载模式';}):[];var btns=es.map(function(sk){return{text:'封禁: '+sk.name,color:'#8e44ad',action:function(){gameState.enemyDisabledSkills.push(sk.name);log('🚫 【重生】封禁 ['+sk.name+']！');gameState.myMaxHp-=1;if(gameState.myHp>gameState.myMaxHp)gameState.myHp=gameState.myMaxHp;gameState.myHp=gameState.myMaxHp;gameState.hasXianshangZuozhe=false;gameState.hasChaozaiMoshi=true;log('🔥 失去[线上作者]，获得[超载模式]！');closeModal();renderBattle();}};});btns.push({text:'放弃',color:'#7f8c8d',action:function(){closeModal();checkWin();}});showModal('🔥 限定技：重生','濒死！封禁敌方1技能，减1体力上限回满血，切换形态。',btns);}
 function triggerSkill_Huamao(){if(gameState.hasUsedHuamao)return;if(gameState.myMaxHp<=1)return;gameState.hasUsedHuamao=true;gameState.myMaxHp-=1;gameState.myHp=gameState.myMaxHp;gameState.hasBanwei=false;gameState.hasMaoniang=true;log('🐱 【化猫】发动！失去体力上限，回满血，变身猫娘！');renderBattle();}
