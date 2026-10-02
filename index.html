@@ -15,20 +15,15 @@ body {
     height: 100vh; width: 100vw; 
     overflow: hidden; user-select: none; 
     position: relative;
-    /* 防止iOS橡皮筋效果导致布局错乱 */
     overscroll-behavior: none;
-    /* 安全区域适配 */
     padding-top: env(safe-area-inset-top);
     padding-bottom: env(safe-area-inset-bottom);
 }
-
-/* 登录弹窗移动端优化 */
 #auth-modal {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0,0,0,.9);
     display: flex; justify-content: center; align-items: center;
     z-index: 99999;
-    /* 允许弹窗内滚动，防止键盘遮挡 */
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
 }
@@ -44,10 +39,9 @@ body {
 .auth-box input {
     width: 100%; padding: 14px; margin-bottom: 14px;
     border: 1px solid #7f8c8d; border-radius: 8px;
-    font-size: 16px !important; /* iOS防止自动缩放 */
+    font-size: 16px !important; 
     background: #1a1a1a; color: #fff; outline: none;
     box-sizing: border-box;
-    /* 移动端触摸优化 */
     touch-action: manipulation;
 }
 .auth-box button {
@@ -57,22 +51,16 @@ body {
     touch-action: manipulation;
 }
 .auth-box button:active { opacity: 0.8; transform: scale(0.98); }
-
-/* 全局按钮移动端优化 */
 button, .card, .hero-card, .nav-item, .tab {
     touch-action: manipulation;
     -webkit-user-select: none;
 }
 .big-btn:active { transform: translateY(5px) scale(0.98) !important; }
-
-/* 手牌区域移动端横向滚动优化 */
 #hand-area {
     -webkit-overflow-scrolling: touch;
     scroll-snap-type: x proximity;
 }
 .card { scroll-snap-align: center; }
-
-/* 原有样式保持不变... */
 .rank-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:bold;margin-left:6px;background:linear-gradient(135deg,#f39c12,#e67e22);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.3)}
 .rank-change{font-size:12px;margin-left:8px;animation:fadeIn 1s ease}
 .rank-up{color:#2ecc71}.rank-down{color:#e74c3c}
@@ -277,14 +265,8 @@ button.action-btn{padding:6px 14px;font-size:12px;border:none;border-radius:5px;
 <div id="uid-modal"><div class="modal-box"><h3>🆔 我的 UID</h3><div class="uid-display"><span id="uid-text">加载中...</span><button class="btn-copy" onclick="copyUID()">📋 复制</button></div><div class="modal-msg" id="uid-msg" style="color:#2ecc71;"></div><div class="modal-btns"><button class="btn-cancel" onclick="closeModalEl('uid-modal')">关闭</button></div></div></div>
 <div id="remark-modal"><div class="modal-box"><h3>📝 修改备注</h3><input type="text" id="remark-input" placeholder="输入新备注" maxlength="12"><div class="modal-btns"><button class="btn-cancel" onclick="closeModalEl('remark-modal')">取消</button><button class="btn-confirm" onclick="saveRemark()">保存</button></div></div></div>
 <div id="friends-modal"><div class="modal-box" style="width:min(380px,90vw);"><h3>🤝 好友系统</h3><div class="tabs"><div class="tab active" id="tab-list" onclick="switchFriendTab('list')">好友列表</div><div class="tab" id="tab-req" onclick="switchFriendTab('req')">好友申请 <span id="req-badge-tab" style="color:#e74c3c;display:none;">(0)</span></div><div class="tab" id="tab-add" onclick="switchFriendTab('add')">添加好友</div></div><div id="panel-list"><div class="friend-list" id="friend-list-container"><div style="color:#7f8c8d;text-align:center;padding:20px;">加载中...</div></div></div><div id="panel-req" style="display:none;"><div class="friend-list" id="req-list-container"><div style="color:#7f8c8d;text-align:center;padding:20px;">加载中...</div></div></div><div id="panel-add" style="display:none;"><input type="text" id="add-uid-input" placeholder="输入对方的完整 UID" style="font-size:13px;text-align:left;"><div class="modal-btns"><button class="btn-primary" onclick="sendFriendRequest()">发送申请</button></div><div class="modal-msg" id="add-msg"></div></div><div class="modal-btns" style="margin-top:20px;"><button class="btn-cancel" onclick="closeModalEl('friends-modal')">关闭</button></div></div></div>
-
-<!-- 2v2 邀请弹窗 -->
 <div id="invite-modal"><div class="modal-box" style="width:min(400px,90vw);"><h3>⚔️ 2v2 邀请好友</h3><p style="font-size:12px;color:#aaa;margin-bottom:10px;">实时在线检测中...</p><div class="invite-list" id="invite-friend-list"><div style="text-align:center;padding:20px;color:#7f8c8d;">加载中...</div></div><div class="modal-btns" style="margin-top:15px;"><button class="btn-cancel" onclick="closeModalEl('invite-modal')">取消</button></div></div></div>
-
-<!-- 2v2 收到邀请弹窗 -->
 <div id="receive-invite-modal" style="z-index:99999;"><div class="modal-box"><h3 style="color:#f1c40f;">📩 收到2v2邀请</h3><p id="invite-from-name" style="font-size:16px;margin:20px 0;">好友邀请你进行2v2对战！</p><div class="modal-btns"><button class="btn-cancel" onclick="reject2v2Invite()">拒绝</button><button class="btn-confirm" onclick="accept2v2Invite()">接受</button></div></div></div>
-
-<!-- 2v2 房间大厅 -->
 <div id="room-lobby-modal" style="z-index:99998;"><div class="modal-box" style="width:min(420px,90vw);">
     <h3>⚔️ 2v2 房间</h3>
     <div class="room-lobby-content">
@@ -308,7 +290,6 @@ button.action-btn{padding:6px 14px;font-size:12px;border:none;border-radius:5px;
     <div class="room-lobby-actions" id="room-lobby-actions"></div>
     <div class="modal-msg" id="room-lobby-msg"></div>
 </div></div>
-
 <div id="card-tooltip"><div class="tt-name"></div><div class="tt-type"></div><div class="tt-desc"></div><div class="tt-wangsheng"></div></div>
 <div id="mulligan-panel"><div class="mulligan-title">🃏 起手调度</div><div class="mulligan-desc">查看下方手牌，选择保留或全部重摸<br>(之后还会再摸2张进入回合)</div><div class="mulligan-btns"><button class="btn-mulligan-keep" onclick="mulliganKeep()">✅ 保留</button><button class="btn-mulligan-redraw" onclick="mulliganRedraw()">🔄 换一批</button></div></div>
 <div id="game-wrapper" style="display:none;width:100%;height:100%;">
@@ -334,15 +315,8 @@ var SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 
 // 【修复】移动端Session持久化配置优化
 var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{
-    auth:{
-        persistSession:true,
-        autoRefreshToken:true,
-        detectSessionInUrl:true,
-        storageKey:'bread-kill-auth'
-    },
-    realtime:{
-        params:{eventsPerSecond:10}
-    }
+    auth:{ persistSession:true, autoRefreshToken:true, detectSessionInUrl:true, storageKey:'bread-kill-auth' },
+    realtime:{ params:{eventsPerSecond:10} }
 });
 
 var currentUserId=null,authModal=document.getElementById('auth-modal'),gameWrapper=document.getElementById('game-wrapper'),authMsgEl=document.getElementById('auth-msg');
@@ -353,7 +327,6 @@ function openModalEl(id){document.getElementById(id).style.display='flex';}
 function closeModalEl(id){document.getElementById(id).style.display='none';}
 function showAuthMsg(t,tp){authMsgEl.textContent=t;authMsgEl.className='auth-msg '+tp;}
 
-// 【修复】移动端登录 - 增加错误处理和重试机制
 async function handleLogin(){
     var e=document.getElementById('email').value.trim(),p=document.getElementById('password').value;
     if(!e||!p)return showAuthMsg('请填写邮箱和密码','error');
@@ -362,11 +335,7 @@ async function handleLogin(){
         var r=await sb.auth.signInWithPassword({email:e,password:p});
         if(r.error)return showAuthMsg('❌ '+r.error.message,'error');
         showAuthMsg('✅ 登录成功！','success');
-        // 【修复】确保session写入后再隐藏弹窗
-        setTimeout(function(){
-            authModal.style.display='none';
-            gameWrapper.style.display='block';
-        },300);
+        setTimeout(function(){ authModal.style.display='none'; gameWrapper.style.display='block'; },300);
     }catch(err){
         console.error('Login error:',err);
         showAuthMsg('❌ 网络错误，请检查网络后重试','error');
@@ -408,15 +377,10 @@ async function handleLogout(){
 
 // 【修复】移动端键盘弹出时自动调整布局
 if(window.visualViewport){
-    window.visualViewport.addEventListener('resize',function(){
-        document.body.style.height=window.visualViewport.height+'px';
-    });
-    window.visualViewport.addEventListener('scroll',function(){
-        window.scrollTo(0,0);
-    });
+    window.visualViewport.addEventListener('resize',function(){ document.body.style.height=window.visualViewport.height+'px'; });
+    window.visualViewport.addEventListener('scroll',function(){ window.scrollTo(0,0); });
 }
 
-// 【修复】Auth状态变更 - 增加初始Session检查
 sb.auth.onAuthStateChange(function(ev,ses){
     console.log('Auth state:',ev,ses?ses.user?.id:'null');
     if(ev==='SIGNED_IN'&&ses){
@@ -429,7 +393,7 @@ sb.auth.onAuthStateChange(function(ev,ses){
         document.getElementById('lobby-player-name').innerText=ep;
         loadSaveFromCloud().then(function(){
             loadPendingRequests();
-            initBroadcastPresence(); // 【修复】使用Broadcast替代Presence
+            initBroadcastPresence(); 
             startInviteListener();
             try{
                 sb.channel('friends-'+currentUserId).on('postgres_changes',{event:'*',schema:'public',table:'friend_requests',filter:'receiver_id=eq.'+currentUserId},function(){loadPendingRequests();}).subscribe();
@@ -446,17 +410,12 @@ sb.auth.onAuthStateChange(function(ev,ses){
     }
 });
 
-// 【修复】页面加载时主动检查已有Session（解决移动端刷新后白屏）
+// 【修复】页面加载时主动检查已有Session
 (async function checkInitialSession(){
     try{
         var {data:{session}}=await sb.auth.getSession();
-        if(session&&session.user){
-            console.log('✅ 检测到已有Session，自动恢复登录');
-            // onAuthStateChange会自动触发SIGNED_IN
-        }
-    }catch(e){
-        console.warn('Session check failed:',e);
-    }
+        if(session&&session.user){ console.log('✅ 检测到已有Session，自动恢复登录'); }
+    }catch(e){ console.warn('Session check failed:',e); }
 })();
 
 async function saveProfileToCloud(){
@@ -526,7 +485,6 @@ function copyUID(){
         document.getElementById('uid-msg').innerText='✅ 已复制！';
         setTimeout(function(){document.getElementById('uid-msg').innerText='';},2000);
     }).catch(function(){
-        // 【修复】移动端clipboard API可能不可用，降级方案
         var ta=document.createElement('textarea');
         ta.value=currentUserId;ta.style.position='fixed';ta.style.left='-9999px';
         document.body.appendChild(ta);ta.select();
@@ -634,41 +592,26 @@ async function handleReq(id,status,sid,sn){
     loadReceivedRequests();loadPendingRequests();if(status==='accepted')loadFriendList();
 }
 
-/* ========== 【修复】Broadcast Presence System (替代原Presence) ========== */
+/* ========== 【修复】Broadcast Presence System ========== */
 var broadcastChannel=null;
-var onlineUsers={}; // {uid: {nickname, ts, online}}
-var ONLINE_TIMEOUT=8000; // 8秒超时判定离线
+var onlineUsers={}; 
+var ONLINE_TIMEOUT=8000; 
 var presenceTimer=null;
 
 function initBroadcastPresence(){
     if(broadcastChannel)broadcastChannel.unsubscribe();
-    
-    // 使用Broadcast频道实现毫秒级在线状态同步
     broadcastChannel=sb.channel('global-broadcast-presence');
-    
-    // 接收其他用户的在线广播
     broadcastChannel.on('broadcast',{event:'heartbeat'},function(payload){
         if(payload.uid&&payload.uid!==currentUserId){
-            onlineUsers[payload.uid]={
-                nickname:payload.nickname||'玩家',
-                ts:Date.now(),
-                online:true
-            };
+            onlineUsers[payload.uid]={ nickname:payload.nickname||'玩家', ts:Date.now(), online:true };
         }
     });
-    
-    // 接收用户离开广播
     broadcastChannel.on('broadcast',{event:'leave'},function(payload){
-        if(payload.uid){
-            delete onlineUsers[payload.uid];
-        }
+        if(payload.uid){ delete onlineUsers[payload.uid]; }
     });
-    
     broadcastChannel.subscribe(function(status){
         if(status==='SUBSCRIBED'){
-            // 立即发送一次心跳
             sendHeartbeat();
-            // 每3秒发送心跳（比原Presence的默认间隔更快）
             if(presenceTimer)clearInterval(presenceTimer);
             presenceTimer=setInterval(sendHeartbeat,3000);
         }
@@ -677,12 +620,7 @@ function initBroadcastPresence(){
 
 function sendHeartbeat(){
     if(!currentUserId||!broadcastChannel)return;
-    broadcastChannel.send({
-        type:'broadcast',
-        event:'heartbeat',
-        payload:{uid:currentUserId,nickname:getDisplayNickname(),ts:Date.now()}
-    });
-    // 同时更新数据库last_seen作为兜底
+    broadcastChannel.send({ type:'broadcast', event:'heartbeat', payload:{uid:currentUserId,nickname:getDisplayNickname(),ts:Date.now()} });
     sb.from('user_saves').update({updated_at:new Date().toISOString()}).eq('user_id',currentUserId);
 }
 
@@ -690,18 +628,16 @@ function isUserOnline(uid){
     if(!uid)return false;
     var u=onlineUsers[uid];
     if(!u)return false;
-    // 检查心跳是否超时
     return (Date.now()-u.ts)<ONLINE_TIMEOUT;
 }
 
-// 页面关闭时发送离开信号
 window.addEventListener('beforeunload',function(){
     if(broadcastChannel&&currentUserId){
         broadcastChannel.send({type:'broadcast',event:'leave',payload:{uid:currentUserId}});
     }
 });
 
-/* ========== 2v2 Room System (延迟优化版) ========== */
+/* ========== 2v2 Room System ========== */
 var currentRoomId=null,roomChannel=null,mySeatIndex=0,is2v2Mode=false,pendingInviteRoomId=null;
 var seats=[],currentTurnSeat=0;
 var roomState={host_ready:false,guest_ready:false,host_hero:null,guest_hero:null,phase:'lobby'};
@@ -712,13 +648,9 @@ async function open2v2Invite(){
     var list=document.getElementById('invite-friend-list');
     list.innerHTML='<div style="text-align:center;padding:20px;color:#7f8c8d;">🔍 检测好友在线状态...</div>';
     
-    // 【修复】打开邀请列表时主动发送ping，触发好友端响应
+    // 【修复】主动发ping唤醒好友心跳
     if(broadcastChannel){
-        broadcastChannel.send({
-            type:'broadcast',
-            event:'heartbeat',
-            payload:{uid:currentUserId,nickname:getDisplayNickname(),ts:Date.now(),ping:true}
-        });
+        broadcastChannel.send({ type:'broadcast', event:'heartbeat', payload:{uid:currentUserId,nickname:getDisplayNickname(),ts:Date.now(),ping:true} });
     }
     
     // 【修复】等待500ms让心跳响应到达后再渲染列表
@@ -729,10 +661,7 @@ async function open2v2Invite(){
         var profiles=await sb.from('user_saves').select('user_id,save_data,updated_at').in('user_id',friendIds);
         var pm={};
         if(profiles.data)profiles.data.forEach(function(p){
-            pm[p.user_id]={
-                nickname:p.save_data&&p.save_data.nickname?p.save_data.nickname:'玩家',
-                updatedAt:p.updated_at
-            };
+            pm[p.user_id]={ nickname:p.save_data&&p.save_data.nickname?p.save_data.nickname:'玩家', updatedAt:p.updated_at };
         });
         var html='';
         friendIds.forEach(function(fid){
@@ -976,10 +905,85 @@ function processJudgments(who,cb){var js=who==='me'?gameState.myJudgments:gameSt
 function getRankValue(r){if(r==='A')return 1;if(r==='J')return 11;if(r==='Q')return 12;if(r==='K')return 13;return parseInt(r);}
 function triggerProtagonistSkill(tn){if(gameState.heroId==='default'&&hasXinshouBaohu())triggerXinshouBaohu('受到'+tn);}
 
-/* ========== Render ========== */
-function renderBattle(){if(!currentHero||is2v2Mode)return;var eh=HEROES.find(function(h){return h.id===gameState.enemyHeroId;});document.getElementById('enemy-portrait').innerText=eh?eh.portrait:'👹';document.getElementById('enemy-hero-name').innerText=eh?eh.name:'敌人';document.getElementById('enemy-hp').innerText='❤️ '+gameState.enemyHp+'/'+gameState.enemyMaxHp;document.getElementById('enemy-hand-count').innerText=gameState.enemyHand.length;var ew=document.getElementById('enemy-weapon');ew.innerHTML='';if(gameState.enemyEquipment.weapon)ew.innerHTML='<span class="equipment-tag">'+gameState.enemyEquipment.weapon.name+'</span>';var ea=document.getElementById('enemy-armor');ea.innerHTML='';if(gameState.enemyEquipment.armor)ea.innerHTML='<span class="equipment-tag armor-tag">'+gameState.enemyEquipment.armor.name+'</span>';var ej=document.getElementById('enemy-judgments');ej.innerHTML='';gameState.enemyJudgments.forEach(function(j){var d=document.createElement('span');d.className='judgment-card '+j.type;d.innerText=j.card.name;ej.appendChild(d);});document.getElementById('my-portrait').innerText=currentHero.portrait||'🧑';var pn=getDisplayNickname();document.getElementById('my-hero-name').innerText=pn+' ('+currentHero.name+')';document.getElementById('my-hp').innerText='❤️ '+gameState.myHp+'/'+gameState.myMaxHp;document.getElementById('my-armor').innerText=gameState.myArmor>0?'🛡️'+gameState.myArmor:'';document.getElementById('hand-limit').innerText=getHandLimit();document.getElementById('turn-number').innerText=gameState.turnNumber;document.getElementById('draw-pile-count').innerText=drawPile.length;document.getElementById('discard-pile-count').innerText=discardPile.length;var mw=document.getElementById('my-weapon');mw.innerHTML='';if(gameState.myEquipment.weapon)mw.innerHTML='<span class="equipment-tag">'+gameState.myEquipment.weapon.name+'</span>';var ma=document.getElementById('my-armor-eq');ma.innerHTML='';if(gameState.myEquipment.armor)ma.innerHTML='<span class="equipment-tag armor-tag">'+gameState.myEquipment.armor.name+'</span>';var mj=document.getElementById('my-judgments');mj.innerHTML='';gameState.myJudgments.forEach(function(j){var d=document.createElement('span');d.className='judgment-card '+j.type;d.innerText=j.card.name;mj.appendChild(d);});var pe=document.getElementById('passive-skills-display');if(gameState.heroId==='yuchengxiao')pe.innerHTML='🐟如鱼得水 | 🎀手办<span class="shouban-badge">'+gameState.myShouban+'</span> | 🎵初音 | 📡电线杆';else if(gameState.heroId==='wangsheng')pe.innerHTML='🧠无谋 | 👻武魂 | 🦴狂骨 | ⚔️连斩 | 🔄反客为主';else if(gameState.heroId==='manhongyi')pe.innerHTML='🍯糖浆 | 🍬糖衣 | 🗡️背刺 | 🚫禁桃';else if(gameState.heroId==='liyucheng')pe.innerHTML='😎彦祖 | 🔥豪情 | 🎁好施 | 🗡️藏刀';else if(gameState.heroId==='xuzongwei')pe.innerHTML='👑皇威 | ❤️归心 | 🚫放逐 | 🌟盛哉 | ⚔️当先';else if(gameState.heroId==='xuyifeng'){var sk='';if(gameState.hasXianshangZuozhe)sk+='📝线上作者 | ';sk+='⚽足球上将 | ';if(!gameState.hasUsedChongsheng)sk+='🔥重生(限定) | ';if(gameState.hasChaozaiMoshi)sk+='⚡超载模式';pe.innerHTML=sk;}else if(gameState.heroId==='sunliangcheng'){var sk='';if(gameState.hasBanwei)sk+='👑班威 | ';if(!gameState.hasUsedHuamao)sk+='🐱化猫(限定) | ';if(gameState.hasMaoniang)sk+='🎀猫娘('+gameState.hasUsedMaoniangCount+'/2)';pe.innerHTML=sk;}else pe.innerHTML='⚡英姿 | 💨飒爽'+(hasXinshouBaohu()?' | 🛡️新手保护':'');var bar=document.getElementById('skills-bar');bar.innerHTML='';if(gameState.heroId==='yuchengxiao'){var b1=document.createElement('button');b1.className='skill-btn';b1.style.background='#ff6b81';b1.innerText='🎀手办('+gameState.myShouban+')';b1.disabled=!gameState.isMyTurn||gameState.phase!=='play'||gameState.myShouban<=0;b1.onclick=useSkill_Shouban;bar.appendChild(b1);}if(gameState.heroId==='manhongyi'){var bt=document.createElement('button');bt.className='skill-btn';bt.style.background='#f39c12';bt.innerText='🍬糖衣';bt.disabled=!gameState.isMyTurn||gameState.phase!=='play';bt.onclick=useSkill_Tangyi;bar.appendChild(bt);}if(gameState.heroId==='liyucheng'){var bh=document.createElement('button');bh.className='skill-btn';bh.style.background='#e74c3c';bh.innerText='🔥豪情';bh.disabled=!gameState.isMyTurn||gameState.phase!=='play'||gameState.myHand.length<2;bh.onclick=useSkill_Haoqing;bar.appendChild(bh);var bhs=document.createElement('button');bhs.className='skill-btn';bhs.style.background='#2ecc71';bhs.innerText='🎁好施';bhs.disabled=!gameState.isMyTurn||gameState.phase!=='play'||gameState.hasUsedHaoshi;bhs.onclick=useSkill_Haoshi;bar.appendChild(bhs);var bc=document.createElement('button');bc.className='skill-btn';bc.style.background='#8e44ad';bc.innerText='🗡️藏刀';bc.disabled=!gameState.isMyTurn||gameState.phase!=='play'||gameState.hasUsedCangdao;bc.onclick=useSkill_Cangdao;bar.appendChild(bc);}if(gameState.heroId==='default'&&userProfile.level<2){var bd=document.createElement('button');bd.className='skill-btn';bd.style.background='#27ae60';bd.innerText='⚡英姿';bd.disabled=!gameState.isMyTurn||gameState.phase!=='play'||gameState.hasUsedSkill;bd.onclick=useSkill_Default;bar.appendChild(bd);}if(gameState.myEquipment.weapon&&gameState.myEquipment.weapon.effect==='weapon_zhangba'){var zb=document.createElement('button');zb.className='skill-btn';zb.style.background='#e67e22';zb.innerText='🐍丈八';zb.disabled=!gameState.isMyTurn||gameState.phase!=='play'||gameState.myHand.length<2;zb.onclick=useSkill_Zhangba;bar.appendChild(zb);}
-if(gameState.heroId==='sunliangcheng'){if(gameState.hasBanwei){var bbw=document.createElement('button');bbw.className='skill-btn';bbw.style.background='#d35400';bbw.innerText='👑班威';bbw.disabled=!gameState.isMyTurn||gameState.phase!=='play'||gameState.hasUsedBanwei;bbw.onclick=useSkill_Banwei;bar.appendChild(bbw);}if(gameState.hasMaoniang){var bmn=document.createElement('button');bmn.className='skill-btn';bmn.style.background='#e84393';bmn.innerText='🎀猫娘('+gameState.hasUsedMaoniangCount+'/2)';bmn.disabled=!gameState.isMyTurn||gameState.phase!=='play'||gameState.myHp<=1||gameState.hasUsedMaoniangCount>=2;bmn.onclick=useSkill_Maoniang;bar.appendChild(bmn);}}
-var ha=document.getElementById('hand-area');ha.innerHTML='';ha.className=gameState.phase==='discard'?'discard-mode':'';gameState.myHand.forEach(function(card,i){var el=document.createElement('div');el.className='card '+(card['class']||'')+(gameState.selectedIndices.indexOf(i)!==-1?' selected':'');var sc=getSuitColor(card.suit);el.innerHTML='<div class="card-top '+sc+'">'+card.rank+'<br>'+card.suit+'</div><div class="card-center">'+card.name+'</div><div class="card-bottom '+sc+'">'+card.suit+card.rank+'</div>';el.onclick=function(){selectCard(i);};el.onmouseenter=function(e){showCardTooltip(card,e);};el.onmouseleave=function(){hideTooltip();};ha.appendChild(el);});var isD=gameState.phase==='discard',isM=(isD||gameState.phase==='haoqing_select'||gameState.phase==='tangyi_select'||gameState.phase==='zhangba_select');document.getElementById('btn-play').style.display=isD?'none':'inline-block';document.getElementById('btn-end').style.display=isD?'none':'inline-block';document.getElementById('btn-discard-confirm').style.display=isD?'inline-block':'none';document.getElementById('discard-tip').style.display=isD?'block':'none';if(isD){var hl=getHandLimit(),ex=gameState.myHand.length-hl;document.getElementById('discard-tip').innerText='请选择'+ex+'张弃置 (已选:'+gameState.selectedIndices.length+'/'+ex+')';}if(gameState.phase==='haoqing_select'){document.getElementById('discard-tip').style.display='block';document.getElementById('discard-tip').innerText='【豪情】选2张 (已选:'+gameState.selectedIndices.length+'/2)';if(gameState.selectedIndices.length===2){var hb=document.createElement('button');hb.className='action-btn';hb.style.background='#e74c3c';hb.innerText='确认豪情';hb.onclick=confirmHaoqingCards;document.getElementById('main-action-bar').appendChild(hb);}}if(gameState.phase==='tangyi_select'){document.getElementById('discard-tip').style.display='block';document.getElementById('discard-tip').innerText='【糖衣】选1张 (已选:'+gameState.selectedIndices.length+'/1)';if(gameState.selectedIndices.length===1){var tb=document.createElement('button');tb.className='action-btn';tb.style.background='#f39c12';tb.innerText='确认糖衣';tb.onclick=confirmTangyiCards;document.getElementById('main-action-bar').appendChild(tb);}}if(gameState.phase==='zhangba_select'){document.getElementById('discard-tip').style.display='block';document.getElementById('discard-tip').innerText='【丈八】选2张 (已选:'+gameState.selectedIndices.length+'/2)';if(gameState.selectedIndices.length===2){var zb2=document.createElement('button');zb2.className='action-btn';zb2.style.background='#e67e22';zb2.innerText='确认丈八';zb2.onclick=confirmZhangbaCards;document.getElementById('main-action-bar').appendChild(zb2);}}}
+/* ========== Render (修复按钮堆积) ========== */
+function renderBattle(){
+    if(!currentHero||is2v2Mode)return;
+    var eh=HEROES.find(function(h){return h.id===gameState.enemyHeroId;});
+    document.getElementById('enemy-portrait').innerText=eh?eh.portrait:'👹';
+    document.getElementById('enemy-hero-name').innerText=eh?eh.name:'敌人';
+    document.getElementById('enemy-hp').innerText='❤️ '+gameState.enemyHp+'/'+gameState.enemyMaxHp;
+    document.getElementById('enemy-hand-count').innerText=gameState.enemyHand.length;
+    var ew=document.getElementById('enemy-weapon');ew.innerHTML='';if(gameState.enemyEquipment.weapon)ew.innerHTML='<span class="equipment-tag">'+gameState.enemyEquipment.weapon.name+'</span>';
+    var ea=document.getElementById('enemy-armor');ea.innerHTML='';if(gameState.enemyEquipment.armor)ea.innerHTML='<span class="equipment-tag armor-tag">'+gameState.enemyEquipment.armor.name+'</span>';
+    var ej=document.getElementById('enemy-judgments');ej.innerHTML='';gameState.enemyJudgments.forEach(function(j){var d=document.createElement('span');d.className='judgment-card '+j.type;d.innerText=j.card.name;ej.appendChild(d);});
+    document.getElementById('my-portrait').innerText=currentHero.portrait||'🧑';
+    var pn=getDisplayNickname();document.getElementById('my-hero-name').innerText=pn+' ('+currentHero.name+')';
+    document.getElementById('my-hp').innerText='❤️ '+gameState.myHp+'/'+gameState.myMaxHp;
+    document.getElementById('my-armor').innerText=gameState.myArmor>0?'🛡️'+gameState.myArmor:'';
+    document.getElementById('hand-limit').innerText=getHandLimit();
+    document.getElementById('turn-number').innerText=gameState.turnNumber;
+    document.getElementById('draw-pile-count').innerText=drawPile.length;
+    document.getElementById('discard-pile-count').innerText=discardPile.length;
+    var mw=document.getElementById('my-weapon');mw.innerHTML='';if(gameState.myEquipment.weapon)mw.innerHTML='<span class="equipment-tag">'+gameState.myEquipment.weapon.name+'</span>';
+    var ma=document.getElementById('my-armor-eq');ma.innerHTML='';if(gameState.myEquipment.armor)ma.innerHTML='<span class="equipment-tag armor-tag">'+gameState.myEquipment.armor.name+'</span>';
+    var mj=document.getElementById('my-judgments');mj.innerHTML='';gameState.myJudgments.forEach(function(j){var d=document.createElement('span');d.className='judgment-card '+j.type;d.innerText=j.card.name;mj.appendChild(d);});
+    var pe=document.getElementById('passive-skills-display');
+    if(gameState.heroId==='yuchengxiao')pe.innerHTML='🐟如鱼得水 | 🎀手办<span class="shouban-badge">'+gameState.myShouban+'</span> | 🎵初音 | 📡电线杆';
+    else if(gameState.heroId==='wangsheng')pe.innerHTML='🧠无谋 | 👻武魂 | 🦴狂骨 | ⚔️连斩 | 🔄反客为主';
+    else if(gameState.heroId==='manhongyi')pe.innerHTML='🍯糖浆 | 🍬糖衣 | 🗡️背刺 | 🚫禁桃';
+    else if(gameState.heroId==='liyucheng')pe.innerHTML='😎彦祖 | 🔥豪情 | 🎁好施 | 🗡️藏刀';
+    else if(gameState.heroId==='xuzongwei')pe.innerHTML='👑皇威 | ❤️归心 | 🚫放逐 | 🌟盛哉 | ⚔️当先';
+    else if(gameState.heroId==='xuyifeng'){var sk='';if(gameState.hasXianshangZuozhe)sk+='📝线上作者 | ';sk+='⚽足球上将 | ';if(!gameState.hasUsedChongsheng)sk+='🔥重生(限定) | ';if(gameState.hasChaozaiMoshi)sk+='⚡超载模式';pe.innerHTML=sk;}
+    else if(gameState.heroId==='sunliangcheng'){var sk='';if(gameState.hasBanwei)sk+='👑班威 | ';if(!gameState.hasUsedHuamao)sk+='🐱化猫(限定) | ';if(gameState.hasMaoniang)sk+='🎀猫娘('+gameState.hasUsedMaoniangCount+'/2)';pe.innerHTML=sk;}
+    else pe.innerHTML='⚡英姿 | 💨飒爽'+(hasXinshouBaohu()?' | 🛡️新手保护':'');
+    
+    var bar=document.getElementById('skills-bar');bar.innerHTML='';
+    if(gameState.heroId==='yuchengxiao'){var b1=document.createElement('button');b1.className='skill-btn';b1.style.background='#ff6b81';b1.innerText='🎀手办('+gameState.myShouban+')';b1.disabled=!gameState.isMyTurn||gameState.phase!=='play'||gameState.myShouban<=0;b1.onclick=useSkill_Shouban;bar.appendChild(b1);}
+    if(gameState.heroId==='manhongyi'){var bt=document.createElement('button');bt.className='skill-btn';bt.style.background='#f39c12';bt.innerText='🍬糖衣';bt.disabled=!gameState.isMyTurn||gameState.phase!=='play';bt.onclick=useSkill_Tangyi;bar.appendChild(bt);}
+    if(gameState.heroId==='liyucheng'){var bh=document.createElement('button');bh.className='skill-btn';bh.style.background='#e74c3c';bh.innerText='🔥豪情';bh.disabled=!gameState.isMyTurn||gameState.phase!=='play'||gameState.myHand.length<2;bh.onclick=useSkill_Haoqing;bar.appendChild(bh);var bhs=document.createElement('button');bhs.className='skill-btn';bhs.style.background='#2ecc71';bhs.innerText='🎁好施';bhs.disabled=!gameState.isMyTurn||gameState.phase!=='play'||gameState.hasUsedHaoshi;bhs.onclick=useSkill_Haoshi;bar.appendChild(bhs);var bc=document.createElement('button');bc.className='skill-btn';bc.style.background='#8e44ad';bc.innerText='🗡️藏刀';bc.disabled=!gameState.isMyTurn||gameState.phase!=='play'||gameState.hasUsedCangdao;bc.onclick=useSkill_Cangdao;bar.appendChild(bc);}
+    if(gameState.heroId==='default'&&userProfile.level<2){var bd=document.createElement('button');bd.className='skill-btn';bd.style.background='#27ae60';bd.innerText='⚡英姿';bd.disabled=!gameState.isMyTurn||gameState.phase!=='play'||gameState.hasUsedSkill;bd.onclick=useSkill_Default;bar.appendChild(bd);}
+    if(gameState.myEquipment.weapon&&gameState.myEquipment.weapon.effect==='weapon_zhangba'){var zb=document.createElement('button');zb.className='skill-btn';zb.style.background='#e67e22';zb.innerText='🐍丈八';zb.disabled=!gameState.isMyTurn||gameState.phase!=='play'||gameState.myHand.length<2;zb.onclick=useSkill_Zhangba;bar.appendChild(zb);}
+    if(gameState.heroId==='sunliangcheng'){if(gameState.hasBanwei){var bbw=document.createElement('button');bbw.className='skill-btn';bbw.style.background='#d35400';bbw.innerText='👑班威';bbw.disabled=!gameState.isMyTurn||gameState.phase!=='play'||gameState.hasUsedBanwei;bbw.onclick=useSkill_Banwei;bar.appendChild(bbw);}if(gameState.hasMaoniang){var bmn=document.createElement('button');bmn.className='skill-btn';bmn.style.background='#e84393';bmn.innerText='🎀猫娘('+gameState.hasUsedMaoniangCount+'/2)';bmn.disabled=!gameState.isMyTurn||gameState.phase!=='play'||gameState.myHp<=1||gameState.hasUsedMaoniangCount>=2;bmn.onclick=useSkill_Maoniang;bar.appendChild(bmn);}}
+    
+    // 【修复】动态按钮堆积 - 先清除旧的动态按钮再创建
+    var actionBar = document.getElementById('main-action-bar');
+    var dynamicBtns = actionBar.querySelectorAll('.action-btn:not(#btn-play):not(#btn-end):not(#btn-discard-confirm)');
+    dynamicBtns.forEach(function(b) { b.remove(); });
+
+    var ha=document.getElementById('hand-area');ha.innerHTML='';ha.className=gameState.phase==='discard'?'discard-mode':'';
+    gameState.myHand.forEach(function(card,i){var el=document.createElement('div');el.className='card '+(card['class']||'')+(gameState.selectedIndices.indexOf(i)!==-1?' selected':'');var sc=getSuitColor(card.suit);el.innerHTML='<div class="card-top '+sc+'">'+card.rank+'<br>'+card.suit+'</div><div class="card-center">'+card.name+'</div><div class="card-bottom '+sc+'">'+card.suit+card.rank+'</div>';el.onclick=function(){selectCard(i);};el.onmouseenter=function(e){showCardTooltip(card,e);};el.onmouseleave=function(){hideTooltip();};ha.appendChild(el);});
+    
+    var isD=gameState.phase==='discard',isM=(isD||gameState.phase==='haoqing_select'||gameState.phase==='tangyi_select'||gameState.phase==='zhangba_select');
+    document.getElementById('btn-play').style.display=isD?'none':'inline-block';
+    document.getElementById('btn-end').style.display=isD?'none':'inline-block';
+    document.getElementById('btn-discard-confirm').style.display=isD?'inline-block':'none';
+    document.getElementById('discard-tip').style.display=isD?'block':'none';
+    
+    if(isD){var hl=getHandLimit(),ex=gameState.myHand.length-hl;document.getElementById('discard-tip').innerText='请选择'+ex+'张弃置 (已选:'+gameState.selectedIndices.length+'/'+ex+')';}
+    
+    // 【修复】动态按钮现在不会堆积了
+    if(gameState.phase==='haoqing_select'){
+        document.getElementById('discard-tip').style.display='block';
+        document.getElementById('discard-tip').innerText='【豪情】选2张 (已选:'+gameState.selectedIndices.length+'/2)';
+        if(gameState.selectedIndices.length===2){
+            var hb=document.createElement('button');hb.className='action-btn';hb.style.background='#e74c3c';hb.innerText='确认豪情';hb.onclick=confirmHaoqingCards;actionBar.appendChild(hb);
+        }
+    }
+    if(gameState.phase==='tangyi_select'){
+        document.getElementById('discard-tip').style.display='block';
+        document.getElementById('discard-tip').innerText='【糖衣】选1张 (已选:'+gameState.selectedIndices.length+'/1)';
+        if(gameState.selectedIndices.length===1){
+            var tb=document.createElement('button');tb.className='action-btn';tb.style.background='#f39c12';tb.innerText='确认糖衣';tb.onclick=confirmTangyiCards;actionBar.appendChild(tb);
+        }
+    }
+    if(gameState.phase==='zhangba_select'){
+        document.getElementById('discard-tip').style.display='block';
+        document.getElementById('discard-tip').innerText='【丈八】选2张 (已选:'+gameState.selectedIndices.length+'/2)';
+        if(gameState.selectedIndices.length===2){
+            var zb2=document.createElement('button');zb2.className='action-btn';zb2.style.background='#e67e22';zb2.innerText='确认丈八';zb2.onclick=confirmZhangbaCards;actionBar.appendChild(zb2);
+        }
+    }
+}
 function showCardTooltip(card,e){var tt=document.getElementById('card-tooltip');tt.querySelector('.tt-name').innerText=card.name;tt.querySelector('.tt-type').innerText=(card.suit||'')+(card.rank||'')+' '+(isWeapon(card)?'武器':isArmor(card)?'防具':'');tt.querySelector('.tt-desc').innerText=CARD_DESC[card.effect]||'';var ws=tt.querySelector('.tt-wangsheng');if(gameState.heroId==='wangsheng'&&isTrickCard(card)&&card.effect!=='wuxie'){ws.style.display='block';ws.innerText='🧠【无谋】可弃杀/掉血发动，或当【杀】使用';}else ws.style.display='none';tt.style.display='block';var x=e.clientX+15,y=e.clientY-10;if(x+270>window.innerWidth)x=e.clientX-275;if(y+200>window.innerHeight)y=window.innerHeight-210;tt.style.left=x+'px';tt.style.top=y+'px';}
 
 /* ========== Wuxiekeji System ========== */
@@ -1019,10 +1023,66 @@ function continueAfterXinshou(){processJudgments('me',function(){if(checkWin())r
 /* ========== Trick Effects ========== */
 function executeTrickEffect(tc){if(tc.effect==='wuzhong'){log('📜 '+cardDesc(tc)+'！');checkWuxiekeji('enemy','【无中生有】',function(neg){if(neg){gameState.isProcessing=false;renderBattle();return;}drawCard('me',2,false);log('📜 摸两张。');gameState.isProcessing=false;renderBattle();checkWin();});return;}if(tc.effect==='dismantle'){log('🌉 '+cardDesc(tc)+'！');checkWuxiekeji('enemy','【过河拆桥】',function(neg){if(neg){gameState.isProcessing=false;renderBattle();return;}showDismantleModal();});return;}if(tc.effect==='snatch'){log('🐑 '+cardDesc(tc)+'！');checkWuxiekeji('enemy','【顺手牵羊】',function(neg){if(neg){gameState.isProcessing=false;renderBattle();return;}showSnatchModal();});return;}if(tc.effect==='duel'){log('⚔️ '+cardDesc(tc)+'！');checkWuxiekeji('enemy','【决斗】',function(neg){if(neg){gameState.isProcessing=false;renderBattle();return;}startDuel('me','enemy');});return;}if(tc.effect==='nanman'){log('🐘 '+cardDesc(tc)+'！');enemyRespondNanman();return;}if(tc.effect==='wanjian'){log('🏹 '+cardDesc(tc)+'！');enemyRespondWanjian();return;}if(tc.effect==='taoyuan'){log('🌸 '+cardDesc(tc)+'！');if(gameState.myHp<gameState.myMaxHp){gameState.myHp++;log(' → 你+1血');}if(gameState.enemyHp<gameState.enemyMaxHp){gameState.enemyHp++;log(' → 敌人+1血');}gameState.isProcessing=false;renderBattle();checkWin();return;}if(tc.effect==='harvest'){log('🌾 '+cardDesc(tc)+'！');showHarvestModal();return;}if(tc.effect==='lightning'){if(gameState.myJudgments.some(function(j){return j.type==='lightning';})||gameState.enemyJudgments.some(function(j){return j.type==='lightning';})){alert('场上已有闪电！');gameState.myHand.push(tc);gameState.isProcessing=false;renderBattle();return;}gameState.myJudgments.push({type:'lightning',card:tc});log('⚡ 放置闪电！');gameState.isProcessing=false;renderBattle();checkWin();return;}if(tc.effect==='indulgence'){if(gameState.enemyJudgments.some(function(j){return j.type==='indulgence';})){alert('敌人已有乐！');gameState.myHand.push(tc);gameState.isProcessing=false;renderBattle();return;}checkWuxiekeji('enemy','【乐不思蜀】',function(neg){if(neg){gameState.isProcessing=false;renderBattle();return;}gameState.enemyJudgments.push({type:'indulgence',card:tc});log('😴 乐不思蜀！');gameState.isProcessing=false;renderBattle();checkWin();});return;}if(tc.effect==='supply'){if(gameState.enemyJudgments.some(function(j){return j.type==='supply';})){alert('敌人已有兵粮！');gameState.myHand.push(tc);gameState.isProcessing=false;renderBattle();return;}checkWuxiekeji('enemy','【兵粮寸断】',function(neg){if(neg){gameState.isProcessing=false;renderBattle();return;}gameState.enemyJudgments.push({type:'supply',card:tc});log('🌾 兵粮寸断！');gameState.isProcessing=false;renderBattle();checkWin();});return;}gameState.isProcessing=false;renderBattle();checkWin();}
 
-/* ========== Player Actions ========== */
+/* ========== Player Actions (修复卡死) ========== */
 function endTurn(){if(gameOver||gameState.isProcessing)return;if(document.getElementById('response-modal').style.display==='flex'){alert('⚠️ 请先处理弹窗');return;}if(!gameState.isMyTurn||gameState.phase!=='play')return;if(gameState.heroId==='xuzongwei'){log('👑 【皇威】跳过弃牌阶段！');finishMyTurn();return;}var hl=getHandLimit(),ex=gameState.myHand.length-hl;if(ex>0){gameState.phase='discard';gameState.selectedIndices=[];log('--- 弃牌阶段 --- 需弃'+ex+'张');renderBattle();}else finishMyTurn();}
 function triggerSkill_ZuqiuShangjiang(dmg,ac,cb){if(gameState.heroId==='xuyifeng'&&!gameState.enemyDisabledSkills.includes('足球上将')){showModal('⚽ 足球上将','令敌人弃2张牌？',[{text:'发动',color:'#2ecc71',action:function(){var dn=0,nm=[];while(dn<2&&gameState.enemyHand.length>0){var ri=Math.floor(Math.random()*gameState.enemyHand.length);var dc=gameState.enemyHand.splice(ri,1)[0];discardCard(dc);nm.push(dc.name);dn++;}if(dn>0)log('⚽ 敌人弃：'+nm.join('、'));closeModal();renderBattle();cb(dmg,ac);}},{text:'不发动',color:'#7f8c8d',action:function(){closeModal();cb(dmg,ac);}}]);}else cb(dmg,ac);}
-function playCard(){if(gameOver||!gameState.isMyTurn||gameState.isProcessing||gameState.phase!=='play')return;if(gameState.selectedIndices.length!==1){alert('请先选择一张牌');return;}var idx=gameState.selectedIndices[0],card=gameState.myHand[idx];if(gameState.heroId==='wangsheng'&&isTrickCard(card)&&card.effect!=='wuxie'){var hasW=!!gameState.myEquipment.weapon;if(gameState.killCountThisTurn>=4&&!hasW){alert('【连斩】每回合最多4杀！');return;}var pc=gameState.myHand.splice(idx,1)[0];gameState.selectedIndices=[];renderBattle();var hk=gameState.myHand.some(function(c){return isKill(c);}),btns=[];if(hk)btns.push({text:'弃杀→发动锦囊',color:'#e74c3c',action:function(){var ki=gameState.myHand.findIndex(function(c){return isKill(c);});var kc=gameState.myHand.splice(ki,1)[0];discardCard(kc);playerLoseCard(kc,'discard');log('🧠 弃'+cardDesc(kc)+'发动'+cardDesc(pc));closeModal();discardCard(pc);executeTrickEffect(pc);}});btns.push({text:'失去1血→发动锦囊',color:'#e67e22',action:function(){gameState.myHp-=1;log('🧠 -1血发动'+cardDesc(pc));closeModal();renderBattle();if(gameState.myHp<=0){gameState.isProcessing=false;promptForDying();}else{discardCard(pc);executeTrickEffect(pc);}}});btns.push({text:'当【杀】使用',color:'#3498db',action:function(){var hasW2=!!gameState.myEquipment.weapon;if(gameState.killCountThisTurn>=4&&!hasW2){alert('【连斩】限制！');return;}var dmg=gameState.hasUsedWine?2:1;log('🧠 '+cardDesc(pc)+'当杀！');gameState.killCountThisTurn++;closeModal();discardCard(pc);var fk={};var src=cardEffects.kill;for(var k in src)fk[k]=src[k];fk.id=Date.now();fk.suit=pc.suit;fk.rank=pc.rank;triggerSkill_ZuqiuShangjiang(dmg,fk,function(d,a){enemyDefend(d,a,false);});}});showModal('🧠 无谋','使用'+cardDesc(pc)+'：',btns);return;}if(isKill(card)){var isWS=gameState.heroId==='wangsheng',isXZ=gameState.heroId==='xuzongwei',bcEx=(gameState.heroId==='manhongyi'&&gameState.hasUsedBeici)?1:0,kl=isWS?4:(isXZ?999:(1+bcEx)),hasW=!!gameState.myEquipment.weapon;if(gameState.killCountThisTurn>=kl&&!hasW){alert('每回合最多'+kl+'张杀！');return;}var ac=card;if(gameState.myEquipment.weapon&&gameState.myEquipment.weapon.effect==='weapon_zhuque'&&card.effect==='damage'){ac={};for(var k in card)ac[k]=card[k];ac.name='火杀';ac['class']='fire_kill';ac.effect='fire_damage';log('🔥 朱雀当火杀！');}var dmg=gameState.hasUsedWine?2:1;log('⚔️ 打出'+cardDesc(ac)+'！');gameState.killCountThisTurn++;var pcc=gameState.myHand.splice(idx,1)[0];discardCard(pcc);playerLoseCard(pcc,'play');gameState.selectedIndices=[];renderBattle();if(gameState.heroId==='manhongyi'&&gameState.myArmor>0&&!gameState.hasUsedBeici){gameState.isProcessing=true;showModal('🗡️ 背刺','失去1层护甲？',[{text:'发动(-1甲)',color:'#e67e22',action:function(){gameState.myArmor-=1;gameState.hasUsedBeici=true;log('🗡️ 背刺发动！');if(gameState.enemyHand.length>0){var ri=Math.floor(Math.random()*gameState.enemyHand.length);var sc=gameState.enemyHand.splice(ri,1)[0];gameState.myHand.push(sc);log('🤏 夺取'+cardDesc(sc));}log('🚫 敌人无法出闪！');closeModal();renderBattle();setTimeout(function(){triggerSkill_ZuqiuShangjiang(dmg,ac,function(d,a){enemyDefend(d,a,true);});},500);}},{text:'不背刺',color:'#7f8c8d',action:function(){closeModal();renderBattle();triggerSkill_ZuqiuShangjiang(dmg,ac,function(d,a){enemyDefend(d,a,false);});}}]);}else{triggerSkill_ZuqiuShangjiang(dmg,ac,function(d,a){enemyDefend(d,a,false);});}return;}if(card.effect==='heal'){if(gameState.heroId==='manhongyi'&&gameState.myHp>0){alert('非濒死不能用桃！');return;}if(gameState.myHp>=gameState.myMaxHp){alert('体力已满');return;}log('💚 '+cardDesc(card)+' +1血');gameState.myHp=Math.min(gameState.myMaxHp,gameState.myHp+1);var c=gameState.myHand.splice(idx,1)[0];discardCard(c);}else if(card.effect==='dodge'){alert('闪只能被攻击时用！');return;}else if(card.effect==='wine'){if(gameState.hasUsedWine){alert('每回合限1酒！');return;}log('🍷 饮酒，下次杀+1');gameState.hasUsedWine=true;var c=gameState.myHand.splice(idx,1)[0];discardCard(c);}else if(card.effect==='wuxie'){alert('无懈只能在锦囊时用！');return;}else if(isWeapon(card)||isArmor(card)){var sl=isWeapon(card)?'weapon':'armor';if(isWeapon(card)&&card.effect==='weapon_zhuge'&&gameState.heroId==='wangsheng'){alert('连斩不能用连弩！');return;}if(gameState.myEquipment[sl]){log('🔧 替换'+cardDesc(gameState.myEquipment[sl]));discardCard(gameState.myEquipment[sl]);}gameState.myEquipment[sl]=gameState.myHand.splice(idx,1)[0];log('🛡️ 装备'+cardDesc(gameState.myEquipment[sl]));}else{var tc=gameState.myHand.splice(idx,1)[0];gameState.selectedIndices=[];renderBattle();discardCard(tc);executeTrickEffect(tc);return;}gameState.selectedIndices=[];renderBattle();checkWin();checkXianshangZuozhe_EmptyHand();}
+
+function playCard(){
+    // 【修复】防止isProcessing永久锁死 - 如果超过5秒自动解锁
+    if (gameState._processingTimestamp && Date.now() - gameState._processingTimestamp > 5000) {
+        console.warn('⚠️ isProcessing超时自动解锁');
+        gameState.isProcessing = false;
+        gameState._processingTimestamp = 0;
+    }
+    
+    if(gameOver||!gameState.isMyTurn||gameState.isProcessing||gameState.phase!=='play')return;
+    if(gameState.selectedIndices.length!==1){alert('请先选择一张牌');return;}
+    
+    // 设置处理时间戳用于超时检测
+    gameState._processingTimestamp = Date.now();
+    
+    var idx=gameState.selectedIndices[0],card=gameState.myHand[idx];
+    if(gameState.heroId==='wangsheng'&&isTrickCard(card)&&card.effect!=='wuxie'){
+        var hasW=!!gameState.myEquipment.weapon;
+        if(gameState.killCountThisTurn>=4&&!hasW){alert('【连斩】每回合最多4杀！');return;}
+        var pc=gameState.myHand.splice(idx,1)[0];
+        gameState.selectedIndices=[];renderBattle();
+        var hk=gameState.myHand.some(function(c){return isKill(c);}),btns=[];
+        if(hk)btns.push({text:'弃杀→发动锦囊',color:'#e74c3c',action:function(){var ki=gameState.myHand.findIndex(function(c){return isKill(c);});var kc=gameState.myHand.splice(ki,1)[0];discardCard(kc);playerLoseCard(kc,'discard');log('🧠 弃'+cardDesc(kc)+'发动'+cardDesc(pc));closeModal();discardCard(pc);executeTrickEffect(pc);}});
+        btns.push({text:'失去1血→发动锦囊',color:'#e67e22',action:function(){gameState.myHp-=1;log('🧠 -1血发动'+cardDesc(pc));closeModal();renderBattle();if(gameState.myHp<=0){gameState.isProcessing=false;promptForDying();}else{discardCard(pc);executeTrickEffect(pc);}}});
+        btns.push({text:'当【杀】使用',color:'#3498db',action:function(){var hasW2=!!gameState.myEquipment.weapon;if(gameState.killCountThisTurn>=4&&!hasW2){alert('【连斩】限制！');return;}var dmg=gameState.hasUsedWine?2:1;log('🧠 '+cardDesc(pc)+'当杀！');gameState.killCountThisTurn++;closeModal();discardCard(pc);var fk={};var src=cardEffects.kill;for(var k in src)fk[k]=src[k];fk.id=Date.now();fk.suit=pc.suit;fk.rank=pc.rank;triggerSkill_ZuqiuShangjiang(dmg,fk,function(d,a){enemyDefend(d,a,false);});}});
+        showModal('🧠 无谋','使用'+cardDesc(pc)+'：',btns);return;
+    }
+    if(isKill(card)){
+        var isWS=gameState.heroId==='wangsheng',isXZ=gameState.heroId==='xuzongwei',bcEx=(gameState.heroId==='manhongyi'&&gameState.hasUsedBeici)?1:0,kl=isWS?4:(isXZ?999:(1+bcEx)),hasW=!!gameState.myEquipment.weapon;
+        if(gameState.killCountThisTurn>=kl&&!hasW){alert('每回合最多'+kl+'张杀！');return;}
+        var ac=card;
+        if(gameState.myEquipment.weapon&&gameState.myEquipment.weapon.effect==='weapon_zhuque'&&card.effect==='damage'){ac={};for(var k in card)ac[k]=card[k];ac.name='火杀';ac['class']='fire_kill';ac.effect='fire_damage';log('🔥 朱雀当火杀！');}
+        var dmg=gameState.hasUsedWine?2:1;log('⚔️ 打出'+cardDesc(ac)+'！');gameState.killCountThisTurn++;
+        var pcc=gameState.myHand.splice(idx,1)[0];discardCard(pcc);playerLoseCard(pcc,'play');gameState.selectedIndices=[];renderBattle();
+        if(gameState.heroId==='manhongyi'&&gameState.myArmor>0&&!gameState.hasUsedBeici){
+            gameState.isProcessing=true;
+            showModal('🗡️ 背刺','失去1层护甲？',[{text:'发动(-1甲)',color:'#e67e22',action:function(){gameState.myArmor-=1;gameState.hasUsedBeici=true;log('🗡️ 背刺发动！');if(gameState.enemyHand.length>0){var ri=Math.floor(Math.random()*gameState.enemyHand.length);var sc=gameState.enemyHand.splice(ri,1)[0];gameState.myHand.push(sc);log('🤏 夺取'+cardDesc(sc));}log('🚫 敌人无法出闪！');closeModal();renderBattle();setTimeout(function(){triggerSkill_ZuqiuShangjiang(dmg,ac,function(d,a){enemyDefend(d,a,true);});},500);}},{text:'不背刺',color:'#7f8c8d',action:function(){closeModal();renderBattle();triggerSkill_ZuqiuShangjiang(dmg,ac,function(d,a){enemyDefend(d,a,false);});}}]);
+        }else{triggerSkill_ZuqiuShangjiang(dmg,ac,function(d,a){enemyDefend(d,a,false);});}
+        return;
+    }
+    if(card.effect==='heal'){
+        if(gameState.heroId==='manhongyi'&&gameState.myHp>0){alert('非濒死不能用桃！');return;}
+        if(gameState.myHp>=gameState.myMaxHp){alert('体力已满');return;}
+        log('💚 '+cardDesc(card)+' +1血');gameState.myHp=Math.min(gameState.myMaxHp,gameState.myHp+1);var c=gameState.myHand.splice(idx,1)[0];discardCard(c);
+    }else if(card.effect==='dodge'){alert('闪只能被攻击时用！');return;}
+    else if(card.effect==='wine'){if(gameState.hasUsedWine){alert('每回合限1酒！');return;}log('🍷 饮酒，下次杀+1');gameState.hasUsedWine=true;var c=gameState.myHand.splice(idx,1)[0];discardCard(c);}
+    else if(card.effect==='wuxie'){alert('无懈只能在锦囊时用！');return;}
+    else if(isWeapon(card)||isArmor(card)){
+        var sl=isWeapon(card)?'weapon':'armor';
+        if(isWeapon(card)&&card.effect==='weapon_zhuge'&&gameState.heroId==='wangsheng'){alert('连斩不能用连弩！');return;}
+        if(gameState.myEquipment[sl]){log('🔧 替换'+cardDesc(gameState.myEquipment[sl]));discardCard(gameState.myEquipment[sl]);}
+        gameState.myEquipment[sl]=gameState.myHand.splice(idx,1)[0];log('🛡️ 装备'+cardDesc(gameState.myEquipment[sl]));
+    }else{
+        var tc=gameState.myHand.splice(idx,1)[0];gameState.selectedIndices=[];renderBattle();discardCard(tc);executeTrickEffect(tc);return;
+    }
+    gameState.selectedIndices=[];renderBattle();checkWin();checkXianshangZuozhe_EmptyHand();
+}
 
 /* ========== Player Skills ========== */
 function useSkill_Shouban(){if(!gameState.isMyTurn||gameState.phase!=='play'||gameState.isProcessing||gameState.skipPlay||gameState.myShouban<=0)return;showModal('🎀 手办('+gameState.myShouban+')','转化为：',[{text:'当【杀】(不计次数)',color:'#e74c3c',action:function(){closeModal();gameState.myShouban--;log('🎀 手办→杀！');var fk={};var src=cardEffects.kill;for(var k in src)fk[k]=src[k];fk.id=Date.now();fk.suit='♠';fk.rank='A';renderBattle();triggerSkill_ZuqiuShangjiang(gameState.hasUsedWine?2:1,fk,function(d,a){enemyDefend(d,a,false);});}},{text:'取消',color:'#7f8c8d',action:function(){closeModal();}}]);}
