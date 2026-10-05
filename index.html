@@ -243,7 +243,9 @@ button.action-btn{padding:6px 14px;font-size:12px;border:none;border-radius:5px;
 <div id="response-modal"><div class="modal-content"><h2 id="modal-title" style="color:#e74c3c;margin-top:0;">提示</h2><p id="modal-desc">描述信息</p><div id="modal-buttons"></div><div id="modal-card-grid" class="card-grid"></div></div></div>
 <script>
 /* ================================================================
- *  面包杀 v7.2-hotfix
+ *  面包杀 v7.3-hotfix
+ *  修复: open2v2Invite 增加排查日志
+ *  修复: subscribeToRoom 无条件启动 REST 轮询兜底
  *  修复: enemyRespondNanman 语法错误导致全页面按钮失效
  *  修复: sendHeartbeat/update/eq/catch TypeError
  *  修复: created_at 400 Bad Request
@@ -320,14 +322,81 @@ var roomPollTimer=null;
 function stopRoomPolling(){if(roomPollTimer){clearInterval(roomPollTimer);roomPollTimer=null;}}
 function startRoomPolling(roomId){stopRoomPolling();console.log('[2v2] Realtime异常，启动REST轮询兜底');roomPollTimer=setInterval(async function(){if(!currentRoomId||!sb||!roomId)return;try{var r=await sb.from('game_rooms').select('*').eq('id',roomId).single();if(r.data)handleRoomUpdate(r.data);}catch(e){console.warn('[2v2] poll fail:', e);}},3000);}
 async function probeGameRooms(){if(!sb||!currentUserId) return {ok:false, msg:'❌ 未登录或SDK未就绪，请重新登录'};try{var r = await sb.from('game_rooms').select('id').limit(1);if(r.error){var m = r.error.message||'';var code = r.error.code||'';console.error('[Probe] game_rooms error:', r.error);if(m.indexOf('does not exist')!==-1 || code==='42P01')return {ok:false, msg:'❌ 数据库缺少 game_rooms 表！\n请在Supabase SQL Editor中执行建表语句。'};if(code==='42501' || m.indexOf('policy')!==-1 || m.indexOf('permission')!==-1)return {ok:false, msg:'❌ RLS策略未放行！\n请在Supabase中检查game_rooms表的Row Level Security策略。'};if(m.indexOf('column')!==-1 && m.indexOf('does not exist')!==-1)return {ok:false, msg:'❌ 表字段缺失！\ngame_rooms表缺少必要字段(id/host_id/guest_id/status/game_data)，请重建表。'};return {ok:false, msg:'❌ ['+code+'] '+m};}return {ok:true};}catch(e){console.error('[Probe] exception:', e);return {ok:false, msg:'❌ 网络异常: '+e.message};}}
-async function open2v2Invite(){if(isOfflineMode){alert('⚠️ 2v2需要联网！');return;}if(!currentUserId||!sb){alert('⚠️ 请先登录！');return;}var probe = await probeGameRooms();if(!probe.ok){alert(probe.msg);var m=document.getElementById('room-lobby-msg');if(m){m.innerText=probe.msg;m.style.color='#e74c3c';}return;}openModalEl('invite-modal');var list=document.getElementById('invite-friend-list');list.innerHTML='<div style="text-align:center;padding:20px;color:#7f8c8d;">🔍 检测在线好友...</div>';if(broadcastChannel)broadcastChannel.send({type:'broadcast',event:'heartbeat',payload:{uid:currentUserId,nickname:getDisplayNickname(),ts:Date.now()}});setTimeout(async function(){if(!sb){list.innerHTML='<div style="text-align:center;padding:20px;color:#e74c3c;">服务未就绪</div>';return;}try{var res=await sb.from('friend_requests').select('sender_id,receiver_id').eq('status','accepted').or('sender_id.eq.'+currentUserId+',receiver_id.eq.'+currentUserId);if(res.error){list.innerHTML='<div style="text-align:center;padding:20px;color:#e74c3c;">查询好友失败</div>';return;}if(!res.data||!res.data.length){list.innerHTML='<div style="text-align:center;padding:20px;color:#e74c3c;">暂无好友，请先添加好友</div>';return;}var fids=res.data.map(function(r){return r.sender_id===currentUserId?r.receiver_id:r.sender_id;});var pr=await sb.from('user_saves').select('user_id,save_data,updated_at').in('user_id',fids);var pm={};if(pr.data)pr.data.forEach(function(p){pm[p.user_id]={nickname:p.save_data&&p.save_data.nickname?p.save_data.nickname:'玩家',updatedAt:p.updated_at};});var h='';fids.forEach(function(fid){var info=pm[fid]||{nickname:'玩家',updatedAt:null};var on=isUserOnline(fid);if(!on&&info.updatedAt&&(Date.now()-new Date(info.updatedAt).getTime()<ONLINE_TIMEOUT))on=true;var btn=on?'<button class="btn-primary" style="padding:4px 12px;font-size:12px;" onclick="send2v2Invite(\''+esc(fid)+'\',\''+esc(info.nickname)+'\')">⚔️ 邀请</button>':'<button disabled style="padding:4px 12px;font-size:12px;background:#555;border:none;border-radius:4px;color:#999;">离线</button>';h+='<div class="invite-item"><div><span class="online-dot '+(on?'on':'off')+'"></span>'+esc(info.nickname)+' <span style="font-size:10px;color:'+(on?'#2ecc71':'#7f8c8d')+';">'+(on?'在线':'离线')+'</span></div><div>'+btn+'</div></div>';});list.innerHTML=h||'<div style="text-align:center;padding:20px;color:#7f8c8d;">无可用好友</div>';}catch(e){list.innerHTML='<div style="text-align:center;padding:20px;color:#e74c3c;">❌ 加载失败: '+e.message+'</div>';}},500);}
+
+// ✅ 修改1：open2v2Invite 增加排查日志
+async function open2v2Invite(){
+  console.log('[2v2 DEBUG] 进入邀请', {
+    isOfflineMode: isOfflineMode, 
+    currentUserId: currentUserId, 
+    sbReady: !!sb,
+    broadcastChannel: !!broadcastChannel
+  });
+
+  if(isOfflineMode){ alert('⚠️ 2v2需要联网！'); return; }
+  if(!currentUserId || !sb){ alert('⚠️ 请先登录！'); return; }
+  
+  var probe = await probeGameRooms();
+  if(!probe.ok){
+    console.error('[2v2 DEBUG] 探针失败:', probe.msg);
+    alert(probe.msg);
+    var m=document.getElementById('room-lobby-msg');
+    if(m){m.innerText=probe.msg;m.style.color='#e74c3c';}
+    return;
+  }
+  
+  openModalEl('invite-modal');
+  var list=document.getElementById('invite-friend-list');
+  list.innerHTML='<div style="text-align:center;padding:20px;color:#7f8c8d;">🔍 检测在线好友...</div>';
+  if(broadcastChannel)broadcastChannel.send({type:'broadcast',event:'heartbeat',payload:{uid:currentUserId,nickname:getDisplayNickname(),ts:Date.now()}});
+  setTimeout(async function(){
+    if(!sb){list.innerHTML='<div style="text-align:center;padding:20px;color:#e74c3c;">服务未就绪</div>';return;}
+    try{
+      var res=await sb.from('friend_requests').select('sender_id,receiver_id').eq('status','accepted').or('sender_id.eq.'+currentUserId+',receiver_id.eq.'+currentUserId);
+      if(res.error){list.innerHTML='<div style="text-align:center;padding:20px;color:#e74c3c;">查询好友失败</div>';return;}
+      if(!res.data||!res.data.length){list.innerHTML='<div style="text-align:center;padding:20px;color:#e74c3c;">暂无好友，请先添加好友</div>';return;}
+      var fids=res.data.map(function(r){return r.sender_id===currentUserId?r.receiver_id:r.sender_id;});
+      var pr=await sb.from('user_saves').select('user_id,save_data,updated_at').in('user_id',fids);
+      var pm={};if(pr.data)pr.data.forEach(function(p){pm[p.user_id]={nickname:p.save_data&&p.save_data.nickname?p.save_data.nickname:'玩家',updatedAt:p.updated_at};});
+      var h='';fids.forEach(function(fid){var info=pm[fid]||{nickname:'玩家',updatedAt:null};var on=isUserOnline(fid);if(!on&&info.updatedAt&&(Date.now()-new Date(info.updatedAt).getTime()<ONLINE_TIMEOUT))on=true;var btn=on?'<button class="btn-primary" style="padding:4px 12px;font-size:12px;" onclick="send2v2Invite(\''+esc(fid)+'\',\''+esc(info.nickname)+'\')">⚔️ 邀请</button>':'<button disabled style="padding:4px 12px;font-size:12px;background:#555;border:none;border-radius:4px;color:#999;">离线</button>';h+='<div class="invite-item"><div><span class="online-dot '+(on?'on':'off')+'"></span>'+esc(info.nickname)+' <span style="font-size:10px;color:'+(on?'#2ecc71':'#7f8c8d')+';">'+(on?'在线':'离线')+'</span></div><div>'+btn+'</div></div>';});
+      list.innerHTML=h||'<div style="text-align:center;padding:20px;color:#7f8c8d;">无可用好友</div>';
+    }catch(e){list.innerHTML='<div style="text-align:center;padding:20px;color:#e74c3c;">❌ 加载失败: '+e.message+'</div>';}
+  },500);
+}
+
 async function send2v2Invite(fid,name){if(!sb||!currentUserId){alert('⚠️ 服务未就绪');return;}if(!confirm('邀请 '+name+' 进行2v2对战？'))return;try{var r=await sb.from('game_rooms').insert({host_id:currentUserId,guest_id:fid,status:'lobby',game_data:{phase:'lobby',host_ready:false,guest_ready:false}}).select().single();if(r.error){console.error('[2v2] insert error:', r.error);var msg = r.error.message||'';var code = r.error.code||'';if(msg.indexOf('does not exist')!==-1 || code==='42P01')msg = '数据库缺少 game_rooms 表，请在Supabase SQL中执行建表语句！';else if(code==='42501' || msg.indexOf('policy')!==-1)msg = 'RLS权限未放行，请在Supabase中添加SELECT/INSERT/UPDATE策略！';else if(msg.indexOf('column')!==-1)msg = '表字段不匹配，请确认game_rooms表包含: id,host_id,guest_id,status,game_data,updated_at';alert('❌ 创建房间失败 ['+code+']：\n'+msg);return;}if(!r.data){alert('❌ 创建成功但返回数据为空');return;}currentRoomId=r.data.id;mySeatIndex=0;myRoomRole='host';closeModalEl('invite-modal');enterRoomLobby();subscribeToRoom(currentRoomId);}catch(e){alert('❌ 创建异常: '+e.message);}}
 function startInviteListener(){if(isOfflineMode||!currentUserId||!sb)return;try{sb.channel('inv-'+currentUserId).on('postgres_changes',{event:'INSERT',schema:'public',table:'game_rooms',filter:'guest_id=eq.'+currentUserId},function(p){if(p.new&&p.new.status==='lobby'){pendingInviteRoomId=p.new.id;showInvitePopup(p.new.host_id);}}).on('postgres_changes',{event:'UPDATE',schema:'public',table:'game_rooms',filter:'guest_id=eq.'+currentUserId},function(p){if(p.new&&p.new.status==='cancelled'&&pendingInviteRoomId===p.new.id){pendingInviteRoomId=null;closeModalEl('receive-invite-modal');}}).subscribe(function(st){if(st==='CHANNEL_ERROR'||st==='TIMED_OUT')startInvitePolling();});}catch(e){startInvitePolling();}}
 function startInvitePolling(){if(invitePollTimer)clearInterval(invitePollTimer);invitePollTimer=setInterval(async function(){if(!currentUserId||!sb||isOfflineMode)return;try{var r=await sb.from('game_rooms').select('id,host_id,status').eq('guest_id',currentUserId).eq('status','lobby').order('updated_at',{ascending:false}).limit(1).maybeSingle();if(r.data&&r.data.id&&!pendingInviteRoomId){pendingInviteRoomId=r.data.id;showInvitePopup(r.data.host_id);}if(pendingInviteRoomId){var r2=await sb.from('game_rooms').select('status').eq('id',pendingInviteRoomId).single();if(r2.data&&r2.data.status==='cancelled'){pendingInviteRoomId=null;closeModalEl('receive-invite-modal');}}}catch(e){}},5000);}
 async function showInvitePopup(hostId){if(!sb)return;var p=await sb.from('user_saves').select('save_data').eq('user_id',hostId).single();var n=p.data&&p.data.save_data&&p.data.save_data.nickname?p.data.save_data.nickname:'好友';document.getElementById('invite-from-name').innerText=n+' 邀请你2v2对战！';openModalEl('receive-invite-modal');}
 async function accept2v2Invite(){if(!pendingInviteRoomId||!sb)return;closeModalEl('receive-invite-modal');currentRoomId=pendingInviteRoomId;mySeatIndex=1;myRoomRole='guest';pendingInviteRoomId=null;enterRoomLobby();subscribeToRoom(currentRoomId);}
 function reject2v2Invite(){closeModalEl('receive-invite-modal');if(pendingInviteRoomId&&sb)safeQuery(sb.from('game_rooms').update({status:'cancelled'}).eq('id',pendingInviteRoomId),'reject_invite');pendingInviteRoomId=null;}
-function subscribeToRoom(roomId){if(!sb||!roomId)return;if(roomChannel){sb.removeChannel(roomChannel);roomChannel=null;}stopRoomPolling();roomChannel=sb.channel('room-'+roomId).on('postgres_changes',{event:'*',schema:'public',table:'game_rooms',filter:'id=eq.'+roomId},function(p){handleRoomUpdate(p.new);}).subscribe(function(st){console.log('[2v2] room channel status:', st);if(st==='CHANNEL_ERROR'||st==='TIMED_OUT'||st==='CLOSED'){startRoomPolling(roomId);}});sb.from('game_rooms').select('*').eq('id',roomId).single().then(function(r){if(r.data)handleRoomUpdate(r.data);}).catch(function(e){console.warn('[2v2] initial fetch fail:', e);});}
+
+// ✅ 修改2：subscribeToRoom 无条件启动 REST 轮询兜底
+function subscribeToRoom(roomId){
+  if(!sb||!roomId)return;
+  if(roomChannel){sb.removeChannel(roomChannel);roomChannel=null;}
+  stopRoomPolling();
+  
+  // 无论 Realtime 是否成功，都立即启动 REST 轮询作为兜底保险
+  startRoomPolling(roomId); 
+  
+  roomChannel=sb.channel('room-'+roomId)
+    .on('postgres_changes',{event:'*',schema:'public',table:'game_rooms',filter:'id=eq.'+roomId},function(p){
+      handleRoomUpdate(p.new);
+    })
+    .subscribe(function(st){
+      console.log('[2v2] room channel status:', st);
+      // 只有当 Realtime 明确订阅成功时，才停止轮询节省请求
+      if(st === 'SUBSCRIBED') {
+        console.log('[2v2] Realtime 连接成功，停止 REST 轮询');
+        stopRoomPolling();
+      }
+    });
+    
+  sb.from('game_rooms').select('*').eq('id',roomId).single()
+    .then(function(r){if(r.data)handleRoomUpdate(r.data);})
+    .catch(function(e){console.warn('[2v2] initial fetch fail:', e);});
+}
+
 function handleRoomUpdate(room){if(!room)return;var gd=room.game_data||{};roomState=gd;if(room.status==='cancelled'){alert('对方已取消房间');leaveRoom();return;}var hp=document.getElementById('heroes-page'),bp=document.getElementById('battle-page'),lp=document.getElementById('lobby-page');if(room.status==='lobby'||gd.phase==='lobby'){if(document.getElementById('room-lobby-modal').style.display!=='flex')enterRoomLobby();updateRoomLobbyUI(room);}else if(gd.phase==='selecting'){closeModalEl('room-lobby-modal');if(!bp.classList.contains('active')&&!hp.classList.contains('active')){lp.classList.remove('active');hp.classList.add('active');enterHeroSelect('rank');}}else if(gd.phase==='playing'){closeModalEl('room-lobby-modal');hp.classList.remove('active');bp.classList.add('active');if(gd.seats)syncGameState(gd);if(!gameState||!gameState.initialized){var myH=currentHero?currentHero.id:(mySeatIndex===0?gd.host_hero:gd.guest_hero);var opH=mySeatIndex===0?gd.guest_hero:gd.host_hero;if(myH&&opH)init2v2Battle(myH,opH);}}else if(room.status==='finished'){alert(gd.result||'游戏结束');leaveRoom();}}
 function updateRoomLobbyUI(room){var gd=room.game_data||{};if(!sb)return;Promise.all([sb.from('user_saves').select('save_data').eq('user_id',room.host_id).single(),sb.from('user_saves').select('save_data').eq('user_id',room.guest_id).single()]).then(function(rs){var hn=rs[0].data&&rs[0].data.save_data&&rs[0].data.save_data.nickname?rs[0].data.save_data.nickname:'队长';var gn=rs[1].data&&rs[1].data.save_data&&rs[1].data.save_data.nickname?rs[1].data.save_data.nickname:'队员';document.getElementById('room-host-name').innerText=hn;document.getElementById('room-guest-name').innerText=gn;var ho=isUserOnline(room.host_id),go=isUserOnline(room.guest_id);var hs=document.getElementById('room-host-status'),gs=document.getElementById('room-guest-status');hs.innerText=gd.host_ready?'✅ 已准备':(!ho?'🔴 离线':'⏳ 等待中');hs.className='role-status '+(gd.host_ready?'ready':(!ho?'offline':'waiting'));gs.innerText=gd.guest_ready?'✅ 已准备':(!go?'🔴 离线':'⏳ 等待中');gs.className='role-status '+(gd.guest_ready?'ready':(!go?'offline':'waiting'));var ad=document.getElementById('room-lobby-actions');ad.innerHTML='';var m=document.getElementById('room-lobby-msg');m.innerText='';if(myRoomRole==='guest'){if(!gd.guest_ready){var b=document.createElement('button');b.className='btn-confirm';b.innerText='✅ 准备';b.onclick=function(){safeQuery(sb.from('game_rooms').update({game_data:Object.assign({},gd,{guest_ready:true})}).eq('id',currentRoomId),'guest_ready');};ad.appendChild(b);}else{m.innerText='✅ 已准备，等待队长...';m.style.color='#2ecc71';}var lb=document.createElement('button');lb.className='btn-danger';lb.innerText='离开';lb.onclick=leaveRoom;ad.appendChild(lb);}else{if(gd.host_ready&&gd.guest_ready){var b=document.createElement('button');b.className='btn-confirm';b.innerText='⚔️ 选武将开始';b.onclick=function(){safeQuery(sb.from('game_rooms').update({game_data:Object.assign({},gd,{phase:'selecting'}),status:'selecting'}).eq('id',currentRoomId),'phase_selecting');};ad.appendChild(b);}else if(!gd.host_ready){var b=document.createElement('button');b.className='btn-primary';b.innerText='✅ 准备';b.onclick=function(){safeQuery(sb.from('game_rooms').update({game_data:Object.assign({},gd,{host_ready:true})}).eq('id',currentRoomId),'host_ready');};ad.appendChild(b);}else{m.innerText='⏳ 等待队员...';m.style.color='#e67e22';}var cb=document.createElement('button');cb.className='btn-danger';cb.innerText='取消房间';cb.onclick=function(){safeQuery(sb.from('game_rooms').update({status:'cancelled'}).eq('id',currentRoomId),'cancel_room');leaveRoom();};ad.appendChild(cb);}}).catch(function(){});}
 function enterRoomLobby(){closeModalEl('invite-modal');closeModalEl('receive-invite-modal');openModalEl('room-lobby-modal');}
