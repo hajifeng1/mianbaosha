@@ -12870,6 +12870,28 @@ Resources:`;
       }
       p.focus();
     }
+    function makeSafeStorage() {
+      try {
+        var t = '__bk_test__';
+        localStorage.setItem(t, '1');
+        localStorage.removeItem(t);
+        return localStorage;
+      } catch (e) {
+        // 某些手机浏览器/隐私模式禁用 localStorage：内存兜底，保证本次会话可登录
+        var mem = {};
+        return {
+          getItem: function(k) {
+            return (k in mem) ? mem[k] : null;
+          },
+          setItem: function(k, v) {
+            mem[k] = String(v);
+          },
+          removeItem: function(k) {
+            delete mem[k];
+          }
+        };
+      }
+    }
     var SUPABASE_URL = 'https://xhehybtjnvyksjaznlla.supabase.co';
     var SUPABASE_ANON_KEY =
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoZWh5YnRqbnZ5a3NqYXpubGxhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAzMTEzMzMsImV4cCI6MjEwNTg4NzMzM30.-muF-1xOuKaAjHY0BYPgQpm2GFi62rPb0Fx33yYPbRM';
@@ -12884,7 +12906,8 @@ Resources:`;
             persistSession: true,
             autoRefreshToken: true,
             detectSessionInUrl: true,
-            storageKey: 'bread-kill-auth'
+            storageKey: 'bread-kill-auth',
+            storage: makeSafeStorage()
           },
           realtime: {
             params: {
@@ -13037,6 +13060,9 @@ Resources:`;
         p = document.getElementById('password').value;
       if (!e || !p) return showAuthMsg('请填写邮箱和密码', 'error');
       if (!sb) return showAuthMsg('❌ 组件加载失败，请用离线模式', 'error');
+      if (navigator.onLine === false) {
+        return showAuthMsg('❌ 当前设备无网络连接\n请开启网络（WiFi/流量）后重试，或点下方「离线模式」先游玩', 'error');
+      }
       // ✅ 手机网络下首次请求常因 DNS/连接建立失败报 "Failed to fetch"，自动重试最多3次
       var lastErr = null;
       for (var attempt = 1; attempt <= 3; attempt++) {
@@ -13066,7 +13092,7 @@ Resources:`;
       if (lastErr && lastErr.message === 'TIMEOUT') {
         showAuthMsg('❌ 连接服务器超时\n请检查手机网络（尝试切换 WiFi/流量）后重试', 'error');
       } else if (isNetworkError(lastErr)) {
-        showAuthMsg('❌ 网络连接失败（Failed to fetch）\n请检查手机网络或切换 WiFi/流量后重试；也可点下方「离线模式」先游玩', 'error');
+        showAuthMsg('❌ 网络连接失败（Failed to fetch），已自动重试3次\n请切换 WiFi/流量后重试；部分手机网络可能无法访问游戏服务器，也可点下方「离线模式」先游玩', 'error');
       } else {
         showAuthMsg('❌ ' + ((lastErr && lastErr.message) || '未知错误'), 'error');
       }
