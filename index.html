@@ -10995,6 +10995,13 @@ Resources:`;
       line-height: 1
     }
 
+    .signin-day .d-ic img {
+      width: 24px;
+      height: 24px;
+      object-fit: contain;
+      vertical-align: middle
+    }
+
     .signin-day .d-rw {
       font-size: 11px;
       color: #f1c40f
@@ -11117,6 +11124,13 @@ Resources:`;
       display: flex;
       align-items: center;
       justify-content: center;
+    }
+
+    .shop-icon img {
+      max-width: 52px;
+      max-height: 52px;
+      object-fit: contain
+    }
       background: rgba(0, 0, 0, .35);
       border-radius: 10px;
       flex-shrink: 0
@@ -11207,6 +11221,13 @@ Resources:`;
 
     .bag-icon {
       font-size: 28px
+    }
+
+    .bag-icon img {
+      width: 30px;
+      height: 30px;
+      object-fit: contain;
+      vertical-align: middle
     }
 
     .bag-name {
@@ -11775,6 +11796,14 @@ Resources:`;
       flex-shrink: 0;
       overflow: hidden;
       margin-top: 4px
+    }
+
+    .hero-portrait img,
+    .player-portrait img,
+    .enemy-portrait-small img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover
     }
 
     .player-top-row {
@@ -14298,6 +14327,7 @@ Resources:`;
         maxHp: 4,
         faction: '面',
         portrait: '🦆',
+        portraitImg: 'hero_wangsheng.png',
         skills: [{
           name: '无谋',
           type: 'lock',
@@ -14328,6 +14358,7 @@ Resources:`;
         maxHp: 4,
         faction: '群',
         portrait: '🍬',
+        portraitImg: 'hero_manhongyi.png',
         skills: [{
           name: '糖浆',
           type: 'lock',
@@ -14354,6 +14385,7 @@ Resources:`;
         maxHp: 4,
         faction: '面',
         portrait: '😎',
+        portraitImg: 'hero_liyucheng.png',
         skills: [{
           name: '彦祖',
           type: 'lock',
@@ -14380,6 +14412,7 @@ Resources:`;
         maxHp: 4,
         faction: '马',
         portrait: '👑',
+        portraitImg: 'hero_xuzongwei.png',
         skills: [{
           name: '皇威',
           type: 'lock',
@@ -14410,6 +14443,7 @@ Resources:`;
         maxHp: 4,
         faction: '面',
         portrait: '🎀',
+        portraitImg: 'hero_yuchengxiao.png',
         skills: [{
           name: '如鱼得水',
           type: 'lock',
@@ -14436,6 +14470,7 @@ Resources:`;
         maxHp: 4,
         faction: '面',
         portrait: '🐝',
+        portraitImg: 'hero_xuyifeng.png',
         skills: [{
           name: '线上作者',
           type: 'lock',
@@ -14462,6 +14497,7 @@ Resources:`;
         maxHp: 5,
         faction: '面',
         portrait: '🐱',
+        portraitImg: 'hero_sunliangcheng.png',
         skills: [{
           name: '班威',
           type: 'active',
@@ -14484,6 +14520,7 @@ Resources:`;
         maxHp: 6,
         faction: '群',
         portrait: '🐝',
+        portraitImg: 'hero_hajifeng.png',
         skills: [{
           name: '抉择',
           type: 'active',
@@ -14522,6 +14559,7 @@ Resources:`;
         maxHp: 4,
         faction: '面',
         portrait: '🎖️',
+        portraitImg: 'hero_chensicong.png',
         skills: [{
           name: '弹药箱',
           type: 'lock',
@@ -14577,6 +14615,9 @@ Resources:`;
         for (var i = 0; i < HEROES.length; i++) {
           if (HEROES[i].id === lh.id) {
             f = true;
+            // ✅ 云端武将数据补充本地立绘字段，否则图鉴显示emoji
+            if (!HEROES[i].portraitImg && lh.portraitImg) HEROES[i].portraitImg = lh.portraitImg;
+            if (!HEROES[i].portrait && lh.portrait) HEROES[i].portrait = lh.portrait;
             break;
           }
         }
@@ -15044,6 +15085,11 @@ Resources:`;
       return m[f] ? '<span class="faction-tag ' + m[f].c + '">' + m[f].l + '</span>' : '';
     }
 
+    function heroPortraitHTML(h, fb) {
+      if (h && h.portraitImg) return '<img src="' + h.portraitImg + '" alt="">';
+      return (h && h.portrait) || fb || '🧑';
+    }
+
     function renderHeroesGrid() {
       var g = document.getElementById('heroes-grid');
       g.innerHTML = '';
@@ -15078,8 +15124,7 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
           btnHtml = '<button class="hero-select-btn ' + (s ? 'equipped' : '') + '" onclick="selectHero(\'' + hero.id +
             '\')">' + (s ? '✅ 已出战' : '选择') + '</button>';
         }
-        c.innerHTML = '<div class="hero-portrait"><span style="font-size:80px;">' + (hero.portrait || '🧑') +
-          '</span>' + lh + '<div class="hero-name-overlay">' + hero.name +
+        c.innerHTML = '<div class="hero-portrait">' + heroPortraitHTML(hero) + lh + '<div class="hero-name-overlay">' + hero.name +
           '</div></div><div class="hero-info"><div class="hero-title">' + hero.title + getFactionHTML(hero
           .faction) + '</div><div class="hero-hp">❤️ ' + hero.hp + '/' + hero.maxHp +
           '</div></div><div class="hero-skills">' + sh + '</div>' + lr + btnHtml;
@@ -15108,7 +15153,7 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
     var SHOP_ITEMS = [{
       id: 'fuhuo',
       name: '复活币',
-      icon: '💎',
+      icon: '<img src="fuhuo.png" alt="复活币">',
       price: 500,
       desc: '主线战斗中死亡时自动消耗 1 枚，立即满血复活并继续战斗。'
     }, {
@@ -15177,7 +15222,8 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
       type: 'item',
       itemId: 'fuhuo',
       count: 2,
-      label: '💎 复活币 ×2'
+      img: 'fuhuo.png',
+      label: '复活币 ×2'
     }, {
       type: 'hero',
       heroId: 'hajifeng',
@@ -15249,7 +15295,9 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
         else if (!signedToday && i < progress + 1) cls += ' signed';
         else if (!signedToday && i === progress + 1) cls += ' today';
         else cls += ' locked';
-        var ic = (cls.indexOf('signed') !== -1) ? '✅' : (i === 7 ? '🎁' : (i === 6 ? '🐝' : '🪙'));
+        var ic = (cls.indexOf('signed') !== -1) ? '✅' :
+          (SIGNIN_REWARDS[i - 1].img ? '<img src="' + SIGNIN_REWARDS[i - 1].img + '" alt="">' :
+            (i === 7 ? '🎁' : (i === 6 ? '🐝' : '🪙')));
         h += '<div class="' + cls + '"><div class="d-num">第' + i + '天</div>' +
           '<div class="d-ic">' + ic + '</div>' +
           '<div class="d-rw">' + SIGNIN_REWARDS[i - 1].label + '</div></div>';
@@ -17958,22 +18006,22 @@ sync2v2State();
     function render2v2Battle() {
       if (!seats || seats.length < 4) return;
       // 队友信息
-      document.getElementById('tm-portrait').innerText = seats[1].hero.portrait || '🤝';
+      document.getElementById('tm-portrait').innerHTML = heroPortraitHTML(seats[1].hero, '🤝');
       document.getElementById('tm-name').innerText = seats[1].hero.name + (seats[1].alive ? '' : ' 💀');
       document.getElementById('tm-hp').innerText = '❤️ ' + seats[1].hp + '/' + seats[1].maxHp;
       document.getElementById('tm-hand-count').innerText = seats[1].hand.length;
       // 敌人1信息
-      document.getElementById('e1-portrait').innerText = seats[2].hero.portrait || '👹';
+      document.getElementById('e1-portrait').innerHTML = heroPortraitHTML(seats[2].hero, '👹');
       document.getElementById('e1-name').innerText = seats[2].hero.name + (seats[2].alive ? '' : ' 💀');
       document.getElementById('e1-hp').innerText = '❤️ ' + seats[2].hp + '/' + seats[2].maxHp;
       document.getElementById('e1-hand-count').innerText = seats[2].hand.length;
       // 敌人2信息
-      document.getElementById('e2-portrait').innerText = seats[3].hero.portrait || '👺';
+      document.getElementById('e2-portrait').innerHTML = heroPortraitHTML(seats[3].hero, '👺');
       document.getElementById('e2-name').innerText = seats[3].hero.name + (seats[3].alive ? '' : ' 💀');
       document.getElementById('e2-hp').innerText = '❤️ ' + seats[3].hp + '/' + seats[3].maxHp;
       document.getElementById('e2-hand-count').innerText = seats[3].hand.length;
       // 自己信息
-      document.getElementById('my-portrait').innerText = seats[0].hero.portrait || '🧑';
+      document.getElementById('my-portrait').innerHTML = heroPortraitHTML(seats[0].hero, '🧑');
       document.getElementById('my-hero-name').innerText = getDisplayNickname() + ' (' + seats[0].hero.name + ')';
       document.getElementById('my-hp').innerText = '❤️ ' + seats[0].hp + '/' + seats[0].maxHp;
       document.getElementById('my-armor').innerText = seats[0].armor > 0 ? '🛡️' + seats[0].armor : '';
@@ -18595,7 +18643,7 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
       var eh = HEROES.find(function(h) {
         return h.id === gameState.enemyHeroId;
       });
-      document.getElementById('enemy-portrait').innerText = eh ? eh.portrait : '👹';
+      document.getElementById('enemy-portrait').innerHTML = eh ? heroPortraitHTML(eh, '👹') : '👹';
       document.getElementById('enemy-hero-name').innerText = eh ? eh.name : '敌人';
       document.getElementById('enemy-hp').innerText = '❤️ ' + gameState.enemyHp + '/' + gameState.enemyMaxHp;
       document.getElementById('enemy-hand-count').innerText = gameState.enemyHand.length;
@@ -18613,7 +18661,7 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
         d.innerText = j.card.name;
         ej.appendChild(d);
       });
-      document.getElementById('my-portrait').innerText = currentHero.portrait || '🧑';
+      document.getElementById('my-portrait').innerHTML = heroPortraitHTML(currentHero, '🧑');
       document.getElementById('my-hero-name').innerText = getDisplayNickname() + ' (' + currentHero.name + ')';
       document.getElementById('my-hp').innerText = '❤️ ' + gameState.myHp + '/' + gameState.myMaxHp;
       document.getElementById('my-armor').innerText = gameState.myArmor > 0 ? '🛡️' + gameState.myArmor : '';
