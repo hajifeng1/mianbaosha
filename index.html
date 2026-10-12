@@ -10779,7 +10779,9 @@ Resources:`;
     }
 
     #lobby-page {
-      background: linear-gradient(180deg, #2c3e50 0%, #000 100%);
+      background:
+        linear-gradient(180deg, rgba(12, 14, 18, .46) 0%, rgba(12, 14, 18, .74) 100%),
+        url("主页背景图.jpg") center / cover no-repeat #1a1a1a;
       justify-content: space-between
     }
 
@@ -10862,7 +10864,7 @@ Resources:`;
       background: rgba(0, 0, 0, .9);
       display: flex;
       justify-content: space-around;
-      align-items: center;
+      align-items: stretch;
       border-top: 1px solid #444;
       flex-shrink: 0;
       padding-bottom: env(safe-area-inset-bottom)
@@ -11050,14 +11052,19 @@ Resources:`;
       color: #7f8c8d;
       cursor: pointer;
       display: flex;
+      flex: 1;
+      min-width: 0;
+      padding: 4px 2px;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       font-size: 12px;
       transition: color .2s;
       position: relative
     }
 
-    .nav-item:hover {
+    .nav-item:hover,
+    .nav-item.nav-active {
       color: #f1c40f
     }
 
@@ -12529,6 +12536,225 @@ Resources:`;
       border-color: #e74c3c
     }
 
+    /* ===== 聊天 & 反馈 ===== */
+    #chat-page {
+      background: linear-gradient(180deg, rgba(14, 18, 26, .97) 0%, rgba(6, 8, 12, .99) 100%)
+    }
+
+    .chat-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      background: rgba(0, 0, 0, .58);
+      border-bottom: 1px solid #444;
+      flex-shrink: 0
+    }
+
+    .chat-header-main {
+      flex: 1;
+      min-width: 0
+    }
+
+    .chat-header-main h2 {
+      margin: 0;
+      font-size: 18px;
+      color: #f1c40f;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .chat-subtitle {
+      margin-top: 2px;
+      font-size: 11px;
+      color: #95a5a6;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .chat-mode-btn {
+      flex-shrink: 0;
+      border: 1px solid #f1c40f;
+      border-radius: 20px;
+      padding: 8px 12px;
+      background: rgba(241, 196, 15, .1);
+      color: #f1c40f;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      touch-action: manipulation
+    }
+
+    .chat-mode-btn.feedback-on {
+      background: linear-gradient(135deg, #f1c40f, #e67e22);
+      border-color: #f39c12;
+      color: #3d2800
+    }
+
+    .chat-status {
+      min-height: 24px;
+      padding: 4px 12px;
+      box-sizing: border-box;
+      font-size: 12px;
+      color: #95a5a6;
+      background: rgba(0, 0, 0, .28);
+      border-bottom: 1px solid rgba(255, 255, 255, .06);
+      flex-shrink: 0
+    }
+
+    .chat-status.ok {
+      color: #2ecc71
+    }
+
+    .chat-status.warn {
+      color: #f39c12
+    }
+
+    .chat-status.error {
+      color: #e74c3c
+    }
+
+    .chat-messages {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      padding: 14px 12px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      -webkit-overflow-scrolling: touch
+    }
+
+    .chat-empty {
+      margin: auto;
+      max-width: 260px;
+      color: #7f8c8d;
+      text-align: center;
+      font-size: 13px;
+      line-height: 1.7
+    }
+
+    .chat-message {
+      max-width: min(82%, 520px);
+      padding: 9px 11px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, .075);
+      border: 1px solid rgba(255, 255, 255, .12);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, .18);
+      align-self: flex-start
+    }
+
+    .chat-message.own {
+      align-self: flex-end;
+      background: linear-gradient(135deg, rgba(52, 152, 219, .34), rgba(41, 128, 185, .24));
+      border-color: rgba(52, 152, 219, .55)
+    }
+
+    .chat-message.feedback-msg {
+      background: linear-gradient(135deg, rgba(241, 196, 15, .18), rgba(230, 126, 34, .12));
+      border-color: rgba(241, 196, 15, .48)
+    }
+
+    .chat-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 4px;
+      font-size: 11px;
+      color: #95a5a6
+    }
+
+    .chat-author {
+      min-width: 0;
+      color: #f1c40f;
+      font-weight: bold;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap
+    }
+
+    .chat-time {
+      flex-shrink: 0
+    }
+
+    .chat-content {
+      font-size: 14px;
+      line-height: 1.55;
+      color: #ecf0f1;
+      word-break: break-word;
+      white-space: pre-wrap
+    }
+
+    .chat-expiry {
+      margin-top: 5px;
+      font-size: 10px;
+      color: #7f8c8d
+    }
+
+    .chat-input-bar {
+      display: flex;
+      gap: 8px;
+      padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+      background: rgba(0, 0, 0, .88);
+      border-top: 1px solid #444;
+      flex-shrink: 0
+    }
+
+    .chat-input-bar input {
+      flex: 1;
+      min-width: 0;
+      padding: 12px 14px;
+      border: 1px solid #555;
+      border-radius: 22px;
+      outline: none;
+      background: rgba(255, 255, 255, .08);
+      color: #fff;
+      font-size: 15px;
+      box-sizing: border-box
+    }
+
+    .chat-input-bar input:focus {
+      border-color: #f1c40f
+    }
+
+    .chat-send-btn {
+      flex-shrink: 0;
+      border: none;
+      border-radius: 22px;
+      padding: 0 18px;
+      background: linear-gradient(135deg, #f1c40f, #e67e22);
+      color: #3d2800;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      touch-action: manipulation
+    }
+
+    .chat-send-btn:active,
+    .chat-mode-btn:active {
+      transform: scale(.97);
+      opacity: .88
+    }
+
+    @media (max-width:380px) {
+      .chat-header {
+        gap: 7px;
+        padding: 10px
+      }
+
+      .chat-header-main h2 {
+        font-size: 16px
+      }
+
+      .chat-mode-btn {
+        padding: 7px 9px;
+        font-size: 12px
+      }
+    }
+
     /* 弹窗统一遮罩定位（修复弹窗打开后不可见） */
     #friends-modal,
     #invite-modal,
@@ -12703,6 +12929,7 @@ Resources:`;
         <div class="nav-item" onclick="showHeroesPage()"><i>⚔️</i>武将</div>
         <div class="nav-item" onclick="openShopPage()"><i>🛒</i>商城</div>
         <div class="nav-item" onclick="openRankPage()"><i>🏆</i>排行</div>
+        <div class="nav-item" id="nav-chat" onclick="openChatPage()"><i>💬</i>聊天</div>
         <div class="nav-item" onclick="openFriendsModal()"><i>🤝</i>好友<span class="nav-badge" id="req-badge-nav"
             style="display:none;">0</span></div>
         <div class="nav-item" onclick="openBagPage()"><i>🎒</i>背包</div>
@@ -12752,6 +12979,22 @@ Resources:`;
       </div>
       <div class="lb-subtitle">按胜场排名 · 每分钟自动缓存更新</div>
       <div class="lb-list" id="lb-list"></div>
+    </div>
+    <div id="chat-page" class="page">
+      <div class="chat-header">
+        <button class="btn-back" onclick="closeChatPage()">← 返回</button>
+        <div class="chat-header-main">
+          <h2 id="chat-page-title">💬 聊天频道</h2>
+          <div class="chat-subtitle" id="chat-subtitle">消息从发出时起保留 7 天</div>
+        </div>
+        <button class="chat-mode-btn" id="chat-mode-btn" onclick="toggleChatFeedbackMode()">📝 反馈</button>
+      </div>
+      <div class="chat-status" id="chat-status">准备加载...</div>
+      <div class="chat-messages" id="chat-messages"></div>
+      <div class="chat-input-bar">
+        <input type="text" id="chat-input" maxlength="500" placeholder="说点什么..." autocomplete="off">
+        <button class="chat-send-btn" onclick="sendChatMessage()">发送</button>
+      </div>
     </div>
     <div id="level-page" class="page">
       <div class="heroes-header"><button class="btn-back" onclick="closeSubPage('level-page')">← 返回</button>
@@ -12943,7 +13186,10 @@ Resources:`;
     };
     var isSavingProfile = false,
       currentRemarkUid = '',
-      isDataLoaded = false;
+      isDataLoaded = false,
+      cloudProfileLoaded = false,
+      cloudProfileExisted = false,
+      profileStorage = makeSafeStorage();
 
     function safeQuery(q, label) {
       return new Promise(function(resolve) {
@@ -13199,6 +13445,15 @@ Resources:`;
             ownedHeroes: [],
             levelProgress: 0
           };
+          cloudProfileLoaded = false;
+          cloudProfileExisted = false;
+          stopChatSystem();
+          chatMode = 'chat';
+          chatMessages = [];
+          feedbackMessages = [];
+          chatRemoteAvailable = false;
+          feedbackRemoteMode = '';
+          updateChatModeUI();
           updateLobbyRankUI();
           authModal.style.display = 'flex';
           gameWrapper.style.display = 'none';
@@ -13230,11 +13485,70 @@ Resources:`;
         } catch (e) {}
       })();
     }
+
+    function hasMeaningfulProfileData(p) {
+      p = p || {};
+      return ((p.level || 1) > 1) ||
+        ((p.wins || 0) > 0) ||
+        ((p.losses || 0) > 0) ||
+        ((p.coins || 0) > 0) ||
+        ((p.yuanbao || 0) > 0) ||
+        ((p.levelProgress || 0) > 0) ||
+        (Array.isArray(p.ownedHeroes) && p.ownedHeroes.length > 0) ||
+        Object.keys(p.inventory || {}).length > 0 ||
+        Object.keys(p.friends_remark || {}).length > 0 ||
+        !!(p.nickname && String(p.nickname).trim());
+    }
+
+    function getProfileBackupKey() {
+      return 'bread-kill-profile-backup:' + currentUserId;
+    }
+
+    function readProfileBackup() {
+      try {
+        var v = JSON.parse(profileStorage.getItem(getProfileBackupKey()) || 'null');
+        return (v && typeof v === 'object') ? v : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function writeProfileBackup(data) {
+      try {
+        var oldBackup = readProfileBackup();
+        // 永远不要用空白新档覆盖本机保留的旧备份。
+        if (oldBackup && hasMeaningfulProfileData(oldBackup.save_data) && !hasMeaningfulProfileData(data)) return;
+        profileStorage.setItem(getProfileBackupKey(), JSON.stringify({
+          save_data: data,
+          backed_up_at: new Date().toISOString()
+        }));
+      } catch (e) {}
+    }
+
+    function isProfileRegression(current, backup) {
+      current = current || {};
+      backup = backup || {};
+      if ((backup.level || 1) > 1 && (current.level || 1) <= 1) return true;
+      if ((backup.wins || 0) > 0 && (current.wins || 0) <= 0) return true;
+      if ((backup.losses || 0) > 0 && (current.losses || 0) <= 0) return true;
+      if ((backup.yuanbao || 0) > 0 && (current.yuanbao || 0) <= 0) return true;
+      if ((backup.levelProgress || 0) > 0 && (current.levelProgress || 0) <= 0) return true;
+      if ((backup.ownedHeroes || []).length > 0 && (current.ownedHeroes || []).length <= 0) return true;
+      if (Object.keys(backup.inventory || {}).length > 0 && Object.keys(current.inventory || {}).length <= 0) return true;
+      return false;
+    }
+
     async function saveProfileToCloud() {
-      if (isOfflineMode || !currentUserId || !sb || !isDataLoaded) return false;
+      if (isOfflineMode || !currentUserId || !sb || !isDataLoaded || !cloudProfileLoaded) return false;
       if (isSavingProfile) return false;
       isSavingProfile = true;
       try {
+        var localBackup = readProfileBackup();
+        if (cloudProfileExisted && localBackup && isProfileRegression(userProfile, localBackup.save_data)) {
+          // 检测到等级、胜场、武将或道具异常归零：立即阻止空档覆盖云端。
+          console.error('[存档保护] 检测到账号数据异常回退，已阻止保存。', localBackup.save_data);
+          return false;
+        }
         var r = await sb.from('user_saves').upsert({
           user_id: currentUserId,
           save_data: userProfile,
@@ -13250,7 +13564,10 @@ Resources:`;
       }
     }
     async function loadSaveFromCloud() {
+      cloudProfileLoaded = false;
+      cloudProfileExisted = false;
       if (isOfflineMode || !sb) {
+        cloudProfileLoaded = true;
         isDataLoaded = true;
         updateLobbyRankUI();
         renderHeroesGrid();
@@ -13259,7 +13576,19 @@ Resources:`;
       try {
         var r = await safeQuery(sb.from('user_saves').select('save_data').eq('user_id', currentUserId).maybeSingle(),
           'load_save');
+        if (r.error) {
+          // 加载失败时绝不把默认档案标记为“已加载”，避免任何后续操作覆盖云端。
+          var backup = readProfileBackup();
+          if (backup && backup.save_data) userProfile = Object.assign({}, userProfile, backup.save_data);
+          isDataLoaded = false;
+          updateLobbyRankUI();
+          updateAllNicknameDisplays();
+          renderHeroesGrid();
+          console.error('[存档保护] 云端存档加载失败，本次登录已切换为只读模式。', r.error);
+          return;
+        }
         if (r.data && r.data.save_data) {
+          cloudProfileExisted = true;
           var d = r.data.save_data;
           userProfile.level = typeof d.level === 'number' ? d.level : 1;
           userProfile.wins = typeof d.wins === 'number' ? d.wins : 0;
@@ -13274,9 +13603,23 @@ Resources:`;
           userProfile.inventory = (typeof d.inventory === 'object' && d.inventory !== null) ? d.inventory : {};
           userProfile.ownedHeroes = Array.isArray(d.ownedHeroes) ? d.ownedHeroes : [];
           userProfile.levelProgress = (typeof d.levelProgress === 'number' && d.levelProgress >= 0) ? d.levelProgress : 0;
+          var localBackup = readProfileBackup();
+          if (localBackup && localBackup.save_data && isProfileRegression(userProfile, localBackup.save_data)) {
+            userProfile = Object.assign({}, userProfile, localBackup.save_data);
+            console.warn('[存档保护] 检测到云端档案异常回退，已从本机备份恢复。');
+            setTimeout(function() {
+              saveProfileToCloud();
+            }, 800);
+          }
+          writeProfileBackup(userProfile);
         }
-      } catch (e) {}
-      isDataLoaded = true;
+        cloudProfileLoaded = true;
+        isDataLoaded = true;
+      } catch (e) {
+        isDataLoaded = false;
+        cloudProfileLoaded = false;
+        console.error('[存档保护] 云端存档读取异常，本次登录已切换为只读模式。', e);
+      }
       updateLobbyRankUI();
       updateAllNicknameDisplays();
       renderHeroesGrid();
@@ -15220,6 +15563,618 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
       document.getElementById(_subPageFrom || 'lobby-page').classList.add('active');
       updateLobbyRankUI();
     }
+
+    /* ================================================================
+     *  ✅ 聊天 & 反馈系统
+     * 聊天消息：发出后 7 天自动过期清理
+     * 反馈消息：不进入聊天频道，仅管理员账号可见
+     * ================================================================ */
+    var CHAT_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+    var CHAT_TABLE = 'chat_messages';
+    var FEEDBACK_TABLE = 'feedback_messages';
+
+    // 反馈管理员 Supabase UID（账号管理 → 查看UID），多个管理员可用英文逗号分隔。
+    var ADMIN_USER_ID = '8cfa6acc-0247-45a6-b8f9-5da4c4238e89';
+
+    var chatMode = 'chat'; // chat | feedback
+    var chatMessages = [];
+    var feedbackMessages = [];
+    var chatRemoteAvailable = false;
+    var feedbackRemoteMode = ''; // table | rooms | local
+    var chatChannel = null;
+    var chatPollTimer = null;
+    var chatCleanupTimer = null;
+    var chatStatusTimer = null;
+    var chatLocalStorage = makeSafeStorage();
+
+    function getChatUserId() {
+      if (currentUserId) return currentUserId;
+      var key = 'bread-kill-offline-uid';
+      var uid = chatLocalStorage.getItem(key);
+      if (!uid) {
+        uid = 'offline-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+        chatLocalStorage.setItem(key, uid);
+      }
+      return uid;
+    }
+
+    function getPrimaryAdminUserId() {
+      return (ADMIN_USER_ID || '').split(',').map(function(s) {
+        return s.trim();
+      }).filter(Boolean)[0] || '';
+    }
+
+    function isChatAdmin() {
+      if (!currentUserId) return false;
+      return (ADMIN_USER_ID || '').split(',').map(function(s) {
+        return s.trim();
+      }).filter(Boolean).indexOf(currentUserId) !== -1;
+    }
+
+    function readLocalList(key) {
+      try {
+        var v = JSON.parse(chatLocalStorage.getItem(key) || '[]');
+        return Array.isArray(v) ? v : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function writeLocalList(key, rows) {
+      try {
+        chatLocalStorage.setItem(key, JSON.stringify(rows || []));
+      } catch (e) {}
+    }
+
+    function chatLocalKey(prefix) {
+      return prefix + ':' + getChatUserId();
+    }
+
+    function getTimeMs(v) {
+      if (typeof v === 'number') return v;
+      if (!v) return NaN;
+      var t = new Date(v).getTime();
+      return isNaN(t) ? NaN : t;
+    }
+
+    function normalizeChatMessage(m) {
+      m = m || {};
+      var createdMs = getTimeMs(m.created_at || m.createdAt);
+      if (!isFinite(createdMs)) createdMs = Date.now();
+      var expiresMs = getTimeMs(m.expires_at || m.expiresAt);
+      if (!isFinite(expiresMs)) expiresMs = createdMs + CHAT_TTL_MS;
+      return {
+        id: String(m.id || ('local-' + createdMs + '-' + Math.random().toString(36).slice(2, 8))),
+        user_id: m.user_id || m.userId || '',
+        sender_name: String(m.sender_name || m.senderName || m.nickname || '玩家'),
+        content: String(m.content || ''),
+        created_at: new Date(createdMs).toISOString(),
+        expires_at: new Date(expiresMs).toISOString(),
+        createdMs: createdMs,
+        expiresMs: expiresMs
+      };
+    }
+
+    function normalizeFeedbackMessage(m) {
+      m = m || {};
+      var createdMs = getTimeMs(m.created_at || m.createdAt);
+      if (!isFinite(createdMs)) createdMs = Date.now();
+      return {
+        id: String(m.id || ('feedback-local-' + createdMs + '-' + Math.random().toString(36).slice(2, 8))),
+        user_id: m.user_id || m.userId || '',
+        sender_name: String(m.sender_name || m.senderName || m.nickname || '玩家'),
+        content: String(m.content || ''),
+        created_at: new Date(createdMs).toISOString(),
+        createdMs: createdMs
+      };
+    }
+
+    function isLiveChatMessage(m) {
+      return !!(m && m.expiresMs > Date.now() && String(m.content || '').trim());
+    }
+
+    function sortChatAsc(a, b) {
+      return (a.createdMs || 0) - (b.createdMs || 0);
+    }
+
+    function sortFeedbackDesc(a, b) {
+      return (b.createdMs || 0) - (a.createdMs || 0);
+    }
+
+    function setChatStatus(text, type) {
+      var el = document.getElementById('chat-status');
+      if (!el) return;
+      if (chatStatusTimer) {
+        clearTimeout(chatStatusTimer);
+        chatStatusTimer = null;
+      }
+      el.innerText = text || '';
+      el.className = 'chat-status' + (type ? ' ' + type : '');
+      if (type === 'ok' || type === 'warn') {
+        chatStatusTimer = setTimeout(function() {
+          if (el.innerText === text) {
+            el.innerText = '';
+            el.className = 'chat-status';
+          }
+        }, 5000);
+      }
+    }
+
+    function formatChatTime(iso) {
+      var d = new Date(iso);
+      if (isNaN(d.getTime())) return '';
+      var mm = d.getMonth() + 1,
+        dd = d.getDate(),
+        hh = d.getHours(),
+        mi = d.getMinutes();
+      return (mm < 10 ? '0' + mm : mm) + '-' + (dd < 10 ? '0' + dd : dd) + ' ' +
+        (hh < 10 ? '0' + hh : hh) + ':' + (mi < 10 ? '0' + mi : mi);
+    }
+
+    function formatChatExpiry(m) {
+      var ms = (m.expiresMs || 0) - Date.now();
+      if (ms <= 0) return '已到期清除';
+      var days = Math.floor(ms / 86400000),
+        hours = Math.floor(ms % 86400000 / 3600000),
+        minutes = Math.floor(ms % 3600000 / 60000);
+      if (days > 0) return days + ' 天 ' + hours + ' 小时后清除';
+      if (hours > 0) return hours + ' 小时 ' + minutes + ' 分钟后清除';
+      return Math.max(1, minutes) + ' 分钟后清除';
+    }
+
+    function updateChatModeUI() {
+      var isFeedback = chatMode === 'feedback',
+        title = document.getElementById('chat-page-title'),
+        sub = document.getElementById('chat-subtitle'),
+        btn = document.getElementById('chat-mode-btn'),
+        input = document.getElementById('chat-input');
+      if (title) title.innerText = isFeedback ? '📮 反馈给开发者' : '💬 聊天频道';
+      if (sub) sub.innerText = isFeedback ? '不会出现在聊天频道 · 仅开发者可见' : '消息从发出时起保留 7 天';
+      if (btn) {
+        btn.innerText = isFeedback ? '💬 聊天' : '📝 反馈';
+        btn.className = 'chat-mode-btn' + (isFeedback ? ' feedback-on' : '');
+      }
+      if (input) input.placeholder = isFeedback ? '请输入反馈内容...' : '说点什么...';
+    }
+
+    function renderChatMessages() {
+      var box = document.getElementById('chat-messages');
+      if (!box) return;
+      var rows = chatMode === 'feedback' ? feedbackMessages : chatMessages;
+      if (!rows.length) {
+        box.innerHTML = '<div class="chat-empty">' + (chatMode === 'feedback' ?
+          '暂无反馈记录<br>点击右上角「💬 聊天」可返回频道' :
+          '暂时没有消息<br>发送第一条消息，和大家打个招呼吧') + '</div>';
+        return;
+      }
+      var html = '';
+      rows.forEach(function(m) {
+        var own = !!(currentUserId && m.user_id === currentUserId),
+          cls = 'chat-message' + (own ? ' own' : '') + (chatMode === 'feedback' ? ' feedback-msg' : ''),
+          author = esc(m.sender_name || '玩家'),
+          time = esc(formatChatTime(m.created_at)),
+          expiry = '';
+        if (chatMode === 'chat') expiry = '<div class="chat-expiry">⏳ ' + esc(formatChatExpiry(m)) + '</div>';
+        else expiry = '<div class="chat-expiry">🔒 仅开发者可见' + (isChatAdmin() && !own ? ' · 玩家反馈' : '') + '</div>';
+        html += '<div class="' + cls + '"><div class="chat-meta"><span class="chat-author">' + author +
+          '</span><span class="chat-time">' + time + '</span></div><div class="chat-content">' + esc(m.content) +
+          '</div>' + expiry + '</div>';
+      });
+      box.innerHTML = html;
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function appendChatMessage(raw) {
+      var m = normalizeChatMessage(raw);
+      if (!isLiveChatMessage(m)) return;
+      for (var i = 0; i < chatMessages.length; i++) {
+        if (String(chatMessages[i].id) === String(m.id)) return;
+      }
+      chatMessages.push(m);
+      chatMessages.sort(sortChatAsc);
+      if (chatMode === 'chat') renderChatMessages();
+    }
+
+    function replaceChatMessage(oldId, raw) {
+      var found = false,
+        m = normalizeChatMessage(raw);
+      chatMessages = chatMessages.map(function(x) {
+        if (String(x.id) === String(oldId)) {
+          found = true;
+          return m;
+        }
+        return x;
+      });
+      if (!found) chatMessages.push(m);
+      chatMessages.sort(sortChatAsc);
+      if (chatMode === 'chat') renderChatMessages();
+    }
+
+    function loadLocalChatMessages() {
+      var rows = readLocalList(chatLocalKey('bread-kill-chat')).map(normalizeChatMessage).filter(isLiveChatMessage);
+      rows.sort(sortChatAsc);
+      writeLocalList(chatLocalKey('bread-kill-chat'), rows.slice(-200));
+      chatMessages = rows.slice(-200);
+      if (chatMode === 'chat') renderChatMessages();
+    }
+
+    function saveLocalChatMessage(raw) {
+      var m = normalizeChatMessage(raw),
+        rows = readLocalList(chatLocalKey('bread-kill-chat')).map(normalizeChatMessage);
+      rows.push(m);
+      rows = rows.filter(isLiveChatMessage).sort(sortChatAsc).slice(-200);
+      writeLocalList(chatLocalKey('bread-kill-chat'), rows);
+      chatMessages = rows;
+      if (chatMode === 'chat') renderChatMessages();
+    }
+
+    function loadLocalFeedbackMessages() {
+      var rows = readLocalList(chatLocalKey('bread-kill-feedback')).map(normalizeFeedbackMessage);
+      rows.sort(sortFeedbackDesc);
+      feedbackMessages = rows.slice(0, 100);
+      if (chatMode === 'feedback') renderChatMessages();
+    }
+
+    function saveLocalFeedbackMessage(raw) {
+      var m = normalizeFeedbackMessage(raw),
+        rows = readLocalList(chatLocalKey('bread-kill-feedback')).map(normalizeFeedbackMessage);
+      rows.unshift(m);
+      rows.sort(sortFeedbackDesc);
+      rows = rows.slice(0, 100);
+      writeLocalList(chatLocalKey('bread-kill-feedback'), rows);
+      feedbackMessages = rows;
+      if (chatMode === 'feedback') renderChatMessages();
+    }
+
+    async function loadChatMessages(silent) {
+      if (chatMode !== 'chat') return;
+      if (isOfflineMode || !sb || !currentUserId) {
+        chatRemoteAvailable = false;
+        loadLocalChatMessages();
+        if (!silent) setChatStatus('离线模式：消息暂存在本机', 'warn');
+        startChatPolling();
+        return;
+      }
+      if (!silent) setChatStatus('加载聊天...');
+      var cutoff = new Date(Date.now() - CHAT_TTL_MS).toISOString(),
+        res = await safeQuery(sb.from(CHAT_TABLE)
+          .select('id,user_id,sender_name,content,created_at,expires_at')
+          .gte('created_at', cutoff)
+          .order('created_at', {
+            ascending: true
+          })
+          .limit(200), 'load_chat');
+      if (res.error) {
+        chatRemoteAvailable = false;
+        loadLocalChatMessages();
+        if (!silent) setChatStatus('聊天服务未连接，已使用本机暂存', 'warn');
+        startChatPolling();
+        return;
+      }
+      chatRemoteAvailable = true;
+      chatMessages = (res.data || []).map(normalizeChatMessage).filter(isLiveChatMessage).sort(sortChatAsc);
+      renderChatMessages();
+      if (!silent) setChatStatus('已连接聊天频道', 'ok');
+      startChatRealtime();
+      startChatPolling();
+    }
+
+    function startChatRealtime() {
+      if (chatChannel || !sb || !currentUserId) return;
+      try {
+        chatChannel = sb.channel('bread-kill-global-chat').on('postgres_changes', {
+          event: 'INSERT',
+          schema: 'public',
+          table: CHAT_TABLE
+        }, function(payload) {
+          if (chatMode !== 'chat') return;
+          appendChatMessage(payload.new || payload.record || {});
+          cleanupExpiredChatMessages();
+        }).subscribe(function(status) {
+          if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+            setChatStatus('实时连接失败，将自动刷新', 'warn');
+          }
+        });
+      } catch (e) {
+        chatChannel = null;
+      }
+    }
+
+    function startChatPolling() {
+      if (chatPollTimer) clearInterval(chatPollTimer);
+      chatPollTimer = setInterval(function() {
+        var page = document.getElementById('chat-page');
+        if (!page || !page.classList.contains('active')) return;
+        cleanupExpiredChatMessages();
+        if (chatMode === 'chat') loadChatMessages(true);
+        else loadFeedbackMessages(true);
+      }, 12000);
+      if (chatCleanupTimer) clearInterval(chatCleanupTimer);
+      chatCleanupTimer = setInterval(cleanupExpiredChatMessages, 60000);
+    }
+
+    function stopChatSystem() {
+      if (chatChannel) {
+        try {
+          chatChannel.unsubscribe();
+        } catch (e) {}
+        try {
+          if (sb) sb.removeChannel(chatChannel);
+        } catch (e) {}
+        chatChannel = null;
+      }
+      if (chatPollTimer) {
+        clearInterval(chatPollTimer);
+        chatPollTimer = null;
+      }
+      if (chatCleanupTimer) {
+        clearInterval(chatCleanupTimer);
+        chatCleanupTimer = null;
+      }
+    }
+
+    async function cleanupExpiredChatMessages() {
+      var now = Date.now(),
+        before = chatMessages.length;
+      chatMessages = chatMessages.filter(function(m) {
+        return m.expiresMs > now;
+      });
+      if (chatMessages.length !== before && chatMode === 'chat') renderChatMessages();
+
+      var localRows = readLocalList(chatLocalKey('bread-kill-chat')).map(normalizeChatMessage).filter(isLiveChatMessage);
+      writeLocalList(chatLocalKey('bread-kill-chat'), localRows.slice(-200));
+
+      if (chatRemoteAvailable && sb && currentUserId) {
+        safeQuery(sb.from(CHAT_TABLE).delete().lt('expires_at', new Date(now).toISOString()), 'cleanup_chat').catch(
+          function() {});
+      }
+    }
+
+    async function sendChatMessage() {
+      var input = document.getElementById('chat-input');
+      if (!input) return;
+      var content = input.value.trim();
+      if (!content) {
+        setChatStatus('请输入内容', 'warn');
+        return;
+      }
+      if (content.length > 500) content = content.slice(0, 500);
+      if (chatMode === 'feedback') {
+        sendFeedbackMessage(content);
+        return;
+      }
+      if (isOfflineMode || !sb || !currentUserId || !chatRemoteAvailable) {
+        saveLocalChatMessage({
+          user_id: getChatUserId(),
+          sender_name: getDisplayNickname(),
+          content: content
+        });
+        input.value = '';
+        setChatStatus(isOfflineMode ? '离线消息已保存到本机' : '聊天服务未连接，消息已保存到本机', 'warn');
+        return;
+      }
+      var localId = 'pending-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8),
+        created = new Date().toISOString(),
+        msg = normalizeChatMessage({
+          id: localId,
+          user_id: currentUserId,
+          sender_name: getDisplayNickname(),
+          content: content,
+          created_at: created,
+          expires_at: new Date(Date.now() + CHAT_TTL_MS).toISOString()
+        });
+      appendChatMessage(msg);
+      input.value = '';
+      setChatStatus('发送中...');
+      var res = await safeQuery(sb.from(CHAT_TABLE).insert({
+        user_id: currentUserId,
+        sender_name: getDisplayNickname(),
+        content: content,
+        created_at: created,
+        expires_at: msg.expires_at
+      }).select().single(), 'send_chat');
+      if (res.error || !res.data) {
+        chatMessages = chatMessages.filter(function(m) {
+          return String(m.id) !== String(localId);
+        });
+        chatRemoteAvailable = false;
+        saveLocalChatMessage(msg);
+        setChatStatus('发送失败，已保存到本机', 'warn');
+      } else {
+        replaceChatMessage(localId, res.data);
+        setChatStatus('已发送', 'ok');
+      }
+    }
+
+    function isMissingFeedbackTableError(err) {
+      var msg = ((err && err.message) || String(err || '')).toLowerCase();
+      return msg.indexOf('feedback_messages') !== -1 && (msg.indexOf('could not find') !== -1 || msg.indexOf(
+        'pgrst205') !== -1);
+    }
+
+    async function loadFeedbackMessages(silent) {
+      if (chatMode !== 'feedback') return;
+      updateChatModeUI();
+      if (isOfflineMode || !sb || !currentUserId) {
+        feedbackRemoteMode = 'local';
+        loadLocalFeedbackMessages();
+        if (!silent) setChatStatus('离线模式：反馈暂存在本机', 'warn');
+        startChatPolling();
+        return;
+      }
+      if (!silent) setChatStatus('加载反馈...');
+
+      // 优先使用独立反馈表；管理员可查全部，普通玩家只能查自己的反馈。
+      var fbQ = sb.from(FEEDBACK_TABLE).select('id,user_id,sender_name,content,created_at').order('created_at', {
+        ascending: false
+      }).limit(100);
+      if (!isChatAdmin()) fbQ = fbQ.eq('user_id', currentUserId);
+      var tableRes = await safeQuery(fbQ, 'load_feedback_table');
+      if (!tableRes.error) {
+        feedbackRemoteMode = 'table';
+        feedbackMessages = (tableRes.data || []).map(normalizeFeedbackMessage).sort(sortFeedbackDesc);
+        renderChatMessages();
+        if (!silent) setChatStatus(isChatAdmin() ? '已加载全部玩家反馈' : '已加载我的反馈', 'ok');
+        startChatPolling();
+        return;
+      }
+
+      // 兼容回退：复用现有 game_rooms 的权限边界，发送者是 host，开发者是 guest。
+      var roomQ = sb.from('game_rooms').select('id,host_id,guest_id,game_data,created_at').eq('status', 'feedback');
+      if (isChatAdmin() && getPrimaryAdminUserId()) roomQ = roomQ.eq('guest_id', getPrimaryAdminUserId());
+      else roomQ = roomQ.eq('host_id', currentUserId);
+      var roomRes = await safeQuery(roomQ.order('created_at', {
+        ascending: false
+      }).limit(100), 'load_feedback_rooms');
+      if (!roomRes.error) {
+        feedbackRemoteMode = 'rooms';
+        feedbackMessages = (roomRes.data || []).map(function(r) {
+          var d = (r && r.game_data) || {};
+          return normalizeFeedbackMessage({
+            id: r.id,
+            user_id: d.sender_id || r.host_id,
+            sender_name: d.sender_name,
+            content: d.content,
+            created_at: d.created_at || r.created_at
+          });
+        }).sort(sortFeedbackDesc);
+        renderChatMessages();
+        if (!silent) setChatStatus(isChatAdmin() ? '已加载全部玩家反馈' : '反馈已发送给开发者', 'ok');
+        startChatPolling();
+        return;
+      }
+
+      feedbackRemoteMode = 'local';
+      loadLocalFeedbackMessages();
+      if (!silent) {
+        if (isMissingFeedbackTableError(tableRes.error)) {
+          setChatStatus('缺少 feedback_messages 数据表，请先在 Supabase 创建', 'error');
+        } else {
+          setChatStatus('反馈服务未连接，已保存到本机', 'warn');
+        }
+      }
+      startChatPolling();
+    }
+
+    function appendFeedbackMessage(raw) {
+      var m = normalizeFeedbackMessage(raw);
+      if (!String(m.content || '').trim()) return;
+      feedbackMessages.unshift(m);
+      feedbackMessages.sort(sortFeedbackDesc);
+      feedbackMessages = feedbackMessages.slice(0, 100);
+      if (chatMode === 'feedback') renderChatMessages();
+    }
+
+    async function sendFeedbackMessage(content) {
+      if (isOfflineMode || !sb || !currentUserId) {
+        saveLocalFeedbackMessage({
+          user_id: getChatUserId(),
+          sender_name: getDisplayNickname(),
+          content: content
+        });
+        document.getElementById('chat-input').value = '';
+        setChatStatus('离线反馈已保存到本机', 'warn');
+        return;
+      }
+      var msg = normalizeFeedbackMessage({
+        id: 'feedback-pending-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8),
+        user_id: currentUserId,
+        sender_name: getDisplayNickname(),
+        content: content,
+        created_at: new Date().toISOString()
+      });
+      setChatStatus('发送反馈...');
+
+      if (feedbackRemoteMode !== 'rooms') {
+        var tableRes = await safeQuery(sb.from(FEEDBACK_TABLE).insert({
+          user_id: currentUserId,
+          sender_name: getDisplayNickname(),
+          content: content,
+          created_at: msg.created_at
+        }).select().single(), 'send_feedback_table');
+        if (!tableRes.error && tableRes.data) {
+          feedbackRemoteMode = 'table';
+          appendFeedbackMessage(tableRes.data);
+          document.getElementById('chat-input').value = '';
+          setChatStatus('✅ 反馈已发送给开发者', 'ok');
+          return;
+        }
+      }
+
+      var adminId = getPrimaryAdminUserId() || currentUserId,
+        roomRes = await safeQuery(sb.from('game_rooms').insert({
+          host_id: currentUserId,
+          guest_id: adminId,
+          status: 'feedback',
+          game_data: {
+            type: 'feedback',
+            sender_id: currentUserId,
+            sender_name: getDisplayNickname(),
+            content: content,
+            created_at: msg.created_at,
+            client_id: msg.id
+          }
+        }).select().single(), 'send_feedback_room');
+      if (!roomRes.error && roomRes.data) {
+        feedbackRemoteMode = 'rooms';
+        appendFeedbackMessage({
+          id: roomRes.data.id,
+          user_id: currentUserId,
+          sender_name: getDisplayNickname(),
+          content: content,
+          created_at: msg.created_at
+        });
+        document.getElementById('chat-input').value = '';
+        setChatStatus('✅ 反馈已发送给开发者', 'ok');
+      } else {
+        saveLocalFeedbackMessage(msg);
+        document.getElementById('chat-input').value = '';
+        if (isMissingFeedbackTableError(tableRes && tableRes.error)) {
+          setChatStatus('缺少 feedback_messages 数据表，请先在 Supabase 创建', 'error');
+        } else {
+          setChatStatus('反馈服务未连接，已保存到本机', 'warn');
+        }
+      }
+    }
+
+    function startChatSystem() {
+      updateChatModeUI();
+      cleanupExpiredChatMessages();
+      if (chatMode === 'feedback') loadFeedbackMessages(false);
+      else loadChatMessages(false);
+    }
+
+    function openChatPage() {
+      var pageIds = ['lobby-page', 'activity-page', 'heroes-page', 'shop-page', 'bag-page', 'rank-page', 'level-page'];
+      pageIds.forEach(function(id) {
+        var p = document.getElementById(id);
+        if (p) p.classList.remove('active');
+      });
+      document.getElementById('chat-page').classList.add('active');
+      var nav = document.getElementById('nav-chat');
+      if (nav) nav.classList.add('nav-active');
+      startChatSystem();
+    }
+
+    function closeChatPage() {
+      stopChatSystem();
+      document.getElementById('chat-page').classList.remove('active');
+      document.getElementById('lobby-page').classList.add('active');
+      var nav = document.getElementById('nav-chat');
+      if (nav) nav.classList.remove('nav-active');
+      updateLobbyRankUI();
+    }
+
+    function toggleChatFeedbackMode() {
+      chatMode = chatMode === 'feedback' ? 'chat' : 'feedback';
+      stopChatSystem();
+      startChatSystem();
+    }
+
+    document.getElementById('chat-input').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') sendChatMessage();
+    });
+    updateChatModeUI();
 
     /* ================================================================
      *  ✅ 杂栏 · 活动系统
