@@ -11653,6 +11653,54 @@ Resources:`;
       padding: 6px
     }
 
+    #battle-page.mode-2v2.active {
+      display: grid;
+      grid-template-columns: minmax(150px, auto) 1fr minmax(150px, auto);
+      grid-template-rows: auto minmax(0, 1fr) auto auto;
+      grid-template-areas: "top top top" "left mid right" "bottom bottom bottom" "bar bar bar";
+      gap: 6px;
+      align-items: stretch
+    }
+
+    #battle-page.mode-2v2 #battle-2v2-top {
+      grid-area: top;
+      display: flex !important;
+      justify-content: center;
+      margin-bottom: 0
+    }
+
+    #battle-page.mode-2v2 #battle-2v2-top .enemy-zone-wrap {
+      max-width: 380px
+    }
+
+    #battle-page.mode-2v2 #battle-2v2-left {
+      grid-area: left;
+      display: flex !important;
+      flex-direction: column;
+      margin-bottom: 0;
+      min-width: 150px
+    }
+
+    #battle-page.mode-2v2 #battle-2v2-right {
+      grid-area: right;
+      display: flex !important;
+      flex-direction: column;
+      margin-bottom: 0;
+      min-width: 150px
+    }
+
+    #battle-page.mode-2v2 .battle-mid {
+      grid-area: mid
+    }
+
+    #battle-page.mode-2v2 .player-zone-wrap {
+      grid-area: bottom
+    }
+
+    #battle-page.mode-2v2 #bottom-bar {
+      grid-area: bar
+    }
+
     .battle-2v2-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -13137,31 +13185,44 @@ Resources:`;
     </div>
     <div id="battle-page" class="page">
       <div class="battle-2v2-grid" id="battle-2v2-top" style="display:none;">
-        <div class="enemy-zone-wrap teammate-zone small">
-          <div class="enemy-portrait-small" id="tm-portrait"
-            style="background:linear-gradient(135deg,#27ae60,#2ecc71);border-color:#2ecc71;">🤝</div>
-          <div class="enemy-details">
-            <div class="player-name" id="tm-name">队友</div>
-            <div><span class="hp" id="tm-hp">❤️ 4/4</span></div>
-            <div class="hand-count">手牌: <span id="tm-hand-count">0</span></div>
-          </div>
-        </div>
-        <div class="enemy-zone-wrap small">
+        <div class="enemy-zone-wrap small" style="width:100%;">
           <div class="enemy-portrait-small" id="e1-portrait">👹</div>
           <div class="enemy-details">
             <div class="player-name" id="e1-name">敌人1</div>
             <div><span class="hp" id="e1-hp">❤️ 4/4</span></div>
             <div class="hand-count">手牌: <span id="e1-hand-count">0</span></div>
+            <div class="zones-row" style="padding:3px 0 0;">
+              <div class="equipment-zone" id="e1-weapon"></div>
+              <div class="equipment-zone armor-zone" id="e1-armor-eq"></div>
+              <div class="judgment-zone" id="e1-judgments"></div>
+            </div>
           </div>
         </div>
-        <div class="enemy-zone-wrap small" style="grid-column:span 2;">
-          <div style="display:flex;gap:10px;align-items:center;">
-            <div class="enemy-portrait-small" id="e2-portrait">👺</div>
-            <div class="enemy-details">
-              <div class="player-name" id="e2-name">敌人2</div>
-              <div><span class="hp" id="e2-hp">❤️ 4/4</span></div>
-              <div class="hand-count">手牌: <span id="e2-hand-count">0</span></div>
-            </div>
+      </div>
+      <div class="enemy-zone-wrap teammate-zone" id="battle-2v2-left" style="display:none;">
+        <div class="enemy-portrait-small" id="tm-portrait"
+          style="background:linear-gradient(135deg,#27ae60,#2ecc71);border-color:#2ecc71;">🤝</div>
+        <div class="enemy-details">
+          <div class="player-name" id="tm-name">队友</div>
+          <div><span class="hp" id="tm-hp">❤️ 4/4</span></div>
+          <div class="hand-count">手牌: <span id="tm-hand-count">0</span></div>
+          <div class="zones-row" style="padding:3px 0 0;">
+            <div class="equipment-zone" id="tm-weapon"></div>
+            <div class="equipment-zone armor-zone" id="tm-armor-eq"></div>
+            <div class="judgment-zone" id="tm-judgments"></div>
+          </div>
+        </div>
+      </div>
+      <div class="enemy-zone-wrap" id="battle-2v2-right" style="display:none;">
+        <div class="enemy-portrait-small" id="e2-portrait">👺</div>
+        <div class="enemy-details">
+          <div class="player-name" id="e2-name">敌人2</div>
+          <div><span class="hp" id="e2-hp">❤️ 4/4</span></div>
+          <div class="hand-count">手牌: <span id="e2-hand-count">0</span></div>
+          <div class="zones-row" style="padding:3px 0 0;">
+            <div class="equipment-zone" id="e2-weapon"></div>
+            <div class="equipment-zone armor-zone" id="e2-armor-eq"></div>
+            <div class="judgment-zone" id="e2-judgments"></div>
           </div>
         </div>
       </div>
@@ -13817,9 +13878,8 @@ Resources:`;
           if (dataUrl.length > 300000) dataUrl = canvas.toDataURL('image/jpeg', 0.8);
           userProfile.avatar = dataUrl;
           updateLobbyAvatar();
-          saveProfileToCloud();
           loadChatFriendList();
-          alert('✅ 头像已更新');
+          saveAvatarToCloud();
         };
         img.onerror = function() {
           alert('❌ 图片加载失败，请换一张试试');
@@ -13828,6 +13888,21 @@ Resources:`;
       };
       reader.readAsDataURL(file);
       input.value = '';
+    }
+
+    async function saveAvatarToCloud() {
+      var ok = await saveProfileToCloud();
+      if (!ok) {
+        await new Promise(function(r) {
+          setTimeout(r, 2000);
+        });
+        ok = await saveProfileToCloud();
+      }
+      if (ok) {
+        alert('✅ 头像已更新并同步到云端，好友刷新后即可看到');
+      } else {
+        alert('⚠️ 头像已在本机更新，但云端同步失败，其他人暂时看不到。\n请检查网络后重新登录，再上传一次头像。');
+      }
     }
 
     function openAvatarMenu() {
@@ -14257,15 +14332,44 @@ Resources:`;
     var invitePollTimer = null,
       roomPollTimer = null;
 
+    var roomRealtimeChannel = null;
+
     function stopRoomPolling() {
       if (roomPollTimer) {
         clearInterval(roomPollTimer);
         roomPollTimer = null;
       }
+      if (roomRealtimeChannel) {
+        try {
+          if (sb && sb.removeChannel) sb.removeChannel(roomRealtimeChannel);
+        } catch (e) {}
+        roomRealtimeChannel = null;
+      }
     }
 
     function startRoomPolling(roomId) {
       stopRoomPolling();
+      if (sb && sb.channel) {
+        try {
+          roomRealtimeChannel = sb.channel('room-' + roomId)
+            .on('postgres_changes', {
+              event: '*',
+              schema: 'public',
+              table: 'game_rooms',
+              filter: 'id=eq.' + roomId
+            }, function(payload) {
+              try {
+                if (payload && payload.new) {
+                  handleRoomUpdate(payload.new);
+                  selfHealRoomState(payload.new);
+                }
+              } catch (e) {}
+            })
+            .subscribe();
+        } catch (e) {
+          roomRealtimeChannel = null;
+        }
+      }
       roomPollTimer = setInterval(async function() {
         if (!currentRoomId || !sb || !roomId) return;
         try {
@@ -14276,7 +14380,7 @@ Resources:`;
             selfHealRoomState(r.data);
           }
         } catch (e) {}
-      }, 3000);
+      }, 1000);
     }
     
     function selfHealRoomState(room) {
@@ -14767,6 +14871,10 @@ Resources:`;
       };
       document.getElementById('btn-play').onclick = playCard;
       document.getElementById('btn-end').onclick = endTurn;
+      document.getElementById('battle-page').classList.remove('mode-2v2');
+      document.getElementById('battle-2v2-top').style.display = 'none';
+      document.getElementById('battle-2v2-left').style.display = 'none';
+      document.getElementById('battle-2v2-right').style.display = 'none';
       document.getElementById('heroes-page').classList.remove('active');
       document.getElementById('battle-page').classList.remove('active');
       document.getElementById('lobby-page').classList.add('active');
@@ -17250,40 +17358,49 @@ var isInitializing2v2 = false;
         log('⚡ ' + seat.hero.name + '【英姿】摸两张');
       }
       
-      if (seat.hero.id === 'xuzongwei') {
+      var finishDamage2v2 = function() {
+        render2v2Battle();
+        if (seat.hp <= 0) {
+          promptForDying2v2(seatIdx, sourceSeatIdx);
+          if (cb) cb(true);
+          return true;
+        }
+        if (cb) cb(false);
+        return false;
+      };
+      if (seat.hero.id === 'xuzongwei' && seat._disabledSkills.indexOf('放逐') === -1) {
         drawCardToSeat(seat, 2);
         log('❤️ ' + seat.hero.name + '【归心】摸两张');
         if (sourceSeatIdx !== undefined && seats[sourceSeatIdx] && seats[sourceSeatIdx].alive) {
           var src = seats[sourceSeatIdx];
-          if (src.hand.length >= 2) {
-            var dn = [];
-            for (var i = 0; i < 2 && src.hand.length > 0; i++) {
-              var ri = Math.floor(Math.random() * src.hand.length);
-              var dc = src.hand.splice(ri, 1)[0];
-              discardCard(dc);
-              dn.push(dc.name);
-            }
-            log('🚫 ' + seat.hero.name + '【放逐】' + src.hero.name + '弃' + dn.join('、'));
-          }
           src._skipNextDraw = true;
+          if (src.hand.length >= 2) {
+            var doFanzhu = function(cards) {
+              cards.forEach(function(c) {
+                discardCard(c);
+              });
+              log('🚫 ' + seat.hero.name + '【放逐】' + src.hero.name + '弃' + cards.map(function(c) {
+                return c.name;
+              }).join('、'));
+              finishDamage2v2();
+            };
+            if (sourceSeatIdx === 0) {
+              showHandPickModal('🚫 放逐', '【放逐】你选择弃置2张牌', src, 2, doFanzhu);
+              return true;
+            }
+            doFanzhu(randomCardsFrom2v2(src, 2));
+            return true;
+          }
         }
       }
-      render2v2Battle();
-if (seat.hp <= 0) {
-promptForDying2v2(seatIdx, function(dead) {
-if (cb) cb(dead);
-});
-return true;
-}
-if (cb) cb(false);
-return false;
-}
+      return finishDamage2v2();
+    }
 
     
-    function promptForDying2v2(seatIdx) {
+    function promptForDying2v2(seatIdx, srcIdx) {
       var seat = seats[seatIdx];
       if (!seat || seat.hp > 0) return;
-      
+
       if (seat.hero.id === 'chensicong' && seat._hasXiWang) {
         seat._hasXiWang = false;
         seat._hasJinji = true;
@@ -17294,7 +17411,22 @@ return false;
         render2v2Battle();
         return;
       }
-      
+
+      if (seatIdx !== 0) {
+        if (seat.hero.id === 'xuyifeng' && !seat._hasUsedChongsheng) {
+          triggerChongsheng2v2(seatIdx, srcIdx);
+          return;
+        }
+        if (seat.hero.id === 'hajifeng' && seat._hajiChoice === 'disarm' && !seat._hasUsedChongsheng) {
+          triggerHajifengLimit2v2(seatIdx);
+          return;
+        }
+        if (seat.hero.id === 'sunliangcheng' && !seat._hasUsedHuamao && seat.maxHp > 1) {
+          triggerHuamao2v2(seatIdx);
+          return;
+        }
+      }
+
       var pi = seat.hand.findIndex(function(c) {
         return c.effect === 'heal';
       });
@@ -17302,7 +17434,7 @@ return false;
         return c.effect === 'wine';
       });
       if (seatIdx === 0) {
-        
+
         var btns = [];
         if (pi !== -1) btns.push({
           text: '用桃自救',
@@ -17328,6 +17460,30 @@ return false;
             render2v2Battle();
           }
         });
+        if (seat.hero.id === 'xuyifeng' && !seat._hasUsedChongsheng) btns.push({
+          text: '🔥 重生',
+          color: '#9b59b6',
+          action: function() {
+            closeModal();
+            triggerChongsheng2v2(0, srcIdx);
+          }
+        });
+        if (seat.hero.id === 'sunliangcheng' && !seat._hasUsedHuamao && seat.maxHp > 1) btns.push({
+          text: '🐱 化猫',
+          color: '#e67e22',
+          action: function() {
+            closeModal();
+            triggerHuamao2v2(0);
+          }
+        });
+        if (seat.hero.id === 'hajifeng' && seat._hajiChoice === 'disarm' && !seat._hasUsedChongsheng) btns.push({
+          text: '🐝 哈基峰(限定)',
+          color: '#f39c12',
+          action: function() {
+            closeModal();
+            triggerHajifengLimit2v2(0);
+          }
+        });
         btns.push({
           text: '放弃',
           color: '#e74c3c',
@@ -17342,7 +17498,7 @@ return false;
         });
         showModal('⚠️ 濒死', seat.hero.name + '体力为0！', btns);
       } else {
-        
+
         if (pi !== -1) {
           var c = seat.hand.splice(pi, 1)[0];
           discardCard(c);
@@ -17428,7 +17584,7 @@ return false;
       setTimeout(function() {
         if (gameOver) return;
         process2v2Judgments(seatIdx, cb);
-      }, 600);
+      }, 350);
     }
 
     
@@ -17483,6 +17639,7 @@ return false;
           if (ri !== -1) {
             var rc = seat.hand.splice(ri, 1)[0];
             discardCard(rc);
+            wangshengDraw2v2(seat, rc, 'discard');
           }
         }
         render2v2Battle();
@@ -17590,6 +17747,7 @@ return false;
       s.forEach(function(i) {
         var c = seat.hand.splice(i, 1)[0];
         discardCard(c);
+        wangshengDraw2v2(seat, c, 'discard');
         nm.push(c.name);
       });
       gameState.selectedIndices = [];
@@ -17672,46 +17830,46 @@ return false;
     }
 
     
-    function defend2v2(targetIdx, dmg, ac, attackerIdx, cb) {
+    function defend2v2(targetIdx, dmg, ac, attackerIdx, cb, noDodge) {
       var target = seats[targetIdx];
       if (!target || !target.alive) {
         if (cb) cb(false);
         return;
       }
-      
+
       if (target._immuneKill) {
         log('🛡️ ' + target.hero.name + '♣免疫杀');
         if (cb) cb(false);
         return;
       }
-      
+
       if (target.hero.id === 'hajifeng' && target._hajiChoice && getSuitColor(ac.suit) === 'suit-black') {
         log('🐭 【鼠鼠】' + target.hero.name + '免疫黑色' + cardDesc(ac));
         if (cb) cb(false);
         return;
       }
-      
+
       var ignoreArmor = false;
       if (attackerIdx !== undefined && seats[attackerIdx] && seats[attackerIdx].equip && seats[attackerIdx].equip
         .weapon && seats[attackerIdx].equip.weapon.effect === 'weapon_qinggang') {
         ignoreArmor = true;
         log('⚔️ 青釭无视防具');
       }
-      
+
       if (!ignoreArmor && target.equip.armor && target.equip.armor.effect === 'armor_tengjia' && ac.effect ===
         'damage') {
         log('🌿 藤甲免疫普杀');
         if (cb) cb(false);
         return;
       }
-      
+
       if (!ignoreArmor && target.equip.armor && target.equip.armor.effect === 'armor_renwang' && getSuitColor(ac
         .suit) === 'suit-black') {
         log('🛡️ 仁王盾免疫黑杀');
         if (cb) cb(false);
         return;
       }
-      
+
       if (!ignoreArmor && target.equip.armor && target.equip.armor.effect === 'armor_bagua') {
         var jc = null;
         if (!drawPile.length && discardPile.length) {
@@ -17730,26 +17888,87 @@ return false;
           }
         }
       }
-      
+
+      var attacker = attackerIdx !== undefined ? seats[attackerIdx] : null;
+      var needTwo = false,
+        twoLbl = '';
+      if (attacker) {
+        if (attacker.hero.id === 'hajifeng' && attacker._hajiChoice === 'backstab' && attacker._disabledSkills.indexOf(
+            '杀人蜂') === -1) {
+          needTwo = true;
+          twoLbl = '杀人蜂';
+        } else if (attacker.hero.id === 'chensicong' && ac && getSuitColor(ac.suit) === 'suit-black') {
+          needTwo = true;
+          twoLbl = '特种装备';
+        }
+      }
+
       if (targetIdx === 0) {
-        
+
         var btns = [];
-        var di = target.hand.findIndex(function(c) {
-          return c.effect === 'dodge';
-        });
-        if (di !== -1) {
+        if (target.hero.id === 'wangsheng' && !target._hasUsedFanke && target._disabledSkills.indexOf('反客为主') ===
+          -1 && target.hand.some(function(c) {
+            return isKill(c);
+          })) {
           btns.push({
-            text: '出闪',
-            color: '#3498db',
+            text: '🔄 反客为主(弃杀反伤)',
+            color: '#16a085',
             action: function() {
-              var dc = target.hand.splice(di, 1)[0];
-              discardCard(dc);
-              log('🛡️ ' + target.hero.name + '打出' + cardDesc(dc) + '闪避');
+              var ki = target.hand.findIndex(function(c) {
+                return isKill(c);
+              });
+              var kc = target.hand.splice(ki, 1)[0];
+              discardCard(kc);
+              wangshengDraw2v2(target, kc, 'discard');
+              target._hasUsedFanke = true;
+              log('🔄 【反客为主】弃杀反伤');
+              closeModal();
+              if (attacker && attacker.alive) takeDamage2v2(attackerIdx, 1, 0);
+              render2v2Battle();
+              if (cb) cb(false);
+            }
+          });
+        }
+        if (target.hero.id === 'yuchengxiao' && (target._shouban || 0) > 0 && !noDodge) {
+          btns.push({
+            text: '🎀 手办当闪(' + target._shouban + ')',
+            color: '#ff6b81',
+            action: function() {
+              target._shouban--;
+              log('🎀 ' + target.hero.name + '打出手办闪避');
               closeModal();
               render2v2Battle();
               if (cb) cb(false);
             }
           });
+        }
+        var dodges = [];
+        target.hand.forEach(function(c, i) {
+          if (c.effect === 'dodge') dodges.push(i);
+        });
+        if (!noDodge && dodges.length > 0 && (!needTwo || dodges.length >= 2)) {
+          btns.push({
+            text: needTwo ? '出两张闪' : '出闪',
+            color: '#3498db',
+            action: function() {
+              if (needTwo) {
+                var c1 = target.hand.splice(dodges[1], 1)[0];
+                discardCard(c1);
+                var c2 = target.hand.splice(dodges[0], 1)[0];
+                discardCard(c2);
+                log('🛡️ ' + target.hero.name + '打出两张闪抵御');
+              } else {
+                var dc = target.hand.splice(dodges[0], 1)[0];
+                discardCard(dc);
+                log('🛡️ ' + target.hero.name + '打出' + cardDesc(dc) + '闪避');
+              }
+              closeModal();
+              render2v2Battle();
+              if (cb) cb(false);
+            }
+          });
+        } else if (!noDodge && needTwo && dodges.length === 1) {
+          log('⚠️ 【' + twoLbl + '】仅一张闪无法抵御');
         }
         btns.push({
           text: '不出闪(受' + dmg + '伤)',
@@ -17760,16 +17979,54 @@ return false;
             hit2v2(targetIdx, dmg, ac, attackerIdx, cb);
           }
         });
-        showModal('⚠️ ' + seats[attackerIdx].hero.name + '杀你', '出闪抵消' + dmg + '伤害', btns);
+        showModal('⚠️ ' + seats[attackerIdx].hero.name + '杀你', (needTwo ? '【' + twoLbl + '】需要两张闪抵消' : '出闪抵消') +
+          dmg + '伤害', btns);
       } else {
-        
-        var di = target.hand.findIndex(function(c) {
-          return c.effect === 'dodge';
+
+        if (target.hero.id === 'wangsheng' && !target._hasUsedFanke && target._disabledSkills.indexOf('反客为主') ===
+          -1 && attacker && attacker.alive && target.hand.some(function(c) {
+            return isKill(c);
+          })) {
+          var ki = target.hand.findIndex(function(c) {
+            return isKill(c);
+          });
+          var kc = target.hand.splice(ki, 1)[0];
+          discardCard(kc);
+          wangshengDraw2v2(target, kc, 'discard');
+          target._hasUsedFanke = true;
+          log('🔄 ' + target.hero.name + '【反客为主】弃杀反伤');
+          takeDamage2v2(attackerIdx, 1, targetIdx);
+          render2v2Battle();
+          if (cb) cb(false);
+          return;
+        }
+        if (target.hero.id === 'yuchengxiao' && (target._shouban || 0) > 0 && !noDodge && Math.random() > 0.3) {
+          target._shouban--;
+          log('🎀 ' + target.hero.name + '打出手办闪避');
+          render2v2Battle();
+          if (cb) cb(false);
+          return;
+        }
+        var dodges = [];
+        target.hand.forEach(function(c, i) {
+          if (c.effect === 'dodge') dodges.push(i);
         });
-        if (di !== -1) {
-          var dc = target.hand.splice(di, 1)[0];
-          discardCard(dc);
-          log('🛡️ ' + target.hero.name + '打出' + cardDesc(dc) + '闪避');
+        if (!noDodge && dodges.length) {
+          if (needTwo && dodges.length >= 2) {
+            var c1 = target.hand.splice(dodges[1], 1)[0];
+            discardCard(c1);
+            var c2 = target.hand.splice(dodges[0], 1)[0];
+            discardCard(c2);
+            log('🛡️ 【' + twoLbl + '】' + target.hero.name + '打出两张闪抵御');
+          } else if (needTwo) {
+            log('⚠️ 【' + twoLbl + '】' + target.hero.name + '仅一张闪，无法抵御');
+            hit2v2(targetIdx, dmg, ac, attackerIdx, cb);
+            return;
+          } else {
+            var dc = target.hand.splice(dodges[0], 1)[0];
+            discardCard(dc);
+            log('🛡️ ' + target.hero.name + '打出' + cardDesc(dc) + '闪避');
+          }
           render2v2Battle();
           if (cb) cb(false);
         } else {
@@ -17783,35 +18040,51 @@ return false;
     function hit2v2(targetIdx, dmg, ac, attackerIdx, cb) {
       var target = seats[targetIdx];
       var attacker = attackerIdx !== undefined ? seats[attackerIdx] : null;
-      
+
       if (attacker && attacker.equip.weapon && attacker.equip.weapon.effect === 'weapon_guding' && !target.hand
         .length) {
         dmg++;
         log('🔪 古锭刀+1');
       }
-      
+
       if (target.equip.armor && target.equip.armor.effect === 'armor_tengjia' && ac.effect === 'fire_damage') {
         dmg++;
         log('🔥 藤甲火伤+1');
       }
-      
+
       if (attacker && attacker.equip.weapon && attacker.equip.weapon.effect === 'weapon_hanbing' && target.hand.length >
         0) {
-        var dn = 0,
-          nm = [];
-        while (dn < 2 && target.hand.length) {
-          var ri = Math.floor(Math.random() * target.hand.length);
-          var dc = target.hand.splice(ri, 1)[0];
-          discardCard(dc);
-          nm.push(dc.name);
-          dn++;
+        var hanbingDrop = function(cards) {
+          cards.forEach(function(c) {
+            discardCard(c);
+          });
+          if (cards.length) log('🗑️ ' + target.hero.name + '弃' + cards.map(function(c) {
+            return c.name;
+          }).join('、'));
+          render2v2Battle();
+          if (cb) cb(true);
+        };
+        if (targetIdx === 0) {
+          showHandPickModal('🗡️ 寒冰剑', '你选择弃置' + Math.min(2, target.hand.length) + '张牌', target, Math.min(2,
+            target.hand.length), hanbingDrop);
+        } else if (attackerIdx === 0) {
+          playerPickFromSeat2v2(target, 2, hanbingDrop);
+        } else {
+          hanbingDrop(randomCardsFrom2v2(target, 2));
         }
-        if (dn) log('🗑️ ' + target.hero.name + '弃' + nm.join('、'));
-        render2v2Battle();
-        if (cb) cb(true);
         return;
       }
       var dead = takeDamage2v2(targetIdx, dmg, attackerIdx);
+      if (attacker && attacker.hero.id === 'wangsheng' && !dead && target.hp > 0 && !gameOver) {
+        if (attacker.hp < attacker.maxHp) {
+          attacker.hp = Math.min(attacker.maxHp, attacker.hp + 1);
+          drawCardToSeat(attacker, 1);
+          log('🦴 ' + attacker.hero.name + '【狂骨】回1血摸1牌');
+        } else {
+          drawCardToSeat(attacker, 3);
+          log('🦴 ' + attacker.hero.name + '【狂骨】满血摸3');
+        }
+      }
       render2v2Battle();
       if (cb) cb(dead || target.hp <= 0);
     }
@@ -17838,11 +18111,96 @@ return false;
       var enemySeats = getAliveEnemySeats(0);
       var allySeats = getAliveAllySeats(0);
 
-      
+      if (seat.hero.id === 'wangsheng' && isTrickCard(card) && card.effect !== 'wuxie' && !gameState._wumouSkip &&
+        seat._disabledSkills.indexOf('无谋') === -1) {
+        var bcKl = getKillLimit2v2('wangsheng', hasW);
+        var hk = seat.hand.some(function(c) {
+          return isKill(c);
+        });
+        var wbtns = [];
+        if (hk) wbtns.push({
+          text: '弃杀→发动',
+          color: '#e74c3c',
+          action: function() {
+            var ki = seat.hand.findIndex(function(c) {
+              return isKill(c);
+            });
+            var kc = seat.hand.splice(ki, 1)[0];
+            discardCard(kc);
+            wangshengDraw2v2(seat, kc, 'discard');
+            log('🧠 弃杀发动' + cardDesc(card));
+            closeModal();
+            gameState._wumouSkip = true;
+            gameState.selectedIndices = [idx];
+            play2v2Card();
+            gameState._wumouSkip = false;
+          }
+        });
+        wbtns.push({
+          text: '-1血→发动',
+          color: '#e67e22',
+          action: function() {
+            seat.hp--;
+            log('🧠 -1血发动' + cardDesc(card));
+            closeModal();
+            render2v2Battle();
+            if (seat.hp <= 0) {
+              gameState.isProcessing = false;
+              promptForDying2v2(0);
+              return;
+            }
+            gameState._wumouSkip = true;
+            gameState.selectedIndices = [idx];
+            play2v2Card();
+            gameState._wumouSkip = false;
+          }
+        });
+        wbtns.push({
+          text: '当杀使用',
+          color: '#3498db',
+          action: function() {
+            if (!gameState.noKillLimitThisTurn && gameState.killCountThisTurn >= bcKl) {
+              alert('连斩限' + bcKl + '杀');
+              return;
+            }
+            var dmg = 1;
+            if (seat._qixinBonus > 0) {
+              dmg += seat._qixinBonus;
+              seat._qixinBonus = 0;
+              gameState.hasUsedWine = false;
+            } else if (gameState.hasUsedWine) {
+              dmg += 1;
+              gameState.hasUsedWine = false;
+            }
+            log('🧠 ' + cardDesc(card) + '当杀');
+            gameState.killCountThisTurn++;
+            closeModal();
+            var pi2 = seat.hand.indexOf(card);
+            if (pi2 !== -1) seat.hand.splice(pi2, 1);
+            discardCard(card);
+            var fk = {};
+            var wsrc = cardEffects.kill;
+            for (var wk in wsrc) fk[wk] = wsrc[wk];
+            fk.id = Date.now();
+            fk.suit = card.suit;
+            fk.rank = card.rank;
+            launch2v2Kill(seat, dmg, fk, enemySeats, false);
+          }
+        });
+        showModal('🧠 无谋', cardDesc(card) + '：', wbtns);
+        return;
+      }
+
       if (isKill(card)) {
-        if (!gameState.noKillLimitThisTurn && gameState.killCountThisTurn >= 1 && !hasW && seat.hero.id !==
-          'xuzongwei' && seat.hero.id !== 'yuchengxiao' && seat.hero.id !== 'hajifeng') {
-          alert('本回合已出过杀');
+        if (seat.hero.id === 'hajifeng' && getSuitColor(card.suit) === 'suit-black') {
+          alert('🐭【鼠鼠】你不能使用黑色杀！');
+          return;
+        }
+        var bcEx = (seat.hero.id === 'manhongyi' && seat._hasUsedBeici) ? 1 : 0;
+        var kl2 = getKillLimit2v2(seat.hero.id, hasW) + bcEx;
+        var isHajiRedKill = (seat.hero.id === 'hajifeng' && getSuitColor(card.suit) === 'suit-red');
+        if (!gameState.noKillLimitThisTurn && !isHajiRedKill && gameState.killCountThisTurn >= kl2) {
+          alert('最多' + kl2 + '张杀');
           return;
         }
         if (!enemySeats.length) {
@@ -17994,10 +18352,16 @@ return false;
               discardCard(a);
               log('🌉 拆' + cardDesc(a));
             } else if (t.hand.length) {
-              var ri = Math.floor(Math.random() * t.hand.length);
-              var dc = t.hand.splice(ri, 1)[0];
-              discardCard(dc);
-              log('🌉 拆' + t.hero.name + '一张手牌');
+              gameState.selectedIndices = [];
+              render2v2Battle();
+              playerPickFromSeat2v2(t, 1, function(cards) {
+                cards.forEach(function(c) {
+                  discardCard(c);
+                });
+                if (cards.length) log('🌉 拆' + t.hero.name + cardDesc(cards[0]));
+                render2v2Battle();
+              });
+              return;
             } else log('🌉 ' + t.hero.name + '无牌可拆');
             gameState.selectedIndices = [];
             render2v2Battle();
@@ -18038,10 +18402,16 @@ return false;
               seat.hand.push(a);
               log('🐑 牵' + cardDesc(a));
             } else if (t.hand.length) {
-              var ri = Math.floor(Math.random() * t.hand.length);
-              var st = t.hand.splice(ri, 1)[0];
-              seat.hand.push(st);
-              log('🐑 牵' + t.hero.name + '一张手牌');
+              gameState.selectedIndices = [];
+              render2v2Battle();
+              playerPickFromSeat2v2(t, 1, function(cards) {
+                cards.forEach(function(c) {
+                  seat.hand.push(c);
+                });
+                if (cards.length) log('🐑 牵' + t.hero.name + cardDesc(cards[0]));
+                render2v2Battle();
+              });
+              return;
             } else log('🐑 ' + t.hero.name + '无牌可牵');
             gameState.selectedIndices = [];
             render2v2Battle();
@@ -18091,7 +18461,7 @@ return false;
           gameState.isProcessing = false;
           render2v2Battle();
           check2v2Win();
-        });
+        }, c);
         return;
       }
 
@@ -18111,7 +18481,7 @@ return false;
           gameState.isProcessing = false;
           render2v2Battle();
           check2v2Win();
-        });
+        }, c);
         return;
       }
 
@@ -18261,12 +18631,23 @@ return false;
       var idx = seat.hand.indexOf(originalCard);
       if (idx === -1) return;
       var dmg = 1;
-      if (gameState.hasUsedWine) {
+      if (seat === seats[0] && gameState.hasUsedWine) {
         dmg++;
         log('🍷 【酒】杀伤害+1');
         gameState.hasUsedWine = false;
       }
-      
+      if (seat._qixinBonus > 0) {
+        dmg += seat._qixinBonus;
+        log('🤝 ' + seat.hero.name + '【齐心】杀伤害+' + seat._qixinBonus);
+        seat._qixinBonus = 0;
+        if (seat === seats[0]) gameState.hasUsedWine = false;
+      }
+      if (seat._damageBonus > 0) {
+        dmg += seat._damageBonus;
+        seat._damageBonus = 0;
+        log('🔥 ' + seat.hero.name + '伤害加成+1');
+      }
+
       if (seat.hero.id === 'chensicong' && getSuitColor(actualCard.suit) === 'suit-red') {
         dmg += 1;
         log('🎯 ' + seat.hero.name + '【特种装备】红杀伤害+1');
@@ -18277,15 +18658,69 @@ return false;
       }
       var pcc = seat.hand.splice(idx, 1)[0];
       discardCard(pcc);
+      wangshengDraw2v2(seat, pcc, 'play');
       gameState.selectedIndices = [];
       render2v2Battle();
-      if (enemySeats.length === 1) {
-        defend2v2(enemySeats[0], dmg, actualCard, 0, function() {});
-      } else {
-        show2v2TargetSelect('🎯 选择攻击目标', '选择要攻击的敌人', false, true, false, function(tIdx) {
-          defend2v2(tIdx, dmg, actualCard, 0, function() {});
-        });
-      }
+      var isPlayer = (seat === seats[0]);
+      var doTarget = function(tIdx) {
+        var doBeici = function(noDodge) {
+          triggerZuqiu2v2(seat, tIdx, function() {
+            defend2v2(tIdx, dmg, actualCard, seats.indexOf(seat), function() {}, noDodge);
+          });
+        };
+        if (seat.hero.id === 'manhongyi' && seat.armor > 0 && !seat._hasUsedBeici && seat._disabledSkills.indexOf(
+            '背刺') === -1) {
+          if (isPlayer) {
+            gameState.isProcessing = true;
+            showModal('🗡️ 背刺', '失去1甲：夺敌1牌+禁闪+额外1杀？', [{
+              text: '发动',
+              color: '#e67e22',
+              action: function() {
+                seat.armor--;
+                seat._hasUsedBeici = true;
+                log('🗡️ 背刺发动');
+                var t = seats[tIdx];
+                if (t.hand.length) {
+                  playerPickFromSeat2v2(t, 1, function(cards) {
+                    cards.forEach(function(c) {
+                      seat.hand.push(c);
+                    });
+                    if (cards.length) log('🤏 夺' + cardDesc(cards[0]));
+                    render2v2Battle();
+                    doBeici(true);
+                  });
+                } else {
+                  render2v2Battle();
+                  doBeici(true);
+                }
+                closeModal();
+              }
+            }, {
+              text: '不背刺',
+              color: '#7f8c8d',
+              action: function() {
+                closeModal();
+                render2v2Battle();
+                doBeici(false);
+              }
+            }]);
+          } else {
+            seat.armor--;
+            seat._hasUsedBeici = true;
+            log('🗡️ ' + seat.hero.name + '【背刺】发动');
+            var t2 = seats[tIdx];
+            if (t2.hand.length) {
+              var st = randomCardsFrom2v2(t2, 1)[0];
+              seat.hand.push(st);
+              log('🤏 ' + seat.hero.name + '夺' + cardDesc(st));
+            }
+            render2v2Battle();
+            doBeici(true);
+          }
+        } else doBeici(false);
+      };
+      if (enemySeats.length === 1) doTarget(enemySeats[0]);
+      else show2v2TargetSelect('🎯 选择攻击目标', '选择要攻击的敌人', false, true, false, doTarget);
     }
 
     
@@ -18296,7 +18731,7 @@ return false;
         var s = seats[enemySeatIndices[i]];
         if (s.hand.some(function(c) {
             return c.effect === 'wuxie';
-          })) {
+          }) || (s.hero.id === 'yuchengxiao' && (s._shouban || 0) > 0)) {
           hasWuxie = true;
           break;
         }
@@ -18327,6 +18762,13 @@ return false;
             cb(true);
             return;
           }
+          if (s.hero.id === 'yuchengxiao' && (s._shouban || 0) > 0) {
+            s._shouban--;
+            log('🛡️ ' + s.hero.name + '打出手办【无懈可击】抵消' + trickName);
+            render2v2Battle();
+            cb(true);
+            return;
+          }
         }
       }
       cb(false);
@@ -18345,24 +18787,47 @@ return false;
           endDuel2v2(currentTurn === attacked ? defenderIdx : attackerIdx);
           return;
         }
+        var otherIdx = currentTurn === attackerIdx ? defenderIdx : attackerIdx;
+        var other = seats[otherIdx];
+        var needTwo = other && other.hero.id === 'hajifeng' && other._hajiChoice === 'backstab' && other
+          ._disabledSkills.indexOf('杀人蜂') === -1;
         var killIdx = seat.hand.findIndex(function(c) {
           return isKill(c);
         });
+        var killIdx2 = -1;
+        if (needTwo) {
+          for (var k2 = killIdx + 1; k2 < seat.hand.length; k2++) {
+            if (isKill(seat.hand[k2])) {
+              killIdx2 = k2;
+              break;
+            }
+          }
+        }
         if (currentTurn === 0) {
-          
+
           var btns = [];
-          if (killIdx !== -1) {
+          if (killIdx !== -1 && (!needTwo || killIdx2 !== -1)) {
             btns.push({
-              text: '打出【杀】',
+              text: needTwo ? '打出两张【杀】' : '打出【杀】',
               color: '#e74c3c',
               action: function() {
-                var kc = seat.hand.splice(killIdx, 1)[0];
-                discardCard(kc);
+                if (needTwo) {
+                  var c2a = seat.hand.splice(killIdx2, 1)[0];
+                  discardCard(c2a);
+                  wangshengDraw2v2(seat, c2a, 'play');
+                  var c2b = seat.hand.splice(killIdx > killIdx2 ? killIdx - 1 : killIdx, 1)[0];
+                  discardCard(c2b);
+                  wangshengDraw2v2(seat, c2b, 'play');
+                } else {
+                  var kc = seat.hand.splice(killIdx, 1)[0];
+                  discardCard(kc);
+                  wangshengDraw2v2(seat, kc, 'play');
+                }
                 log('🗡️ ' + seat.hero.name + '打出【杀】反击');
                 closeModal();
-                currentTurn = currentTurn === attackerIdx ? defenderIdx : attackerIdx;
+                currentTurn = otherIdx;
                 render2v2Battle();
-                setTimeout(duelStep, 800);
+                setTimeout(duelStep, 500);
               }
             });
           }
@@ -18372,26 +18837,37 @@ return false;
             action: function() {
               log('❌ ' + seat.hero.name + '未打出【杀】，决斗落败');
               closeModal();
-              endDuel2v2(currentTurn === attackerIdx ? defenderIdx : attackerIdx, currentTurn);
+              endDuel2v2(otherIdx, currentTurn);
             }
           });
-          showModal('⚔️【决斗】', '轮流出【杀】：请打出一张【杀】，否则受到 1 点伤害', btns);
+          showModal('⚔️【决斗】', (needTwo ? '【杀人蜂】需要两张【杀】响应：' : '轮流出【杀】：') + '请打出【杀】，否则受到 1 点伤害',
+            btns);
         } else {
-          
-          if (killIdx !== -1) {
-            var kc = seat.hand.splice(killIdx, 1)[0];
-            discardCard(kc);
+
+          if (killIdx !== -1 && (!needTwo || killIdx2 !== -1)) {
+            if (needTwo) {
+              var c3a = seat.hand.splice(killIdx2, 1)[0];
+              discardCard(c3a);
+              wangshengDraw2v2(seat, c3a, 'play');
+              var c3b = seat.hand.splice(killIdx > killIdx2 ? killIdx - 1 : killIdx, 1)[0];
+              discardCard(c3b);
+              wangshengDraw2v2(seat, c3b, 'play');
+            } else {
+              var kc = seat.hand.splice(killIdx, 1)[0];
+              discardCard(kc);
+              wangshengDraw2v2(seat, kc, 'play');
+            }
             log('🗡️ ' + seat.hero.name + '打出杀反击');
-            currentTurn = currentTurn === attackerIdx ? defenderIdx : attackerIdx;
+            currentTurn = otherIdx;
             render2v2Battle();
-            setTimeout(duelStep, 800);
+            setTimeout(duelStep, 500);
           } else {
             log('❌ ' + seat.hero.name + '无杀');
-            endDuel2v2(currentTurn === attackerIdx ? defenderIdx : attackerIdx, currentTurn);
+            endDuel2v2(otherIdx, currentTurn);
           }
         }
       }
-      setTimeout(duelStep, 800);
+      setTimeout(duelStep, 500);
     }
 
     
@@ -18399,7 +18875,12 @@ return false;
 function endDuel2v2(winnerIdx, loserIdx) {
     log('🏆 ' + seats[winnerIdx].hero.name + '决斗胜利');
     if (loserIdx !== undefined) {
-        takeDamage2v2(loserIdx, 1);
+        var loser = seats[loserIdx];
+        if (loser && loser.hero.id === 'hajifeng' && loser._hasChuxin) {
+            log('💚 ' + loser.hero.name + '【初心】免疫决斗伤害');
+        } else {
+            takeDamage2v2(loserIdx, 1);
+        }
     } else {
         var loser = winnerIdx === 0 ? getAliveEnemySeats(0)[0] : 0;
         if (loser !== undefined) takeDamage2v2(loser, 1);
@@ -18418,7 +18899,7 @@ function endDuel2v2(winnerIdx, loserIdx) {
                 check2v2Win();
                 
                 if (!gameOver && currentTurnSeat !== 0) {
-                    setTimeout(finish2v2Turn, 600);
+                    setTimeout(finish2v2Turn, 350);
                 }
             }
         }
@@ -18427,34 +18908,36 @@ function endDuel2v2(winnerIdx, loserIdx) {
 
 
 
-function process2v2AOE(targetIndices, responseType, sourceIdx, cb) {
+function process2v2AOE(targetIndices, responseType, sourceIdx, cb, srcCard) {
     if (!targetIndices || targetIndices.length === 0) {
         if (cb) cb();
         return;
     }
-    
+
     var tIdx = targetIndices.shift();
     var t = seats[tIdx];
-    
+
     if (!t || !t.alive) {
-        process2v2AOE(targetIndices, responseType, sourceIdx, cb);
+        process2v2AOE(targetIndices, responseType, sourceIdx, cb, srcCard);
         return;
     }
-    
-    
+
+
     if (t.hero.id === 'yuchengxiao') {
         log('📡 ' + t.hero.name + '【电线杆】免疫');
-        process2v2AOE(targetIndices, responseType, sourceIdx, cb);
+        process2v2AOE(targetIndices, responseType, sourceIdx, cb, srcCard);
         return;
     }
     if (t.equip.armor && t.equip.armor.effect === 'armor_tengjia') {
         log('🌿 ' + t.hero.name + '藤甲免疫');
-        process2v2AOE(targetIndices, responseType, sourceIdx, cb);
+        process2v2AOE(targetIndices, responseType, sourceIdx, cb, srcCard);
         return;
     }
-    if (t.hero.id === 'hajifeng' && t._hasChuxin) {
-        log('💚 ' + t.hero.name + '【初心】免疫');
-        process2v2AOE(targetIndices, responseType, sourceIdx, cb);
+    if (t.hero.id === 'hajifeng' && t._hajiChoice && ((srcCard && getSuitColor(srcCard.suit) === 'suit-black') || t
+        ._hasChuxin)) {
+        if (t._hasChuxin) log('💚 ' + t.hero.name + '【初心】免疫');
+        else log('🐭 【鼠鼠】' + t.hero.name + '免疫黑色' + cardDesc(srcCard));
+        process2v2AOE(targetIndices, responseType, sourceIdx, cb, srcCard);
         return;
     }
     
@@ -18473,14 +18956,15 @@ function process2v2AOE(targetIndices, responseType, sourceIdx, cb) {
                 action: function() {
                     var c = t.hand.splice(ci, 1)[0];
                     discardCard(c);
+                    wangshengDraw2v2(t, c, 'play');
                     log('🛡️ ' + t.hero.name + '打出' + cardDesc(c) + '抵御');
                     closeModal();
                     render2v2Battle();
-                    process2v2AOE(targetIndices, responseType, sourceIdx, cb);
+                    process2v2AOE(targetIndices, responseType, sourceIdx, cb, srcCard);
                 }
             });
         }
-        
+
         btns.push({
             text: '无' + needCard + '(受1伤)',
             color: '#e74c3c',
@@ -18489,8 +18973,8 @@ function process2v2AOE(targetIndices, responseType, sourceIdx, cb) {
                 closeModal();
                 takeDamage2v2(tIdx, 1, sourceIdx);
                 render2v2Battle();
-                
-                
+
+
                 var waitDyingCount = 0;
                 var waitDying = setInterval(function() {
                     waitDyingCount++;
@@ -18498,35 +18982,36 @@ function process2v2AOE(targetIndices, responseType, sourceIdx, cb) {
                     var modalVisible = modalEl && modalEl.style.display === 'flex';
                     if (!modalVisible || gameOver || waitDyingCount > 40) {
                         clearInterval(waitDying);
-                        if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
+                        if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb, srcCard);
                     }
                 }, 300);
             }
         });
         showModal('🛡️ ' + needCard + '抵御', t.hero.name + '需要打出' + needCard, btns);
     } else {
-        
+
         var ci = t.hand.findIndex(function(c) {
             return responseType === 'kill' ? isKill(c) : c.effect === 'dodge';
         });
-        
+
         if (ci !== -1) {
-            
+
             var c = t.hand.splice(ci, 1)[0];
             discardCard(c);
+            wangshengDraw2v2(t, c, 'play');
             var needCardName = responseType === 'kill' ? '杀' : '闪';
             log('🛡️ ' + t.hero.name + '打出' + cardDesc(c) + '抵御');
             render2v2Battle();
             setTimeout(function() {
-                process2v2AOE(targetIndices, responseType, sourceIdx, cb);
-            }, 500);
+                process2v2AOE(targetIndices, responseType, sourceIdx, cb, srcCard);
+            }, 350);
         } else {
-            
+
             log('❌ ' + t.hero.name + '受1伤');
             takeDamage2v2(tIdx, 1, sourceIdx);
             render2v2Battle();
-            
-            
+
+
             var waitDyingCount = 0;
             var waitDying = setInterval(function() {
                 waitDyingCount++;
@@ -18534,7 +19019,7 @@ function process2v2AOE(targetIndices, responseType, sourceIdx, cb) {
                 var modalVisible = modalEl && modalEl.style.display === 'flex';
                 if (!modalVisible || gameOver || waitDyingCount > 40) {
                     clearInterval(waitDying);
-                    if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
+                    if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb, srcCard);
                 }
             }, 300);
         }
@@ -18839,6 +19324,83 @@ function process2v2AOE(targetIndices, responseType, sourceIdx, cb) {
           }
         }
       }
+      if (seat.hero.id === 'liyucheng' && !seat._hasUsedCangdao && seat.hp > 2 && seat._disabledSkills.indexOf(
+          '藏刀') === -1 && aliveEnemies.length) {
+        seat._hasUsedCangdao = true;
+        var ct = seats[aliveEnemies[Math.floor(Math.random() * aliveEnemies.length)]];
+        loseHpSeat2v2(ct, 1, '藏刀');
+        log('🗡️ ' + seat.hero.name + '【藏刀】' + ct.hero.name + '-1体力');
+        if (gameOver || !seat.alive) return;
+      }
+      if (seat.hero.id === 'liyucheng' && !seat._hasUsedHaoshi && seat.hp < seat.maxHp && seat._disabledSkills.indexOf(
+          '好施') === -1) {
+        seat._hasUsedHaoshi = true;
+        drawCardToSeat(seat, 3);
+        seat.hp = Math.min(seat.maxHp, seat.hp + 1);
+        log('🎁 ' + seat.hero.name + '【好施】摸3回1血');
+        render2v2Battle();
+      }
+      if (seat.hero.id === 'manhongyi' && seat._disabledSkills.indexOf('糖衣') === -1) {
+        if (!seat._hasUsedTangyiB && seat.hp > 1 && seat.armor < 2) {
+          seat._hasUsedTangyiB = true;
+          loseHpSeat2v2(seat, 1, '糖衣');
+          if (gameOver || !seat.alive || seat.hp <= 0) return;
+          seat.armor += 2;
+          log('🍬 ' + seat.hero.name + '【糖衣】-1血+2甲(共' + seat.armor + '点)');
+          render2v2Battle();
+        } else if (!seat._hasUsedTangyiA && seat.hand.length > 0 && seat.armor < 3) {
+          seat._hasUsedTangyiA = true;
+          var tc = seat.hand.splice(Math.floor(Math.random() * seat.hand.length), 1)[0];
+          discardCard(tc);
+          wangshengDraw2v2(seat, tc, 'discard');
+          seat.armor++;
+          log('🍬 ' + seat.hero.name + '【糖衣】弃' + cardDesc(tc) + '+1甲(' + seat.armor + ')');
+          render2v2Battle();
+        }
+      }
+      if (seat.hero.id === 'sunliangcheng' && seat._hasMaoniang && seat._hasUsedMaoniangCount < 2 && seat.hp > 1 &&
+        seat._disabledSkills.indexOf('猫娘') === -1 && aliveEnemies.length) {
+        seat._hasUsedMaoniangCount++;
+        seat.hp--;
+        log('🎀 ' + seat.hero.name + '【猫娘】-1血(' + seat._hasUsedMaoniangCount + '/2)');
+        var mt = seats[aliveEnemies[Math.floor(Math.random() * aliveEnemies.length)]];
+        takeDamage2v2(mt, 1, seatIdx);
+        if (gameOver || !seat.alive) return;
+        if (mt.hand.length) {
+          var mc = randomCardsFrom2v2(mt, 1)[0];
+          seat.hand.push(mc);
+          log('🤏 ' + seat.hero.name + '夺' + cardDesc(mc));
+          drawCardToSeat(seat, 3);
+          log('📚 ' + seat.hero.name + '摸3张');
+        } else if (seat.hp < seat.maxHp) {
+          seat.hp++;
+          log('💖 ' + seat.hero.name + '回1血');
+        }
+        render2v2Battle();
+      }
+      if (seat.hero.id === 'sunliangcheng' && seat._hasBanwei && !seat._hasUsedBanwei && seat._disabledSkills.indexOf(
+          '班威') === -1 && seat.hand.length >= 3) {
+        var bwCandidates = aliveEnemies.filter(function(i) {
+          return seats[i].hand.length > 0;
+        });
+        if (bwCandidates.length) {
+          seat._hasUsedBanwei = true;
+          var bwt = seats[bwCandidates[Math.floor(Math.random() * bwCandidates.length)]];
+          var bn2 = bwt.hand.length;
+          for (var bi = 0; bi < bn2; bi++) seat.hand.push(bwt.hand[bi]);
+          bwt.hand = [];
+          log('👑 ' + seat.hero.name + '【班威】夺' + bwt.hero.name + bn2 + '张');
+          render2v2Battle();
+          setTimeout(function() {
+            if (gameOver) return;
+            log('💀 ' + seat.hero.name + '【班威】副作用，濒死');
+            seat.hp = 0;
+            render2v2Battle();
+            promptForDying2v2(seatIdx);
+          }, 600);
+          return;
+        }
+      }
       if (duIdx !== -1 && countCards(h, function(c) {
           return isKill(c);
         }) >= 2) {
@@ -18865,7 +19427,7 @@ function process2v2AOE(targetIndices, responseType, sourceIdx, cb) {
           ai2v2Kill(seat, seatIdx, aliveEnemies, function() {
             finish2v2Turn();
           });
-        });
+        }, c);
         return;
       }
       var wjIdx = h.findIndex(function(c) {
@@ -18883,12 +19445,12 @@ function process2v2AOE(targetIndices, responseType, sourceIdx, cb) {
           ai2v2Kill(seat, seatIdx, aliveEnemies, function() {
             finish2v2Turn();
           });
-        });
+        }, c);
         return;
       }
 
       
-      if (seat.hp < seat.maxHp) {
+      if (seat.hp < seat.maxHp && seat.hero.id !== 'manhongyi') {
         var peachIdx = h.findIndex(function(c) {
           return c.effect === 'heal';
         });
@@ -18927,17 +19489,22 @@ function process2v2AOE(targetIndices, responseType, sourceIdx, cb) {
     function ai2v2Kill(seat, seatIdx, aliveEnemies, cb) {
       var hasW = !!seat.equip.weapon;
       var kl = 1;
-      if (seat.hero.id === 'chensicong') kl = 999; 
+      if (seat.hero.id === 'chensicong') kl = 999;
       if (seat.hero.id === 'xuzongwei' || seat.hero.id === 'yuchengxiao' || seat.hero.id === 'hajifeng') kl = 999;
       if (seat.hero.id === 'wangsheng') kl = 4;
       if (hasW && seat.hero.id !== 'wangsheng') kl = 999;
+      if (seat.hero.id === 'manhongyi' && seat._hasUsedBeici) kl += 1;
       if (seat._killCountThisTurn >= kl) {
         if (cb) cb();
         return;
       }
-      var kI = seat.hand.findIndex(function(c) {
-        return isKill(c);
-      });
+      var kI = -1;
+      for (var i = 0; i < seat.hand.length; i++) {
+        if (!isKill(seat.hand[i])) continue;
+        if (seat.hero.id === 'hajifeng' && getSuitColor(seat.hand[i].suit) === 'suit-black') continue;
+        kI = i;
+        break;
+      }
       if (kI === -1) {
         if (cb) cb();
         return;
@@ -18949,28 +19516,68 @@ function process2v2AOE(targetIndices, responseType, sourceIdx, cb) {
       var target = aliveEnemies[Math.floor(Math.random() * aliveEnemies.length)];
       var kc = seat.hand.splice(kI, 1)[0];
       discardCard(kc);
+      wangshengDraw2v2(seat, kc, 'play');
       if (!seat._killCountThisTurn) seat._killCountThisTurn = 0;
       seat._killCountThisTurn++;
       var dmg = 1;
-      
+
+      if (seat._qixinBonus > 0) {
+        dmg += seat._qixinBonus;
+        log('🤝 ' + seat.hero.name + '【齐心】杀伤害+' + seat._qixinBonus);
+        seat._qixinBonus = 0;
+      }
+      if (seat._damageBonus > 0) {
+        dmg += seat._damageBonus;
+        seat._damageBonus = 0;
+        log('🔥 ' + seat.hero.name + '伤害加成+1');
+      }
       if (seat.hero.id === 'chensicong' && getSuitColor(kc.suit) === 'suit-red') {
         dmg += 1;
         log('🎯 ' + seat.hero.name + '【特种装备】红杀伤害+1');
       }
       log('⚔️ ' + seat.hero.name + '对' + seats[target].hero.name + '打出' + cardDesc(kc));
       render2v2Battle();
-      setTimeout(function() {
-        defend2v2(target, dmg, kc, seatIdx, function() {
-          
-          if (seat._killCountThisTurn < kl && seat.hand.some(function(c) {
-              return isKill(c);
-            })) {
-            ai2v2Kill(seat, seatIdx, aliveEnemies, cb);
-          } else {
-            if (cb) cb();
-          }
+      var noDodge = false;
+      if (seat.hero.id === 'manhongyi' && seat.armor > 0 && !seat._hasUsedBeici && seat._disabledSkills.indexOf(
+          '背刺') === -1) {
+        seat.armor--;
+        seat._hasUsedBeici = true;
+        noDodge = true;
+        log('🗡️ ' + seat.hero.name + '【背刺】发动');
+        var t0 = seats[target];
+        if (t0.hand.length) {
+          var st0 = randomCardsFrom2v2(t0, 1)[0];
+          seat.hand.push(st0);
+          log('🤏 ' + seat.hero.name + '夺' + cardDesc(st0));
+        }
+        render2v2Battle();
+      }
+      var proceed = function() {
+        setTimeout(function() {
+          defend2v2(target, dmg, kc, seatIdx, function() {
+
+            if (seat._killCountThisTurn < kl && seat.hand.some(function(c) {
+                return isKill(c);
+              })) {
+              ai2v2Kill(seat, seatIdx, aliveEnemies, cb);
+            } else {
+              if (cb) cb();
+            }
+          }, noDodge);
+        }, 450);
+      };
+      if (seat.hero.id === 'xuyifeng' && seat._disabledSkills.indexOf('足球上将') === -1) {
+        var zc = randomCardsFrom2v2(seats[target], 2);
+        zc.forEach(function(c) {
+          discardCard(c);
         });
-      }, 600);
+        if (zc.length) log('⚽ ' + seat.hero.name + '【足球上将】' + seats[target].hero.name + '弃' + zc.map(function(
+          c) {
+          return c.name;
+        }).join('、'));
+        render2v2Battle();
+      }
+      proceed();
     }
 
 
@@ -19134,14 +19741,51 @@ gameOver = false;      my2v2SeatIndex = mySeatIndex;
       };
       initDeck();
       seats.forEach(function(s) {
+        init2v2SeatSkills(s);
         drawCardToSeat(s, 4);
       });
       gameState.myHand = seats[0].hand;
+      document.getElementById('battle-page').classList.add('mode-2v2');
       document.getElementById('battle-2v2-top').style.display = 'grid';
+      document.getElementById('battle-2v2-left').style.display = 'flex';
+      document.getElementById('battle-2v2-right').style.display = 'flex';
       document.getElementById('battle-1v1-top').style.display = 'none';
       render2v2Battle();
       log('--- ⚔️ 2v2对战开始！---');
       log(getDisplayNickname() + '【' + myH.name + '】&【' + tmH.name + '】VS【' + e1H.name + '】&【' + e2H.name + '】');
+      seats.forEach(function(s, i) {
+        if (s.hero.id === 'hajifeng') {
+          if (i === 0) {
+            gameState.isProcessing = true;
+            setTimeout(function() {
+              showModal('🐝 抉择', '选择你的路线：', [{
+                text: '⚔️ 背刺 → 获得[杀人蜂]',
+                color: '#e74c3c',
+                action: function() {
+                  seats[0]._hajiChoice = 'backstab';
+                  log('🐝 【抉择】选择背刺，获得[杀人蜂]');
+                  closeModal();
+                  gameState.isProcessing = false;
+                  render2v2Battle();
+                }
+              }, {
+                text: '🛡️ 缴械 → 获得[哈基峰]限定技',
+                color: '#3498db',
+                action: function() {
+                  seats[0]._hajiChoice = 'disarm';
+                  log('🐝 【抉择】选择缴械，获得[哈基峰]限定技');
+                  closeModal();
+                  gameState.isProcessing = false;
+                  render2v2Battle();
+                }
+              }]);
+            }, 300);
+          } else {
+            s._hajiChoice = Math.random() > 0.5 ? 'backstab' : 'disarm';
+            log('🐝 ' + s.hero.name + '【抉择】选择了' + (s._hajiChoice === 'backstab' ? '背刺' : '缴械'));
+          }
+        }
+      });
       var newGd = Object.assign({}, roomState, {
         phase: 'playing',
         seats: seats.map(function(s) {
@@ -19161,25 +19805,30 @@ gameOver = false;      my2v2SeatIndex = mySeatIndex;
         status: 'playing'
       }).eq('id', currentRoomId), 'init_2v2');
       currentTurnSeat = 0;
-      setTimeout(process2v2Turn, 1000);
+      setTimeout(process2v2Turn, 600);
     }
 
     function drawCardToSeat(seat, count) {
       for (var i = 0; i < count; i++) {
         if (!drawPile.length) {
           if (!discardPile.length) {
-            log('⚠️ 牌堆空！');
-            return;
+            break;
           }
           drawPile = discardPile.slice();
           discardPile = [];
           shuffleArray(drawPile);
         }
+        if (!drawPile.length) break;
         seat.hand.push(drawPile.pop());
+        if (seat.hero.id === 'xuzongwei' && seat.hand[seat.hand.length - 1].effect === 'weapon_zhuge') {
+          var zc = seat.hand.pop();
+          discardCard(zc);
+          drawCardToSeat(seat, 2);
+          log('🌟 ' + seat.hero.name + '【盛哉】弃置连弩，摸2张');
+        }
       }
     }
 
-    
     function process2v2Turn() {
       if (gameOver) return;
       var attempts = 0;
@@ -19193,7 +19842,7 @@ gameOver = false;      my2v2SeatIndex = mySeatIndex;
       }
       var seat = seats[currentTurnSeat];
       var isPlayerTurn = (currentTurnSeat === 0);
-      
+
       seat._killCountThisTurn = 0;
       seat._turnFinished = false;
       seat._skipDraw = false;
@@ -19201,7 +19850,27 @@ gameOver = false;      my2v2SeatIndex = mySeatIndex;
       seat._immuneKill = false;
       seat._hpLossThisTurn = 0;
       seat._hasUsedXiujia = false;
+      seat._hasUsedFanke = false;
+      seat._qixinBonus = 0;
+      seat._damageBonus = 0;
+      if (seat._skipNextDraw) {
+        seat._skipNextDraw = false;
+        seat._skipDraw = true;
+        log('🚫 ' + seat.hero.name + '【放逐】跳过摸牌');
+      }
       if (seat._hasXiWang === undefined) seat._hasXiWang = true;
+      if (currentTurnSeat !== 0) {
+        seat._hasUsedTangyiA = false;
+        seat._hasUsedTangyiB = false;
+        seat._hasUsedBeici = false;
+        seat._hasUsedCangdao = false;
+        seat._hasUsedHaoshi = false;
+      }
+      if (seat.hero.id === 'sunliangcheng') {
+        seat._hasUsedBanwei = false;
+        seat._hasUsedMaoniangCount = 0;
+      }
+      if (seat.hero.id === 'hajifeng') seat._hasUsedShiwang = false;
       gameState.killCountThisTurn = 0;
       gameState.noKillLimitThisTurn = false;
       gameState.hasUsedWine = false;
@@ -19210,49 +19879,31 @@ gameOver = false;      my2v2SeatIndex = mySeatIndex;
       document.getElementById('current-turn-name').innerText = seat.hero.name + ' 的回合';
       log('🔄 === 第' + gameState.turnNumber + '回合 ' + seat.hero.name + ' ===');
 
-      
-      process2v2Judgments(currentTurnSeat, function() {
+      seats.forEach(function(s) {
+        if (s.alive && s.hero.id === 'yuchengxiao') {
+          s._shouban = (s._shouban || 0) + 1;
+          log('🎵 【初音】' + s.hero.name + '+1手办(' + s._shouban + ')');
+        }
+      });
+      if (seat.hero.id === 'hajifeng' && seat._hasChuxin && seat.hp < seat.maxHp) {
+        seat.hp++;
+        log('💚 ' + seat.hero.name + '【初心】回合开始回复1体力');
+      }
+      if (seat._hasChaozaiMoshi && seat.hp < seat.maxHp) {
+        seat.hp++;
+        log('⚡ ' + seat.hero.name + '【超载】回复1血');
+      }
+
+      var proceedAfterDraw = function() {
         if (gameOver || !seat.alive) {
           nextSeat2v2();
           return;
         }
-        
-        if (seat._skipDraw) {
-          log('🌾 ' + seat.hero.name + '跳过摸牌');
-        } else {
-          
-          if (seat.hero.id === 'liyucheng') {
-            drawCardToSeat(seat, 4);
-            log('🌟 ' + seat.hero.name + '【彦祖】摸4');
-          } else if (seat.hero.id === 'manhongyi') {
-            drawCardToSeat(seat, 5);
-            log('🍯 ' + seat.hero.name + '【糖浆】摸5');
-          } else if (seat.hero.id === 'xuzongwei') {
-            
-            var ss = ['♠', '♥', '♣', '♦'],
-              rs = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'],
-              nk = {};
-            var src = cardEffects.kill;
-            for (var k in src) nk[k] = src[k];
-            nk.id = Date.now();
-            nk.suit = ss[Math.floor(Math.random() * 4)];
-            nk.rank = rs[Math.floor(Math.random() * 13)];
-            seat.hand.push(nk);
-            log('⚔️ ' + seat.hero.name + '【当先】获' + cardDesc(nk));
-            drawCardToSeat(seat, 2);
-            log('📚 ' + seat.hero.name + '摸2');
-          } else {
-            drawCardToSeat(seat, 2);
-            log('📚 ' + seat.hero.name + '摸2张牌');
-          }
-        }
         render2v2Battle();
-        
         if (seat.hero.id === 'chensicong' && seat.hand.length === 0) {
           drawCardToSeat(seat, 2);
           log('📦 ' + seat.hero.name + '【弹药箱】无手牌，摸2张');
         }
-        
         if (seat.hero.id === 'chensicong' && seat._hasJinji) {
           triggerJinji2v2(currentTurnSeat);
           if (gameOver || !seat.alive || seat.hp <= 0) {
@@ -19260,7 +19911,6 @@ gameOver = false;      my2v2SeatIndex = mySeatIndex;
             return;
           }
         }
-        
         if (seat._skipPlay) {
           log('😴 ' + seat.hero.name + '跳过出牌');
           render2v2Battle();
@@ -19268,7 +19918,7 @@ gameOver = false;      my2v2SeatIndex = mySeatIndex;
             discardPhase2v2(currentTurnSeat, function() {
               nextSeat2v2();
             });
-          }, 500);
+          }, 350);
           return;
         }
         if (isPlayerTurn) {
@@ -19287,8 +19937,57 @@ gameOver = false;      my2v2SeatIndex = mySeatIndex;
           setTimeout(function() {
             seat._killCountThisTurn = 0;
             ai2v2Turn(seat);
-          }, 1200);
+          }, 600);
         }
+      };
+
+      triggerQixin2v2(currentTurnSeat, function() {
+        if (gameOver) return;
+        triggerRuyu2v2(currentTurnSeat, function() {
+          if (gameOver || !seat.alive) {
+            nextSeat2v2();
+            return;
+          }
+          process2v2Judgments(currentTurnSeat, function() {
+            if (gameOver || !seat.alive) {
+              nextSeat2v2();
+              return;
+            }
+            if (seat._skipDraw) {
+              log('🌾 ' + seat.hero.name + '跳过摸牌');
+              proceedAfterDraw();
+            } else if (seat._hasXianshangZuozhe) {
+              triggerXianshang2v2(seat, function() {
+                proceedAfterDraw();
+              });
+            } else {
+              if (seat.hero.id === 'liyucheng') {
+                drawCardToSeat(seat, 4);
+                log('🌟 ' + seat.hero.name + '【彦祖】摸4');
+              } else if (seat.hero.id === 'manhongyi') {
+                drawCardToSeat(seat, 5);
+                log('🍯 ' + seat.hero.name + '【糖浆】摸5');
+              } else if (seat.hero.id === 'xuzongwei') {
+                var ss = ['♠', '♥', '♣', '♦'],
+                  rs = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'],
+                  nk = {};
+                var src = cardEffects.kill;
+                for (var k in src) nk[k] = src[k];
+                nk.id = Date.now();
+                nk.suit = ss[Math.floor(Math.random() * 4)];
+                nk.rank = rs[Math.floor(Math.random() * 13)];
+                seat.hand.push(nk);
+                log('⚔️ ' + seat.hero.name + '【当先】获' + cardDesc(nk));
+                drawCardToSeat(seat, 2);
+                log('📚 ' + seat.hero.name + '摸2');
+              } else {
+                drawCardToSeat(seat, 2);
+                log('📚 ' + seat.hero.name + '摸2张牌');
+              }
+              proceedAfterDraw();
+            }
+          });
+        });
       });
     }
 
@@ -19323,7 +20022,7 @@ currentTurnSeat = (currentTurnSeat + 1) % 4;
 if (currentTurnSeat === 0) gameState.turnNumber++;
 sync2v2State();
       render2v2Battle();
-      setTimeout(process2v2Turn, 800);
+      setTimeout(process2v2Turn, 400);
     }
 
     
@@ -19398,10 +20097,7 @@ sync2v2State();
       gameState.isMyTurn = false;
       document.getElementById('btn-play').style.display = 'none';
       document.getElementById('btn-end').style.display = 'none';
-      
-      discardPhase2v2(0, function() {
-        nextSeat2v2();
-      });
+      finish2v2Turn();
     }
 
     
@@ -19411,6 +20107,13 @@ sync2v2State();
       var seat = seats[seatIdx];
       if (!seat) return;
       if (seat._turnFinished) return;
+      if (seat.hero.id === 'xuzongwei' && !seat._extraTurn && seat._disabledSkills.indexOf('当先') === -1) {
+        seat._extraTurn = true;
+        log('⏳ ' + seat.hero.name + '【当先】额外回合');
+        render2v2Battle();
+        setTimeout(process2v2Turn, 400);
+        return;
+      }
       seat._turnFinished = true;
       log('⏭️ ' + seat.hero.name + '结束出牌');
       gameState.isMyTurn = false;
@@ -19422,7 +20125,7 @@ sync2v2State();
         discardPhase2v2(seatIdx, function() {
           nextSeat2v2();
         });
-      }, 500);
+      }, 300);
     }
 
     
@@ -19481,6 +20184,23 @@ sync2v2State();
       document.getElementById('e2-name').innerText = seats[3].hero.name + (seats[3].alive ? '' : ' 💀');
       document.getElementById('e2-hp').innerText = '❤️ ' + seats[3].hp + '/' + seats[3].maxHp;
       document.getElementById('e2-hand-count').innerText = seats[3].hand.length;
+
+      [['tm', 1], ['e1', 2], ['e2', 3]].forEach(function(p) {
+        var pf = p[0],
+          s = seats[p[1]];
+        var we = document.getElementById(pf + '-weapon');
+        we.innerHTML = s.equip.weapon ? '<span class="equipment-tag">' + s.equip.weapon.name + '</span>' : '';
+        var ae = document.getElementById(pf + '-armor-eq');
+        ae.innerHTML = s.equip.armor ? '<span class="equipment-tag armor-tag">' + s.equip.armor.name + '</span>' : '';
+        var je = document.getElementById(pf + '-judgments');
+        je.innerHTML = '';
+        s.judgments.forEach(function(jd) {
+          var d = document.createElement('span');
+          d.className = 'judgment-card ' + jd.type;
+          d.innerText = jd.card.name;
+          je.appendChild(d);
+        });
+      });
       
       document.getElementById('my-portrait').innerHTML = heroPortraitHTML(seats[0].hero, '🧑');
       document.getElementById('my-hero-name').innerText = getDisplayNickname() + ' (' + seats[0].hero.name + ')';
@@ -19521,7 +20241,8 @@ sync2v2State();
           return function() {
             if (gameOver || !gameState.isMyTurn) return;
             if (!gameState.selectedIndices) gameState.selectedIndices = [];
-            var mp = (gameState.phase === 'discard');
+            var mp = (gameState.phase === 'discard' || gameState.phase === 'haoqing_select' || gameState.phase ===
+              'tangyi_select' || gameState.phase === 'zhangba_select');
             if (mp) {
               var pos = gameState.selectedIndices.indexOf(idx);
               if (pos === -1) gameState.selectedIndices.push(idx);
@@ -19549,15 +20270,48 @@ sync2v2State();
       document.getElementById('btn-end').onclick = end2v2Turn;
       document.getElementById('btn-discard-confirm').onclick = confirmDiscard2v2;
       
-      if (isDiscard) {
-        var ex = gameState._discardNeeded || 0;
+      var selPhase = (gameState.phase === 'haoqing_select' || gameState.phase === 'tangyi_select' || gameState.phase ===
+        'zhangba_select');
+      if (isDiscard || selPhase) {
+        var needN = 0,
+          tipTxt = '';
+        if (isDiscard) {
+          needN = gameState._discardNeeded || 0;
+          tipTxt = '选' + needN + '张弃置';
+        } else if (gameState.phase === 'haoqing_select') {
+          needN = 2;
+          tipTxt = '🔥豪情选2张';
+        } else if (gameState.phase === 'tangyi_select') {
+          needN = 1;
+          tipTxt = '🍬糖衣选1张';
+        } else if (gameState.phase === 'zhangba_select') {
+          needN = 2;
+          tipTxt = '🐍丈八选2张';
+        }
         document.getElementById('discard-tip').style.display = 'block';
-        document.getElementById('discard-tip').innerText = '选' + ex + '张弃置(' + gameState.selectedIndices.length + '/' +
-          ex + ')';
+        document.getElementById('discard-tip').innerText = tipTxt + '(' + gameState.selectedIndices.length + '/' +
+          needN + ')';
         document.getElementById('btn-discard-confirm').style.display = 'inline-block';
+        document.getElementById('btn-discard-confirm').onclick = isDiscard ? confirmDiscard2v2 : confirm2v2SkillSelect;
         document.getElementById('btn-play').style.display = 'none';
         document.getElementById('btn-end').style.display = 'none';
-      } else if (!isMyTurn) {
+        if (selPhase && !document.getElementById('btn-skill-cancel')) {
+          var cbBtn = document.createElement('button');
+          cbBtn.id = 'btn-skill-cancel';
+          cbBtn.className = 'action-btn';
+          cbBtn.innerText = '取消';
+          cbBtn.onclick = function() {
+            gameState.phase = 'play';
+            gameState.selectedIndices = [];
+            render2v2Battle();
+          };
+          document.getElementById('main-action-bar').appendChild(cbBtn);
+        }
+      } else {
+        var oldCb = document.getElementById('btn-skill-cancel');
+        if (oldCb) oldCb.remove();
+      }
+      if (!isMyTurn && !isDiscard && !selPhase) {
         document.getElementById('btn-discard-confirm').style.display = 'none';
         document.getElementById('discard-tip').style.display = 'none';
       }
@@ -19566,14 +20320,882 @@ sync2v2State();
       if (!seats[0].alive) {
         pe.innerHTML = '<span style="color:#e74c3c;">💀 已阵亡</span>';
       } else {
-        pe.innerHTML = '🎮 2v2模式 · ' + seats[0].hero.name;
+        var hid0 = seats[0].hero.id;
+        var sk0 = '';
+        if (hid0 === 'yuchengxiao') sk0 = '🐟如鱼得水|🎀手办(' + (seats[0]._shouban || 0) + ')|🎵初音|📡电线杆';
+        else if (hid0 === 'wangsheng') sk0 = '🧠无谋|👻武魂|🦴狂骨|⚔️连斩|🔄反客为主';
+        else if (hid0 === 'manhongyi') sk0 = '🍯糖浆|🍬糖衣|🗡️背刺|🚫禁桃';
+        else if (hid0 === 'liyucheng') sk0 = '😎彦祖|🔥豪情|🎁好施|🗡️藏刀';
+        else if (hid0 === 'xuzongwei') sk0 = '👑皇威|❤️归心|🚫放逐|🌟盛哉|⚔️当先';
+        else if (hid0 === 'xuyifeng') {
+          if (seats[0]._hasXianshangZuozhe) sk0 += '📝线上作者|';
+          sk0 += '⚽足球上将|';
+          if (!seats[0]._hasUsedChongsheng) sk0 += '🔥重生|';
+          if (seats[0]._hasChaozaiMoshi) sk0 += '⚡超载';
+        } else if (hid0 === 'sunliangcheng') {
+          if (seats[0]._hasBanwei) sk0 += '👑班威|';
+          if (!seats[0]._hasUsedHuamao) sk0 += '🐱化猫|';
+          if (seats[0]._hasMaoniang) sk0 += '🎀猫娘(' + seats[0]._hasUsedMaoniangCount + '/2)';
+        } else if (hid0 === 'hajifeng') {
+          sk0 = '🐭鼠鼠';
+          if (seats[0]._hajiChoice === 'backstab') sk0 += '|🐝杀人蜂';
+          if (seats[0]._hajiChoice === 'disarm') {
+            if (!seats[0]._hasUsedChongsheng) sk0 += '|🔥哈基峰(限定)';
+            if (seats[0]._hasShiwang) sk0 += '|😞失望' + (seats[0]._hasUsedShiwang ? '(已用)' : '');
+            if (seats[0]._hasChuxin) sk0 += '|💚初心';
+          }
+          sk0 += '|🤝齐心' + (seats[0]._qixinBonus > 0 ? '(增伤中)' : '');
+        } else if (hid0 === 'chensicong') {
+          sk0 = '📦弹药箱|🎯特种装备|🎽六套';
+          if (!seats[0]._hasUsedXiujia) sk0 += '|🧰修甲包';
+          sk0 += '|💉兴奋剂';
+          if (seats[0]._hasXiWang) sk0 += '|🌟三角洲的希望';
+          if (seats[0]._hasJinji) sk0 += '|🌿禁忌之力(' + (seats[0]._gui || 0) + '/3)';
+        } else sk0 = '⚡英姿|💨飒爽' + (hasXinshouBaohu() ? '|🛡️新手保护' : '');
+        var dis0 = seats[0]._disabledSkills || [];
+        if (dis0.length) sk0 += ' <span style="color:#e74c3c;">封禁:' + dis0.join('、') + '</span>';
+        pe.innerHTML = sk0;
       }
-      
+
       var bar = document.getElementById('skills-bar');
       bar.innerHTML = '';
+      var mk2v2Btn = function(label, color, enabled, fn) {
+        var b = document.createElement('button');
+        b.className = 'skill-btn';
+        b.style.background = color;
+        b.innerText = label;
+        b.disabled = !enabled;
+        b.onclick = fn;
+        bar.appendChild(b);
+      };
+      var canUse = isMyTurn && !gameOver;
+      if (seats[0].alive) {
+        if (hid0 === 'yuchengxiao') {
+          mk2v2Btn('🎀手办(' + (seats[0]._shouban || 0) + ')', '#ff6b81', canUse && (seats[0]._shouban || 0) > 0,
+            use2v2Skill_Shouban);
+        }
+        if (hid0 === 'manhongyi') {
+          mk2v2Btn('🍬糖衣', '#f39c12', canUse, use2v2Skill_Tangyi);
+        }
+        if (hid0 === 'liyucheng') {
+          mk2v2Btn('🔥豪情', '#e74c3c', canUse && seats[0].hand.length >= 2, use2v2Skill_Haoqing);
+          mk2v2Btn('🎁好施', '#2ecc71', canUse && !seats[0]._hasUsedHaoshi, use2v2Skill_Haoshi);
+          mk2v2Btn('🗡️藏刀', '#8e44ad', canUse && !seats[0]._hasUsedCangdao, use2v2Skill_Cangdao);
+        }
+        if (hid0 === 'default' && userProfile.level < 2) {
+          mk2v2Btn('⚡英姿', '#27ae60', canUse && !gameState.hasUsedSkill, use2v2Skill_Default);
+        }
+        if (seats[0].equip.weapon && seats[0].equip.weapon.effect === 'weapon_zhangba') {
+          mk2v2Btn('🐍丈八', '#e67e22', canUse && seats[0].hand.length >= 2, use2v2Skill_Zhangba);
+        }
+        if (hid0 === 'sunliangcheng') {
+          if (seats[0]._hasBanwei) mk2v2Btn('👑班威', '#d35400', canUse && !seats[0]._hasUsedBanwei,
+            use2v2Skill_Banwei);
+          if (seats[0]._hasMaoniang) mk2v2Btn('🎀猫娘(' + seats[0]._hasUsedMaoniangCount + '/2)', '#e84393', canUse &&
+            seats[0].hp > 1 && seats[0]._hasUsedMaoniangCount < 2, use2v2Skill_Maoniang);
+        }
+        if (hid0 === 'hajifeng' && seats[0]._hasShiwang && !seats[0]._hasUsedShiwang) {
+          mk2v2Btn('😞失望', '#8e44ad', canUse, use2v2Skill_Shiwang);
+        }
+        if (hid0 === 'chensicong') {
+          mk2v2Btn('🧰修甲包' + (seats[0].armor > 0 ? '(' + seats[0].armor + '甲)' : ''), '#16a085', canUse && !
+            seats[0]._hasUsedXiujia, use2v2Skill_Xiujia);
+          mk2v2Btn('💉兴奋剂', '#d35400', canUse && seats[0].hp < seats[0].maxHp, use2v2Skill_Xingfenji);
+        }
+      }
     }
 
     
+    function init2v2SeatSkills(seat) {
+      var hid = seat.hero.id;
+      seat._disabledSkills = [];
+      seat._shouban = 0;
+      seat._hajiChoice = null;
+      seat._hasShiwang = false;
+      seat._hasChuxin = false;
+      seat._hasUsedShiwang = false;
+      seat._qixinBonus = 0;
+      seat._damageBonus = 0;
+      seat._hasXianshangZuozhe = (hid === 'xuyifeng');
+      seat._hasChaozaiMoshi = false;
+      seat._hasUsedChongsheng = false;
+      seat._hasBanwei = (hid === 'sunliangcheng');
+      seat._hasMaoniang = false;
+      seat._hasUsedHuamao = false;
+      seat._hasUsedBanwei = false;
+      seat._hasUsedMaoniangCount = 0;
+      seat._hasUsedTangyiA = false;
+      seat._hasUsedTangyiB = false;
+      seat._hasUsedBeici = false;
+      seat._hasUsedCangdao = false;
+      seat._hasUsedHaoshi = false;
+      seat._hasUsedFanke = false;
+      seat._extraTurn = false;
+    }
+
+    function getKillLimit2v2(hid, hasW) {
+      if (hid === 'xuzongwei' || hid === 'yuchengxiao' || hid === 'hajifeng') return 999;
+      if (hid === 'wangsheng') return 4;
+      return hasW ? 999 : 1;
+    }
+
+    function wangshengDraw2v2(seat, card, reason) {
+      if (seat.hero.id === 'wangsheng' && isKill(card) && (reason === 'play' || reason === 'discard')) {
+        drawCardToSeat(seat, 2);
+        log('👻 ' + seat.hero.name + '【武魂】摸两张');
+      }
+    }
+
+    function showHandPickModal(title, desc, seat, n, cb) {
+      var m = document.getElementById('response-modal');
+      document.getElementById('modal-title').innerText = title;
+      document.getElementById('modal-desc').innerText = desc;
+      document.getElementById('modal-buttons').innerHTML = '';
+      var g = document.getElementById('modal-card-grid');
+      g.innerHTML = '';
+      var picked = [];
+      var confirmBtn = document.createElement('button');
+      confirmBtn.className = 'btn-confirm';
+      confirmBtn.innerText = '确认(0/' + n + ')';
+      confirmBtn.disabled = true;
+      seat.hand.forEach(function(c, i) {
+        var e = document.createElement('div');
+        e.className = 'card-back';
+        e.style.background = '#fdfdfd';
+        e.style.color = '#333';
+        e.style.fontSize = '14px';
+        var cc = getSuitColor(c.suit);
+        e.innerHTML = '<div style="text-align:center;"><div class="' + cc + '" style="font-size:18px;">' + c.rank + c
+          .suit + '</div><div>' + c.name + '</div></div>';
+        e.onclick = function() {
+          var p = picked.indexOf(i);
+          if (p === -1) {
+            if (picked.length >= n) return;
+            picked.push(i);
+            e.style.outline = '3px solid #e74c3c';
+          } else {
+            picked.splice(p, 1);
+            e.style.outline = 'none';
+          }
+          confirmBtn.innerText = '确认(' + picked.length + '/' + n + ')';
+          confirmBtn.disabled = picked.length !== n;
+        };
+        g.appendChild(e);
+      });
+      confirmBtn.onclick = function() {
+        var cards = picked.slice().sort(function(a, b) {
+          return b - a;
+        }).map(function(i) {
+          return seat.hand.splice(i, 1)[0];
+        });
+        closeModal();
+        if (cb) cb(cards);
+      };
+      document.getElementById('modal-buttons').appendChild(confirmBtn);
+      m.style.display = 'flex';
+    }
+
+    function playerPickFromSeat2v2(tSeat, n, cb) {
+      if (!tSeat.hand.length) {
+        if (cb) cb([]);
+        return;
+      }
+      showHandPickModal('🃏 选择' + n + '张牌', '从' + tSeat.hero.name + '的手牌中选择' + Math.min(n, tSeat.hand.length) +
+        '张', tSeat, Math.min(n, tSeat.hand.length), cb);
+    }
+
+    function randomCardsFrom2v2(tSeat, n) {
+      var out = [];
+      while (out.length < n && tSeat.hand.length) {
+        var ri = Math.floor(Math.random() * tSeat.hand.length);
+        out.push(tSeat.hand.splice(ri, 1)[0]);
+      }
+      return out;
+    }
+
+    function triggerZuqiu2v2(seat, tIdx, cb) {
+      if (seat === seats[0] && seat.hero.id === 'xuyifeng' && seat._disabledSkills.indexOf('足球上将') === -1) {
+        showModal('⚽ 足球上将', '令' + seats[tIdx].hero.name + '弃2牌？', [{
+          text: '发动',
+          color: '#2ecc71',
+          action: function() {
+            closeModal();
+            playerPickFromSeat2v2(seats[tIdx], 2, function(cards) {
+              cards.forEach(function(c) {
+                discardCard(c);
+              });
+              if (cards.length) log('⚽ ' + seats[tIdx].hero.name + '弃' + cards.map(function(c) {
+                return c.name;
+              }).join('、'));
+              render2v2Battle();
+              if (cb) cb();
+            });
+          }
+        }, {
+          text: '不发动',
+          color: '#7f8c8d',
+          action: function() {
+            closeModal();
+            if (cb) cb();
+          }
+        }]);
+      } else if (seat !== seats[0] && seat.hero.id === 'xuyifeng' && seat._disabledSkills.indexOf('足球上将') === -1) {
+        var cards = randomCardsFrom2v2(seats[tIdx], 2);
+        cards.forEach(function(c) {
+          discardCard(c);
+        });
+        if (cards.length) log('⚽ ' + seat.hero.name + '【足球上将】' + seats[tIdx].hero.name + '弃' + cards.map(
+          function(c) {
+            return c.name;
+          }).join('、'));
+        render2v2Battle();
+        if (cb) cb();
+      } else if (cb) cb();
+    }
+
+    function launch2v2Kill(seat, dmg, actualCard, enemySeats, noDodge) {
+      var doT = function(tIdx) {
+        triggerZuqiu2v2(seat, tIdx, function() {
+          defend2v2(tIdx, dmg, actualCard, seats.indexOf(seat), function() {}, noDodge);
+        });
+      };
+      if (enemySeats.length === 1) doT(enemySeats[0]);
+      else show2v2TargetSelect('🎯 选择攻击目标', '选择要攻击的敌人', false, true, false, doT);
+    }
+
+    function triggerQixin2v2(seatIdx, cb) {
+      var seat = seats[seatIdx];
+      if (!seat || !seat.alive || seat.hero.id !== 'hajifeng' || seat._disabledSkills.indexOf('齐心') !== -1) {
+        if (cb) cb();
+        return;
+      }
+      if (seat.hp >= 4) {
+        drawCardToSeat(seat, 2);
+        log('🤝 ' + seat.hero.name + '【齐心】失去1点体力，摸2张牌');
+        loseHpSeat2v2(seat, 1, '齐心');
+        render2v2Battle();
+        if (cb) cb();
+      } else if (seat.hp >= 2) {
+        if (seatIdx === 0) {
+          showModal('🤝 齐心', '是否回复1点体力并获得本回合杀伤害+2？(不与酒叠加)', [{
+            text: '回复并增伤',
+            color: '#2ecc71',
+            action: function() {
+              seat.hp = Math.min(seat.maxHp, seat.hp + 1);
+              seat._qixinBonus = 2;
+              log('🤝 【齐心】回复1点体力，本回合杀伤害+2');
+              closeModal();
+              render2v2Battle();
+              if (cb) cb();
+            }
+          }, {
+            text: '不发动',
+            color: '#7f8c8d',
+            action: function() {
+              closeModal();
+              if (cb) cb();
+            }
+          }]);
+        } else {
+          var hasKillInHand = seat.hand.some(function(c) {
+            return isKill(c);
+          });
+          if (seat.hp < seat.maxHp && seat.hp <= 2) {
+            seat.hp = Math.min(seat.maxHp, seat.hp + 1);
+            log('🤝 ' + seat.hero.name + '【齐心】回复1点体力');
+          } else if (hasKillInHand) {
+            seat._qixinBonus = 2;
+            log('🤝 ' + seat.hero.name + '【齐心】本回合杀伤害+2');
+          } else if (seat.hp < seat.maxHp) {
+            seat.hp = Math.min(seat.maxHp, seat.hp + 1);
+            log('🤝 ' + seat.hero.name + '【齐心】回复1点体力');
+          }
+          render2v2Battle();
+          if (cb) cb();
+        }
+      } else if (cb) cb();
+    }
+
+    function triggerRuyu2v2(seatIdx, cb) {
+      var seat = seats[seatIdx];
+      if (!seat || !seat.alive || seat.hero.id !== 'yuchengxiao') {
+        if (cb) cb();
+        return;
+      }
+      log('🐟 ' + seat.hero.name + '【如鱼得水】判定...');
+      var jc = null;
+      if (!drawPile.length && discardPile.length) {
+        drawPile = discardPile.slice();
+        discardPile = [];
+        shuffleArray(drawPile);
+      }
+      if (drawPile.length) jc = drawPile.pop();
+      if (!jc) {
+        if (cb) cb();
+        return;
+      }
+      log('🎴 ' + jc.suit + jc.rank);
+      discardCard(jc);
+      if (jc.suit === '♠') {
+        drawCardToSeat(seat, 5);
+        log('♠ ' + seat.hero.name + '摸5张');
+      } else if (jc.suit === '♣') {
+        seat._immuneKill = true;
+        log('♣ ' + seat.hero.name + '免疫杀');
+      } else if (jc.suit === '♥') {
+        seat._shouban = (seat._shouban || 0) + 3;
+        log('♥ ' + seat.hero.name + '+3手办');
+      } else {
+        seat.hp--;
+        seat._damageBonus = 1;
+        log('♦ ' + seat.hero.name + '-1血(' + seat.hp + ')伤害+1');
+        if (seat.hp <= 0) {
+          render2v2Battle();
+          promptForDying2v2(seatIdx);
+          if (cb) cb();
+          return;
+        }
+      }
+      render2v2Battle();
+      setTimeout(function() {
+        if (cb) cb();
+      }, 350);
+    }
+
+    function triggerXianshang2v2(seat, cb) {
+      if (!seat._hasXianshangZuozhe) {
+        if (cb) cb();
+        return;
+      }
+      var seatIdx = seats.indexOf(seat);
+      var enemies = getAliveEnemySeats(seatIdx);
+      log('📝 ' + seat.hero.name + '【线上作者】摸4+无中生有');
+      drawCardToSeat(seat, 4);
+      var wzs = {};
+      var src2 = cardEffects.wuzhongshengyou;
+      for (var k in src2) wzs[k] = src2[k];
+      wzs.id = Date.now();
+      wzs.suit = SUITS[Math.floor(Math.random() * 4)];
+      wzs.rank = RANKS[Math.floor(Math.random() * 13)];
+      seat.hand.push(wzs);
+      var jc = null;
+      if (!drawPile.length && discardPile.length) {
+        drawPile = discardPile.slice();
+        discardPile = [];
+        shuffleArray(drawPile);
+      }
+      if (drawPile.length) jc = drawPile.pop();
+      if (jc) {
+        log('🎴 判定' + jc.suit + jc.rank);
+        discardCard(jc);
+        if (jc.suit === '♥' || jc.suit === '♦') {
+          log('🔴 红色，敌-1血');
+          if (enemies.length) {
+            takeDamage2v2(enemies[Math.floor(Math.random() * enemies.length)], 1, seatIdx);
+          }
+        } else {
+          log('⚫ 黑色，弃敌1牌');
+          if (enemies.length) {
+            var et = seats[enemies[Math.floor(Math.random() * enemies.length)]];
+            var got = randomCardsFrom2v2(et, 1);
+            got.forEach(function(c) {
+              discardCard(c);
+            });
+            if (got.length) log('🗑️ 弃' + et.hero.name + '的' + cardDesc(got[0]));
+          }
+        }
+      }
+      render2v2Battle();
+      setTimeout(function() {
+        if (cb) cb();
+      }, 500);
+    }
+
+    function triggerHuamao2v2(seatIdx) {
+      var seat = seats[seatIdx];
+      if (!seat || seat._hasUsedHuamao || seat.maxHp <= 1) return;
+      seat._hasUsedHuamao = true;
+      seat.maxHp--;
+      seat.hp = seat.maxHp;
+      seat._hasBanwei = false;
+      seat._hasMaoniang = true;
+      log('🐱 ' + seat.hero.name + '【化猫】变身猫娘！');
+      render2v2Battle();
+    }
+
+    function triggerHajifengLimit2v2(seatIdx) {
+      var seat = seats[seatIdx];
+      if (!seat || seat._hasUsedChongsheng) return;
+      seat._hasUsedChongsheng = true;
+      seat.hp = seat.maxHp;
+      drawCardToSeat(seat, 10);
+      seat._hasShiwang = true;
+      seat._hasChuxin = true;
+      log('🐝 ' + seat.hero.name + '【哈基峰】限定技发动！回满血摸10张，获得[失望][初心]');
+      render2v2Battle();
+    }
+
+    function triggerChongsheng2v2(seatIdx, srcIdx) {
+      var seat = seats[seatIdx];
+      if (!seat || seat._hasUsedChongsheng) return;
+      seat._hasUsedChongsheng = true;
+      var banSeat = (srcIdx !== undefined && seats[srcIdx] && seats[srcIdx].alive) ? seats[srcIdx] : null;
+      if (!banSeat) {
+        var foes = getAliveEnemySeats(seatIdx);
+        if (foes.length) banSeat = seats[foes[Math.floor(Math.random() * foes.length)]];
+      }
+      var applyBan = function(name) {
+        if (banSeat) {
+          banSeat._disabledSkills.push(name);
+          log('🚫 【重生】封禁[' + name + ']');
+        }
+        seat.maxHp--;
+        seat.hp = seat.maxHp;
+        seat._hasXianshangZuozhe = false;
+        seat._hasChaozaiMoshi = true;
+        render2v2Battle();
+      };
+      if (seatIdx === 0 && banSeat) {
+        var es = banSeat.hero.skills.filter(function(sk) {
+          return sk.name !== '重生' && sk.name !== '超载模式';
+        });
+        var btns = es.map(function(sk) {
+          return {
+            text: '封禁: ' + sk.name,
+            color: '#8e44ad',
+            action: function() {
+              closeModal();
+              applyBan(sk.name);
+            }
+          };
+        });
+        showModal('🔥 重生', '濒死！封禁敌方1技能，回满血。', btns);
+      } else {
+        var bn = '无';
+        if (banSeat) {
+          var pool = banSeat.hero.skills.filter(function(sk) {
+            return sk.name !== '重生' && sk.name !== '超载模式';
+          });
+          if (pool.length) bn = pool[Math.floor(Math.random() * pool.length)].name;
+        }
+        applyBan(bn);
+      }
+    }
+
+    function confirm2v2SkillSelect() {
+      var ph = gameState.phase;
+      var need = ph === 'tangyi_select' ? 1 : 2;
+      if (gameState.selectedIndices.length !== need) {
+        alert('选' + need + '张');
+        return;
+      }
+      var seat = seats[0];
+      var s = gameState.selectedIndices.slice().sort(function(a, b) {
+        return b - a;
+      });
+      s.forEach(function(i) {
+        var c = seat.hand.splice(i, 1)[0];
+        discardCard(c);
+        wangshengDraw2v2(seat, c, 'discard');
+      });
+      gameState.selectedIndices = [];
+      gameState.phase = 'play';
+      if (ph === 'haoqing_select') {
+        seat.hp = Math.min(seat.maxHp, seat.hp + 1);
+        log('🔥 【豪情】弃2张回1血(' + seat.hp + '/' + seat.maxHp + ')');
+        render2v2Battle();
+      } else if (ph === 'tangyi_select') {
+        seat._hasUsedTangyiA = true;
+        seat.armor++;
+        log('🍬 【糖衣】弃1牌+1甲(' + seat.armor + ')');
+        render2v2Battle();
+      } else if (ph === 'zhangba_select') {
+        gameState.killCountThisTurn++;
+        log('🐍 丈八当杀');
+        var fk = {};
+        var src = cardEffects.kill;
+        for (var k in src) fk[k] = src[k];
+        fk.id = Date.now();
+        fk.suit = '♠';
+        fk.rank = 'A';
+        var dmg = 1;
+        if (seat._qixinBonus > 0) {
+          dmg += seat._qixinBonus;
+          seat._qixinBonus = 0;
+          gameState.hasUsedWine = false;
+        } else if (gameState.hasUsedWine) {
+          dmg += 1;
+          gameState.hasUsedWine = false;
+        }
+        render2v2Battle();
+        launch2v2Kill(seat, dmg, fk, getAliveEnemySeats(0), false);
+      }
+    }
+
+    function use2v2Skill_Shouban() {
+      var seat = seats[0];
+      if (!gameState.isMyTurn || gameState.phase !== 'play' || gameState.isProcessing || (seat._shouban || 0) <= 0)
+        return;
+      showModal('🎀 手办(' + seat._shouban + ')', '转化：', [{
+        text: '当杀(不计次)',
+        color: '#e74c3c',
+        action: function() {
+          closeModal();
+          seat._shouban--;
+          log('🎀 手办→杀');
+          var fk = {};
+          var src = cardEffects.kill;
+          for (var k in src) fk[k] = src[k];
+          fk.id = Date.now();
+          fk.suit = '♠';
+          fk.rank = 'A';
+          var dmg = 1;
+          if (seat._qixinBonus > 0) {
+            dmg += seat._qixinBonus;
+            seat._qixinBonus = 0;
+            gameState.hasUsedWine = false;
+          } else if (gameState.hasUsedWine) {
+            dmg += 1;
+            gameState.hasUsedWine = false;
+          }
+          render2v2Battle();
+          launch2v2Kill(seat, dmg, fk, getAliveEnemySeats(0), false);
+        }
+      }, {
+        text: '当闪(备用)',
+        color: '#0984e3',
+        action: function() {
+          closeModal();
+          seat._shouban--;
+          log('🎀 手办→闪(备用)');
+          render2v2Battle();
+        }
+      }, {
+        text: '当无懈(备用)',
+        color: '#636e72',
+        action: function() {
+          closeModal();
+          seat._shouban--;
+          log('🎀 手办→无懈(备用)');
+          render2v2Battle();
+        }
+      }, {
+        text: '取消',
+        color: '#7f8c8d',
+        action: function() {
+          closeModal();
+        }
+      }]);
+    }
+
+    function use2v2Skill_Tangyi() {
+      var seat = seats[0];
+      if (!gameState.isMyTurn || gameState.phase !== 'play' || gameState.isProcessing) return;
+      if (seat._disabledSkills.indexOf('糖衣') !== -1) {
+        alert('【糖衣】已被封禁');
+        return;
+      }
+      var cA = !seat._hasUsedTangyiA && seat.hand.length >= 1,
+        cB = !seat._hasUsedTangyiB;
+      if (!cA && !cB) {
+        alert('糖衣已尽');
+        return;
+      }
+      showModal('🍬 糖衣', '选择：', [{
+        text: '弃1牌+1甲' + (cA ? '' : ' (不可)'),
+        color: '#f39c12',
+        action: function() {
+          if (!cA) return;
+          closeModal();
+          gameState.phase = 'tangyi_select';
+          gameState.selectedIndices = [];
+          render2v2Battle();
+        }
+      }, {
+        text: '-1血+2甲' + (cB ? '' : ' (已用)'),
+        color: '#e74c3c',
+        action: function() {
+          if (!cB) return;
+          seat._hasUsedTangyiB = true;
+          closeModal();
+          loseHpSeat2v2(seat, 1, '糖衣');
+          if (gameOver || !seat.alive || seat.hp <= 0) return;
+          seat.armor += 2;
+          log('🍬 -1血+2甲(' + seat.armor + ')');
+          render2v2Battle();
+        }
+      }, {
+        text: '取消',
+        color: '#7f8c8d',
+        action: function() {
+          closeModal();
+        }
+      }]);
+    }
+
+    function use2v2Skill_Haoqing() {
+      var seat = seats[0];
+      if (!gameState.isMyTurn || gameState.phase !== 'play' || gameState.isProcessing || seat.hand.length < 2)
+        return;
+      gameState.phase = 'haoqing_select';
+      gameState.selectedIndices = [];
+      log('🔥 豪情：选2张弃');
+      render2v2Battle();
+    }
+
+    function use2v2Skill_Haoshi() {
+      var seat = seats[0];
+      if (!gameState.isMyTurn || gameState.phase !== 'play' || gameState.isProcessing || seat._hasUsedHaoshi)
+        return;
+      if (seat._disabledSkills.indexOf('好施') !== -1) {
+        alert('【好施】已被封禁');
+        return;
+      }
+      var others = [];
+      for (var i = 1; i < 4; i++) {
+        if (seats[i].alive) others.push(i);
+      }
+      var btns = others.map(function(i) {
+        return {
+          text: seats[i].hero.name + '摸3(你+1血)',
+          color: i === 1 ? '#2ecc71' : '#e67e22',
+          action: function() {
+            seat._hasUsedHaoshi = true;
+            drawCardToSeat(seats[i], 3);
+            if (seat.hp < seat.maxHp) {
+              seat.hp++;
+              log('🎁 【好施】' + seats[i].hero.name + '摸3，你+1血');
+            } else log('🎁 【好施】' + seats[i].hero.name + '摸3');
+            closeModal();
+            render2v2Battle();
+          }
+        };
+      });
+      btns.push({
+        text: '自己摸3',
+        color: '#3498db',
+        action: function() {
+          seat._hasUsedHaoshi = true;
+          drawCardToSeat(seat, 3);
+          log('🎁 【好施】你摸3');
+          closeModal();
+          render2v2Battle();
+        }
+      });
+      btns.push({
+        text: '取消',
+        color: '#7f8c8d',
+        action: function() {
+          closeModal();
+        }
+      });
+      showModal('🎁 好施', '令一人摸3牌，你回复1点体力', btns);
+    }
+
+    function use2v2Skill_Cangdao() {
+      var seat = seats[0];
+      if (!gameState.isMyTurn || gameState.phase !== 'play' || gameState.isProcessing || seat._hasUsedCangdao)
+        return;
+      if (seat._disabledSkills.indexOf('藏刀') !== -1) {
+        alert('【藏刀】已被封禁');
+        return;
+      }
+      show2v2TargetSelect('🗡️ 藏刀', '令一名敌人失去1点体力', false, true, false, function(tIdx) {
+        seat._hasUsedCangdao = true;
+        loseHpSeat2v2(seats[tIdx], 1, '藏刀');
+        log('🗡️ 【藏刀】' + seats[tIdx].hero.name + '-1体力');
+        render2v2Battle();
+      });
+    }
+
+    function use2v2Skill_Banwei() {
+      var seat = seats[0];
+      if (!gameState.isMyTurn || gameState.phase !== 'play' || gameState.isProcessing || seat._hasUsedBanwei)
+        return;
+      if (seat._disabledSkills.indexOf('班威') !== -1) {
+        alert('【班威】已被封禁');
+        return;
+      }
+      show2v2TargetSelect('👑 班威', '获得目标所有手牌，然后你濒死', false, true, false, function(tIdx) {
+        seat._hasUsedBanwei = true;
+        var t = seats[tIdx];
+        var cnt = t.hand.length;
+        if (cnt) {
+          for (var i = 0; i < cnt; i++) seat.hand.push(t.hand[i]);
+          t.hand = [];
+          log('👑 【班威】夺' + t.hero.name + cnt + '张');
+        } else log('👑 【班威】' + t.hero.name + '无手牌');
+        render2v2Battle();
+        setTimeout(function() {
+          if (gameOver) return;
+          log('💀 【班威】副作用，你濒死');
+          seat.hp = 0;
+          render2v2Battle();
+          promptForDying2v2(0);
+        }, 800);
+      });
+    }
+
+    function use2v2Skill_Maoniang() {
+      var seat = seats[0];
+      if (!gameState.isMyTurn || gameState.phase !== 'play' || gameState.isProcessing || seat.hp <= 1 || seat
+        ._hasUsedMaoniangCount >= 2) return;
+      if (seat._disabledSkills.indexOf('猫娘') !== -1) {
+        alert('【猫娘】已被封禁');
+        return;
+      }
+      show2v2TargetSelect('🎀 猫娘', '-1血：目标-1血并夺其1牌，夺到摸3否则回1血', false, true, false, function(
+        tIdx) {
+        seat._hasUsedMaoniangCount++;
+        seat.hp--;
+        log('🎀 【猫娘】-1血(' + seat._hasUsedMaoniangCount + '/2)');
+        takeDamage2v2(tIdx, 1, 0);
+        if (gameOver || !seat.alive) return;
+        var t = seats[tIdx];
+        if (t.hand.length) {
+          playerPickFromSeat2v2(t, 1, function(cards) {
+            cards.forEach(function(c) {
+              seat.hand.push(c);
+            });
+            if (cards.length) log('🤏 夺' + cardDesc(cards[0]));
+            drawCardToSeat(seat, 3);
+            log('📚 摸3张');
+            render2v2Battle();
+          });
+        } else {
+          if (seat.hp < seat.maxHp) {
+            seat.hp++;
+            log('💖 回1血');
+          }
+          render2v2Battle();
+        }
+      });
+    }
+
+    function use2v2Skill_Shiwang() {
+      var seat = seats[0];
+      if (!gameState.isMyTurn || gameState.phase !== 'play' || gameState.isProcessing || seat._hasUsedShiwang)
+        return;
+      gameState.isProcessing = true;
+      show2v2TargetSelect('😞 失望·第一步', '选择一名其他角色失去1点体力', true, true, false, function(tIdx) {
+        loseHpSeat2v2(seats[tIdx], 1, '失望');
+        log('😞 【失望】' + seats[tIdx].hero.name + '失去1体力');
+        if (gameOver) return;
+        setTimeout(function() {
+          var btns2 = [];
+          for (var i = 0; i < 4; i++) {
+            if (!seats[i].alive || seats[i].hp >= seats[i].maxHp) continue;
+            (function(ii) {
+              btns2.push({
+                text: seats[ii].hero.name + ' +1体力',
+                color: ii === 0 ? '#2ecc71' : '#27ae60',
+                action: function() {
+                  seats[ii].hp = Math.min(seats[ii].maxHp, seats[ii].hp + 1);
+                  log('😞 【失望】' + seats[ii].hero.name + '回复1体力');
+                  closeModal();
+                  finishShiwang2v2();
+                }
+              });
+            })(i);
+          }
+          btns2.push({
+            text: '跳过回复',
+            color: '#7f8c8d',
+            action: function() {
+              closeModal();
+              finishShiwang2v2();
+            }
+          });
+          showModal('😞 失望·第二步', '选择一名角色回复1点体力', btns2);
+        }, 500);
+      });
+    }
+
+    function finishShiwang2v2() {
+      seats[0]._hasUsedShiwang = true;
+      drawCardToSeat(seats[0], 2);
+      log('😞 【失望】摸2张牌');
+      gameState.isProcessing = false;
+      render2v2Battle();
+      check2v2Win();
+    }
+
+    function use2v2Skill_Xiujia() {
+      var seat = seats[0];
+      if (!gameState.isMyTurn || gameState.phase !== 'play' || gameState.isProcessing || seat._hasUsedXiujia)
+        return;
+      seat._hasUsedXiujia = true;
+      loseHpSeat2v2(seat, 1, '修甲包');
+      if (gameOver || !seat.alive || seat.hp <= 0) return;
+      seat.armor += 2;
+      log('🧰 【修甲包】获得2点护甲(共' + seat.armor + '点)');
+      render2v2Battle();
+    }
+
+    function use2v2Skill_Xingfenji() {
+      var seat = seats[0];
+      if (!gameState.isMyTurn || gameState.phase !== 'play' || gameState.isProcessing || seat.hp >= seat.maxHp)
+        return;
+      var bySuit = {};
+      seat.hand.forEach(function(c) {
+        bySuit[c.suit] = (bySuit[c.suit] || 0) + 1;
+      });
+      var btns = [];
+      Object.keys(bySuit).forEach(function(s) {
+        if (bySuit[s] >= 2) btns.push({
+          text: '弃置两张' + s,
+          color: '#e67e22',
+          action: function() {
+            var removed = 0;
+            for (var i = seat.hand.length - 1; i >= 0 && removed < 2; i--) {
+              if (seat.hand[i].suit === s) {
+                var rc = seat.hand.splice(i, 1)[0];
+                discardCard(rc);
+                wangshengDraw2v2(seat, rc, 'discard');
+                removed++;
+              }
+            }
+            seat.hp = Math.min(seat.maxHp, seat.hp + 1);
+            log('💉 【兴奋剂】弃置两张' + s + '，回复1点体力(' + seat.hp + '/' + seat.maxHp + ')');
+            closeModal();
+            render2v2Battle();
+          }
+        });
+      });
+      if (!btns.length) {
+        alert('没有两张同花色的牌');
+        return;
+      }
+      btns.push({
+        text: '取消',
+        color: '#7f8c8d',
+        action: function() {
+          closeModal();
+        }
+      });
+      showModal('💉 兴奋剂', '弃置两张同花色的牌，回复1点体力（当前 ' + seat.hp + '/' + seat.maxHp + '）', btns);
+    }
+
+    function use2v2Skill_Default() {
+      var seat = seats[0];
+      if (!gameState.isMyTurn || gameState.phase !== 'play' || gameState.isProcessing || gameState.hasUsedSkill)
+        return;
+      log('⚡ 【英姿】摸两张');
+      drawCardToSeat(seat, 2);
+      gameState.hasUsedSkill = true;
+      render2v2Battle();
+    }
+
+    function use2v2Skill_Zhangba() {
+      var seat = seats[0];
+      if (!gameState.isMyTurn || gameState.phase !== 'play' || gameState.isProcessing || seat.hand.length < 2)
+        return;
+      gameState.phase = 'zhangba_select';
+      gameState.selectedIndices = [];
+      log('🐍 丈八：选2张当杀');
+      render2v2Battle();
+    }
+
     function handlePostLimitSkill(who) {
       gameState.isProcessing = false;
       renderBattle();
@@ -19635,24 +21257,6 @@ sync2v2State();
           }
         };
       });
-btns.push({
-text: '无' + needCard + '(受1伤)',
-color: '#e74c3c',
-action: function() {
-log('❌ ' + t.hero.name + '受1伤');
-closeModal();
-takeDamage2v2(tIdx, 1, sourceIdx);
-render2v2Battle();
-
-var waitDying = setInterval(function() {
-var modalVisible = document.getElementById('response-modal') && document.getElementById('response-modal').style.display === 'flex';
-if (!modalVisible || gameOver) {
-clearInterval(waitDying);
-if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
-}
-}, 300);
-}
-});
       showModal('🔥 重生', '濒死！封禁敌方1技能，回满血。', btns);
     }
 
@@ -21115,7 +22719,10 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
       initDeck();
       drawCard('me', 4);
       drawCard('enemy', 4);
+      document.getElementById('battle-page').classList.remove('mode-2v2');
       document.getElementById('battle-2v2-top').style.display = 'none';
+      document.getElementById('battle-2v2-left').style.display = 'none';
+      document.getElementById('battle-2v2-right').style.display = 'none';
       document.getElementById('battle-1v1-top').style.display = 'flex';
       renderBattle();
       var mt = currentGameMode === 'rank' ? '2v2' : '主线';
