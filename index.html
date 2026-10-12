@@ -6,13 +6,8 @@
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>面包杀 · 群雄争霸</title>
   <script>
-    /* Supabase SDK v2.117.3 (UMD) - 内联版本，避免 CDN 加载失败/挂起导致页面无响应 */
-    /**
-     * Skipped minification because the original files appears to be already minified.
-     * Original file: /npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js
-     *
-     * Do NOT use SRI with dynamically generated files! More information: https://www.jsdelivr.com/using-sri-with-dynamic-files
-     */
+    
+    
     var supabase = (function(e) {
       function t(e, t) {
         var n = {};
@@ -10230,7 +10225,7 @@ Resources:`;
       -webkit-tap-highlight-color: transparent
     }
 
-    /* FIX: 弹窗默认隐藏，避免页面加载时全部显示在底部 */
+    
     #rename-modal,
     #uid-modal,
     #remark-modal,
@@ -10345,8 +10340,7 @@ Resources:`;
       box-sizing: border-box
     }
 
-    /* 用 .auth-box .pwd-toggle 提高优先级，覆盖 .auth-box button 的 width:100%/padding，
-       否则按钮会铺满整行，导致眼睛显示在中间且整行可点击 */
+    
     .auth-box .pwd-toggle {
       position: absolute;
       right: 2px;
@@ -10781,7 +10775,7 @@ Resources:`;
     #lobby-page {
       background:
         linear-gradient(180deg, rgba(12, 14, 18, .46) 0%, rgba(12, 14, 18, .74) 100%),
-        url("主页背景图.jpg") center / cover no-repeat #1a1a1a;
+        url("home-background.jpg") center / cover no-repeat #1a1a1a;
       justify-content: space-between
     }
 
@@ -10870,7 +10864,7 @@ Resources:`;
       padding-bottom: env(safe-area-inset-bottom)
     }
 
-    /* ===== 主页左侧「杂栏」+ 活动页布局 ===== */
+    
     .lobby-body,
     .activity-body {
       display: flex;
@@ -10949,7 +10943,7 @@ Resources:`;
       box-sizing: border-box
     }
 
-    /* ===== 七日签到 ===== */
+    
     .signin-head {
       text-align: center;
       margin-bottom: 14px
@@ -11088,7 +11082,7 @@ Resources:`;
       text-align: center
     }
 
-    /* ===== 商城 & 背包 ===== */
+    
     .shop-coins {
       margin-left: auto;
       color: #f1c40f;
@@ -11260,7 +11254,7 @@ Resources:`;
       padding: 0 5px
     }
 
-    /* ===== 排行榜 ===== */
+    
     .lb-subtitle {
       text-align: center;
       font-size: 12px;
@@ -11332,7 +11326,7 @@ Resources:`;
       color: #f1c40f
     }
 
-    /* ===== 主线关卡选择（植物大战僵尸风格）===== */
+    
     #level-page {
       background: linear-gradient(180deg, #1e3c1e 0%, #16281a 60%, #0e1a10 100%)
     }
@@ -12479,7 +12473,7 @@ Resources:`;
       color: #fff
     }
 
-    /* ✅ FIX: 2v2 目标选择器样式 */
+    
     .target-selector {
       display: flex;
       flex-wrap: wrap;
@@ -12536,7 +12530,7 @@ Resources:`;
       border-color: #e74c3c
     }
 
-    /* ===== 聊天 & 反馈 ===== */
+    
     #chat-page {
       background: linear-gradient(180deg, rgba(14, 18, 26, .97) 0%, rgba(6, 8, 12, .99) 100%)
     }
@@ -12739,6 +12733,133 @@ Resources:`;
       opacity: .88
     }
 
+    .chat-body {
+      flex: 1;
+      min-height: 0;
+      display: flex
+    }
+
+    .chat-main-col {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 0
+    }
+
+    .chat-friends-col {
+      width: 172px;
+      flex-shrink: 0;
+      border-right: 1px solid #444;
+      background: rgba(0, 0, 0, .45);
+      display: flex;
+      flex-direction: column;
+      min-height: 0
+    }
+
+    .chat-friends-title {
+      padding: 10px 12px 6px;
+      font-size: 13px;
+      color: #f1c40f;
+      border-bottom: 1px solid #333;
+      flex-shrink: 0
+    }
+
+    .chat-friends-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      -webkit-overflow-scrolling: touch
+    }
+
+    .chat-friend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      background: rgba(255, 255, 255, .04);
+      touch-action: manipulation
+    }
+
+    .chat-friend-item:hover {
+      background: rgba(255, 255, 255, .12)
+    }
+
+    .chat-friend-item.active {
+      background: rgba(241, 196, 15, .18);
+      outline: 1px solid rgba(241, 196, 15, .4)
+    }
+
+    .chat-friend-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #34495e;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      overflow: hidden
+    }
+
+    .chat-friend-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover
+    }
+
+    .chat-friend-info {
+      flex: 1;
+      min-width: 0
+    }
+
+    .chat-friend-name {
+      font-size: 13px;
+      color: #eee;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .chat-friend-status {
+      font-size: 11px;
+      margin-top: 1px
+    }
+
+    .avatar-img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover
+    }
+
+    @media (max-width:640px) {
+      .chat-friends-col {
+        width: 128px
+      }
+
+      .chat-friend-item {
+        padding: 6px 5px;
+        gap: 6px
+      }
+
+      .chat-friend-avatar {
+        width: 26px;
+        height: 26px;
+        font-size: 13px
+      }
+
+      .chat-friend-name {
+        font-size: 12px
+      }
+    }
+
     @media (max-width:380px) {
       .chat-header {
         gap: 7px;
@@ -12755,7 +12876,7 @@ Resources:`;
       }
     }
 
-    /* 弹窗统一遮罩定位（修复弹窗打开后不可见） */
+    
     #friends-modal,
     #invite-modal,
     #receive-invite-modal,
@@ -12989,13 +13110,23 @@ Resources:`;
         </div>
         <button class="chat-mode-btn" id="chat-mode-btn" onclick="toggleChatFeedbackMode()">📝 反馈</button>
       </div>
-      <div class="chat-status" id="chat-status">准备加载...</div>
-      <div class="chat-messages" id="chat-messages"></div>
-      <div class="chat-input-bar">
-        <input type="text" id="chat-input" maxlength="500" placeholder="说点什么..." autocomplete="off">
-        <button class="chat-send-btn" onclick="sendChatMessage()">发送</button>
+      <div class="chat-body">
+        <div class="chat-friends-col">
+          <div class="chat-friends-title">好友</div>
+          <div class="chat-friends-list" id="chat-friends-list"></div>
+        </div>
+        <div class="chat-main-col">
+          <div class="chat-status" id="chat-status">准备加载...</div>
+          <div class="chat-messages" id="chat-messages"></div>
+          <div class="chat-input-bar">
+            <input type="text" id="chat-input" maxlength="500" placeholder="说点什么..." autocomplete="off">
+            <button class="chat-send-btn" onclick="sendChatMessage()">发送</button>
+          </div>
+        </div>
       </div>
     </div>
+    <input type="file" id="avatar-file-input" accept="image/*" style="display:none"
+      onchange="handleAvatarFileSelected(event)">
     <div id="level-page" class="page">
       <div class="heroes-header"><button class="btn-back" onclick="closeSubPage('level-page')">← 返回</button>
         <h2>🗺️ 主线关卡</h2>
@@ -13089,10 +13220,7 @@ Resources:`;
     </div>
   </div>
   <script>
-    /* ================================================================
-     *  面包杀 v9.0-complete
-     *  完整修复：2v2全卡牌逻辑、弃牌阶段、判定阶段、武将技能、AI增强
-     * ================================================================ */
+    
     function esc(s) {
       return String(s == null ? '' : s).replace(/\\/g, '\\\\').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(
         />/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
@@ -13120,7 +13248,7 @@ Resources:`;
         localStorage.removeItem(t);
         return localStorage;
       } catch (e) {
-        // 某些手机浏览器/隐私模式禁用 localStorage：内存兜底，保证本次会话可登录
+        
         var mem = {};
         return {
           getItem: function(k) {
@@ -13175,6 +13303,7 @@ Resources:`;
       wins: 0,
       losses: 0,
       nickname: '',
+      avatar: '',
       friends_remark: {},
       coins: 0,
       yuanbao: 0,
@@ -13268,6 +13397,7 @@ Resources:`;
         wins: 0,
         losses: 0,
         nickname: '离线玩家',
+        avatar: '',
         friends_remark: {},
         coins: 0,
         yuanbao: 0,
@@ -13309,7 +13439,7 @@ Resources:`;
       if (navigator.onLine === false) {
         return showAuthMsg('❌ 当前设备无网络连接\n请开启网络（WiFi/流量）后重试，或点下方「离线模式」先游玩', 'error');
       }
-      // ✅ 手机网络下首次请求常因 DNS/连接建立失败报 "Failed to fetch"，自动重试最多3次
+      
       var lastErr = null;
       for (var attempt = 1; attempt <= 3; attempt++) {
         try {
@@ -13516,7 +13646,7 @@ Resources:`;
     function writeProfileBackup(data) {
       try {
         var oldBackup = readProfileBackup();
-        // 永远不要用空白新档覆盖本机保留的旧备份。
+        
         if (oldBackup && hasMeaningfulProfileData(oldBackup.save_data) && !hasMeaningfulProfileData(data)) return;
         profileStorage.setItem(getProfileBackupKey(), JSON.stringify({
           save_data: data,
@@ -13545,7 +13675,7 @@ Resources:`;
       try {
         var localBackup = readProfileBackup();
         if (cloudProfileExisted && localBackup && isProfileRegression(userProfile, localBackup.save_data)) {
-          // 检测到等级、胜场、武将或道具异常归零：立即阻止空档覆盖云端。
+          
           console.error('[存档保护] 检测到账号数据异常回退，已阻止保存。', localBackup.save_data);
           return false;
         }
@@ -13577,7 +13707,7 @@ Resources:`;
         var r = await safeQuery(sb.from('user_saves').select('save_data').eq('user_id', currentUserId).maybeSingle(),
           'load_save');
         if (r.error) {
-          // 加载失败时绝不把默认档案标记为“已加载”，避免任何后续操作覆盖云端。
+          
           var backup = readProfileBackup();
           if (backup && backup.save_data) userProfile = Object.assign({}, userProfile, backup.save_data);
           isDataLoaded = false;
@@ -13594,6 +13724,7 @@ Resources:`;
           userProfile.wins = typeof d.wins === 'number' ? d.wins : 0;
           userProfile.losses = typeof d.losses === 'number' ? d.losses : 0;
           userProfile.nickname = typeof d.nickname === 'string' ? d.nickname : '';
+          userProfile.avatar = typeof d.avatar === 'string' ? d.avatar : '';
           userProfile.friends_remark = typeof d.friends_remark === 'object' && d.friends_remark !== null ? d
             .friends_remark : {};
           userProfile.coins = typeof d.coins === 'number' ? d.coins : 0;
@@ -13649,10 +13780,66 @@ Resources:`;
       document.getElementById('lobby-player-name').innerText = n;
       var h = currentHero ? currentHero.name : '';
       document.getElementById('my-hero-name').innerText = n + (h ? ' (' + h + ')' : '');
+      updateLobbyAvatar();
+    }
+
+    function updateLobbyAvatar() {
+      var el = document.getElementById('lobby-avatar');
+      if (!el) return;
+      if (userProfile.avatar) {
+        el.innerHTML = '<img class="avatar-img" src="' + userProfile.avatar + '" alt="头像">';
+      } else {
+        el.innerText = '👤';
+      }
+    }
+
+    function handleAvatarFileSelected(event) {
+      var input = event.target;
+      var file = input && input.files && input.files[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) {
+        alert('图片太大，请选择 5MB 以内的图片');
+        input.value = '';
+        return;
+      }
+      var reader = new FileReader();
+      reader.onload = function() {
+        var img = new Image();
+        img.onload = function() {
+          var size = 128,
+            canvas = document.createElement('canvas');
+          canvas.width = size;
+          canvas.height = size;
+          var ctx = canvas.getContext('2d'),
+            s = Math.min(img.width, img.height);
+          ctx.drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, size, size);
+          var dataUrl = canvas.toDataURL('image/png');
+          if (dataUrl.length > 300000) dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+          userProfile.avatar = dataUrl;
+          updateLobbyAvatar();
+          saveProfileToCloud();
+          loadChatFriendList();
+          alert('✅ 头像已更新');
+        };
+        img.onerror = function() {
+          alert('❌ 图片加载失败，请换一张试试');
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+      input.value = '';
     }
 
     function openAvatarMenu() {
       showModal('👤 账号管理', '选择操作：', [{
+        text: '🖼️ 修改头像',
+        color: '#9b59b6',
+        action: function() {
+          closeModal();
+          var f = document.getElementById('avatar-file-input');
+          if (f) f.click();
+        }
+      }, {
         text: '✏️ 修改昵称',
         color: '#3498db',
         action: function() {
@@ -13997,7 +14184,7 @@ Resources:`;
             if (presenceTimer) clearInterval(presenceTimer);
             presenceTimer = setInterval(sendHeartbeat, 3000);
           }
-          // ✅ FIX: WebSocket 失败时也启动心跳（走 REST fallback）
+          
           if (s === 'CHANNEL_ERROR' || s === 'TIMED_OUT') {
             console.warn('[Presence] WebSocket failed, using REST fallback');
             sendHeartbeat();
@@ -14007,7 +14194,7 @@ Resources:`;
         });
       } catch (e) {
         console.warn('[Presence] subscribe exception, using REST fallback:', e);
-        // ✅ FIX: 即使 subscribe 抛异常，也保证心跳不中断
+        
         sendHeartbeat();
         if (presenceTimer) clearInterval(presenceTimer);
         presenceTimer = setInterval(sendHeartbeat, 5000);
@@ -14091,7 +14278,7 @@ Resources:`;
         } catch (e) {}
       }, 3000);
     }
-    // ✅ FIX: 自愈 - 网络抖动导致我方状态被覆盖/丢失时，合并写回，几秒内收敛
+    
     function selfHealRoomState(room) {
       if (!currentRoomId || !sb || !myRoomRole) return;
       var gd = room.game_data || {};
@@ -14315,7 +14502,7 @@ Resources:`;
       } catch (e) {
         console.warn('[Invite] subscribe exception:', e);
       }
-      // FIX: 无条件启动邀请轮询（realtime 事件可能不送达，轮询兜底）
+      
       startInvitePolling();
     }
 
@@ -14380,7 +14567,7 @@ Resources:`;
         roomChannel = null;
       }
       stopRoomPolling();
-      // ✅ 关键修复：先启动REST轮询保底，WS成功后再停
+      
       startRoomPolling(roomId);
       try {
         roomChannel = sb.channel('room-' + roomId)
@@ -14395,7 +14582,7 @@ Resources:`;
           .subscribe(function(st) {
             if (st === 'SUBSCRIBED') {
               console.log('[2v2] Realtime connected, keeping REST polling as fallback');
-              // FIX: 不停止 REST 轮询。postgres_changes 事件可能未送达（表未加入 realtime publication），轮询保底
+              
             }
             if (st === 'CHANNEL_ERROR' || st === 'TIMED_OUT') {
               console.warn('[2v2] WS failed, keeping REST polling');
@@ -14971,7 +15158,7 @@ Resources:`;
       gameOver = false;
 
     function isHeroUnlocked(id) {
-      // ✅ 哈基峰、陈思聪为商城限定武将，只能在商城购买后使用
+      
       if (id === 'hajifeng') return (userProfile.ownedHeroes || []).indexOf('hajifeng') !== -1;
       if (id === 'chensicong') return (userProfile.ownedHeroes || []).indexOf('chensicong') !== -1;
       var r = HERO_UNLOCK_LEVELS[id];
@@ -14984,7 +15171,7 @@ Resources:`;
         for (var i = 0; i < HEROES.length; i++) {
           if (HEROES[i].id === lh.id) {
             f = true;
-            // ✅ 云端武将数据补充本地立绘字段，否则图鉴显示emoji
+            
             if (!HEROES[i].portraitImg && lh.portraitImg) HEROES[i].portraitImg = lh.portraitImg;
             if (!HEROES[i].portrait && lh.portrait) HEROES[i].portrait = lh.portrait;
             break;
@@ -15371,7 +15558,7 @@ Resources:`;
         initBattle();
       }
     }
-    // ✅ FIX: 双方确认武将后各自轮询等待对方就位；房主负责把房间切到 playing
+    
     function waitBothHeroes(amHost) {
       var pc = 0,
         hk = amHost ? 'host_hero' : 'guest_hero',
@@ -15501,9 +15688,7 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
       });
     }
 
-    /* ================================================================
-     *  ✅ 商城 & 背包 & 金币系统
-     * ================================================================ */
+    
     var HERO_GOODS = [{
       heroId: 'hajifeng',
       name: '哈基峰',
@@ -15564,23 +15749,24 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
       updateLobbyRankUI();
     }
 
-    /* ================================================================
-     *  ✅ 聊天 & 反馈系统
-     * 聊天消息：发出后 7 天自动过期清理
-     * 反馈消息：不进入聊天频道，仅管理员账号可见
-     * ================================================================ */
+    
     var CHAT_TTL_MS = 7 * 24 * 60 * 60 * 1000;
     var CHAT_TABLE = 'chat_messages';
     var FEEDBACK_TABLE = 'feedback_messages';
+    var DM_TABLE = 'dm_messages';
 
-    // 反馈管理员 Supabase UID（账号管理 → 查看UID），多个管理员可用英文逗号分隔。
+    
     var ADMIN_USER_ID = '8cfa6acc-0247-45a6-b8f9-5da4c4238e89';
 
-    var chatMode = 'chat'; // chat | feedback
+    var chatMode = 'chat'; 
     var chatMessages = [];
     var feedbackMessages = [];
+    var dmMessages = [];
+    var dmTargetId = '';
+    var dmTargetName = '';
+    var dmChannel = null;
     var chatRemoteAvailable = false;
-    var feedbackRemoteMode = ''; // table | rooms | local
+    var feedbackRemoteMode = ''; 
     var chatChannel = null;
     var chatPollTimer = null;
     var chatCleanupTimer = null;
@@ -15724,27 +15910,32 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
 
     function updateChatModeUI() {
       var isFeedback = chatMode === 'feedback',
+        isDm = chatMode === 'dm',
         title = document.getElementById('chat-page-title'),
         sub = document.getElementById('chat-subtitle'),
         btn = document.getElementById('chat-mode-btn'),
         input = document.getElementById('chat-input');
-      if (title) title.innerText = isFeedback ? '📮 反馈给开发者' : '💬 聊天频道';
-      if (sub) sub.innerText = isFeedback ? '不会出现在聊天频道 · 仅开发者可见' : '消息从发出时起保留 7 天';
+      if (title) title.innerText = isDm ? '👤 与 ' + dmTargetName + ' 私聊' : (isFeedback ? '📮 反馈给开发者' :
+        '💬 聊天频道');
+      if (sub) sub.innerText = isDm ? '仅你们两人可见 · 点击左侧「聊天频道」可返回' : (isFeedback ?
+        '不会出现在聊天频道 · 仅开发者可见' : '消息从发出时起保留 7 天');
       if (btn) {
         btn.innerText = isFeedback ? '💬 聊天' : '📝 反馈';
         btn.className = 'chat-mode-btn' + (isFeedback ? ' feedback-on' : '');
       }
-      if (input) input.placeholder = isFeedback ? '请输入反馈内容...' : '说点什么...';
+      if (input) input.placeholder = isDm ? ('私聊 ' + dmTargetName + '...') : (isFeedback ? '请输入反馈内容...' :
+        '说点什么...');
     }
 
     function renderChatMessages() {
       var box = document.getElementById('chat-messages');
       if (!box) return;
-      var rows = chatMode === 'feedback' ? feedbackMessages : chatMessages;
+      var rows = chatMode === 'feedback' ? feedbackMessages : (chatMode === 'dm' ? dmMessages : chatMessages);
       if (!rows.length) {
         box.innerHTML = '<div class="chat-empty">' + (chatMode === 'feedback' ?
-          '暂无反馈记录<br>点击右上角「💬 聊天」可返回频道' :
-          '暂时没有消息<br>发送第一条消息，和大家打个招呼吧') + '</div>';
+          '暂无反馈记录<br>点击右上角「💬 聊天」可返回频道' : (chatMode === 'dm' ?
+            '暂时还没有私聊消息<br>发送第一条消息，和 ' + esc(dmTargetName || '好友') + ' 打个招呼吧' :
+            '暂时没有消息<br>发送第一条消息，和大家打个招呼吧')) + '</div>';
         return;
       }
       var html = '';
@@ -15755,7 +15946,9 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
           time = esc(formatChatTime(m.created_at)),
           expiry = '';
         if (chatMode === 'chat') expiry = '<div class="chat-expiry">⏳ ' + esc(formatChatExpiry(m)) + '</div>';
-        else expiry = '<div class="chat-expiry">🔒 仅开发者可见' + (isChatAdmin() && !own ? ' · 玩家反馈' : '') + '</div>';
+        else if (chatMode === 'dm') expiry = '<div class="chat-expiry">🔒 私聊 · 仅你们两人可见</div>';
+        else expiry = '<div class="chat-expiry">🔒 仅开发者可见' + (isChatAdmin() && !own ? ' · 玩家反馈' : '') +
+          '</div>';
         html += '<div class="' + cls + '"><div class="chat-meta"><span class="chat-author">' + author +
           '</span><span class="chat-time">' + time + '</span></div><div class="chat-content">' + esc(m.content) +
           '</div>' + expiry + '</div>';
@@ -15788,6 +15981,193 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
       if (!found) chatMessages.push(m);
       chatMessages.sort(sortChatAsc);
       if (chatMode === 'chat') renderChatMessages();
+    }
+
+    function normalizeDmMessage(m) {
+      m = m || {};
+      var createdMs = getTimeMs(m.created_at || m.createdAt);
+      if (!isFinite(createdMs)) createdMs = Date.now();
+      return {
+        id: String(m.id || ('dm-local-' + createdMs + '-' + Math.random().toString(36).slice(2, 8))),
+        user_id: m.from_id || m.user_id || m.userId || '',
+        sender_name: String(m.sender_name || m.senderName || m.nickname || '玩家'),
+        content: String(m.content || ''),
+        created_at: new Date(createdMs).toISOString(),
+        createdMs: createdMs
+      };
+    }
+
+    async function loadChatFriendList() {
+      var box = document.getElementById('chat-friends-list');
+      if (!box) return;
+      var channelEntry = '<div class="chat-friend-item' + (chatMode !== 'dm' ? ' active' : '') +
+        '" onclick="openChatChannel()"><div class="chat-friend-avatar">💬</div><div class="chat-friend-info">' +
+        '<div class="chat-friend-name">聊天频道</div><div class="chat-friend-status" style="color:#2ecc71;">所有人</div></div></div>';
+      if (isOfflineMode || !sb || !currentUserId) {
+        box.innerHTML = channelEntry +
+          '<div style="color:#7f8c8d;font-size:12px;text-align:center;padding:14px 6px;">离线模式无法使用好友私聊</div>';
+        return;
+      }
+      var res = await safeQuery(sb.from('friend_requests').select('id,sender_id,receiver_id').eq('status', 'accepted')
+        .or('sender_id.eq.' + currentUserId + ',receiver_id.eq.' + currentUserId), 'load_chat_friends');
+      if (res.error || !res.data || !res.data.length) {
+        box.innerHTML = channelEntry +
+          '<div style="color:#7f8c8d;font-size:12px;text-align:center;padding:14px 6px;">暂无好友<br>去「好友」页添加吧</div>';
+        return;
+      }
+      var fids = [];
+      res.data.forEach(function(r) {
+        var f = r.sender_id === currentUserId ? r.receiver_id : r.sender_id;
+        if (fids.indexOf(f) === -1) fids.push(f);
+      });
+      var pr = await safeQuery(sb.from('user_saves').select('user_id,save_data,updated_at').in('user_id', fids),
+        'load_chat_friend_profiles');
+      var pm = {};
+      if (pr.data) pr.data.forEach(function(p) {
+        pm[p.user_id] = {
+          nickname: p.save_data && p.save_data.nickname ? p.save_data.nickname : '玩家',
+          avatar: p.save_data && typeof p.save_data.avatar === 'string' ? p.save_data.avatar : '',
+          updatedAt: p.updated_at
+        };
+      });
+      var h = channelEntry;
+      fids.forEach(function(fid) {
+        var info = pm[fid] || {
+            nickname: '玩家',
+            avatar: '',
+            updatedAt: null
+          },
+          name = (userProfile.friends_remark && userProfile.friends_remark[fid]) || info.nickname,
+          on = isUserOnline(fid);
+        if (!on && info.updatedAt && (Date.now() - new Date(info.updatedAt).getTime() < ONLINE_TIMEOUT)) on = true;
+        h += '<div class="chat-friend-item' + (chatMode === 'dm' && dmTargetId === fid ? ' active' : '') +
+          '" onclick="openDmWith(\'' + esc(fid) + '\',\'' + esc(name) + '\')">' +
+          '<div class="chat-friend-avatar">' + (info.avatar ? '<img src="' + esc(info.avatar) + '" alt="">' : '👤') +
+          '</div><div class="chat-friend-info"><div class="chat-friend-name">' + esc(name) + '</div>' +
+          '<div class="chat-friend-status" style="color:' + (on ? '#2ecc71' : '#7f8c8d') + ';">' + (on ? '🟢 在线' :
+            '⚪ 离线') + '</div></div></div>';
+      });
+      box.innerHTML = h;
+    }
+
+    function openChatChannel() {
+      chatMode = 'chat';
+      dmTargetId = '';
+      dmTargetName = '';
+      updateChatModeUI();
+      loadChatFriendList();
+      loadChatMessages(false);
+      startChatPolling();
+    }
+
+    function openDmWith(uid, name) {
+      if (!uid || uid === currentUserId) return;
+      chatMode = 'dm';
+      dmTargetId = uid;
+      dmTargetName = name || '好友';
+      updateChatModeUI();
+      loadChatFriendList();
+      loadDmMessages(false);
+      startChatPolling();
+    }
+
+    async function loadDmMessages(silent) {
+      if (chatMode !== 'dm' || !dmTargetId) return;
+      if (isOfflineMode || !sb || !currentUserId) {
+        dmMessages = [];
+        renderChatMessages();
+        if (!silent) setChatStatus('离线模式无法使用私聊', 'warn');
+        return;
+      }
+      if (!silent) setChatStatus('加载私聊...');
+      var res = await safeQuery(sb.from(DM_TABLE).select('id,from_id,to_id,sender_name,content,created_at')
+        .or('and(from_id.eq.' + currentUserId + ',to_id.eq.' + dmTargetId + '),and(from_id.eq.' + dmTargetId +
+          ',to_id.eq.' + currentUserId + ')')
+        .order('created_at', {
+          ascending: true
+        })
+        .limit(200), 'load_dm');
+      if (res.error) {
+        dmMessages = [];
+        renderChatMessages();
+        if (!silent) setChatStatus('私聊服务未连接（需先在 Supabase 创建 dm_messages 表）', 'warn');
+        return;
+      }
+      dmMessages = (res.data || []).map(normalizeDmMessage);
+      renderChatMessages();
+      if (!silent) setChatStatus('正在与 ' + dmTargetName + ' 私聊', 'ok');
+      startDmRealtime();
+    }
+
+    function startDmRealtime() {
+      if (dmChannel || !sb || !currentUserId) return;
+      try {
+        dmChannel = sb.channel('bread-kill-dm-' + currentUserId).on('postgres_changes', {
+          event: 'INSERT',
+          schema: 'public',
+          table: DM_TABLE,
+          filter: 'to_id=eq.' + currentUserId
+        }, function(payload) {
+          if (chatMode !== 'dm') return;
+          var m = payload.new || payload.record || {};
+          if (m.from_id !== dmTargetId) return;
+          var nm = normalizeDmMessage(m);
+          for (var i = 0; i < dmMessages.length; i++) {
+            if (String(dmMessages[i].id) === String(nm.id)) return;
+          }
+          dmMessages.push(nm);
+          dmMessages.sort(sortChatAsc);
+          renderChatMessages();
+        }).subscribe();
+      } catch (e) {
+        dmChannel = null;
+      }
+    }
+
+    async function sendDmMessage(content) {
+      var input = document.getElementById('chat-input');
+      if (isOfflineMode || !sb || !currentUserId) {
+        setChatStatus('离线模式无法发送私聊', 'warn');
+        return;
+      }
+      if (!dmTargetId) return;
+      var localId = 'dm-pending-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8),
+        created = new Date().toISOString(),
+        msg = normalizeDmMessage({
+          id: localId,
+          from_id: currentUserId,
+          sender_name: getDisplayNickname(),
+          content: content,
+          created_at: created
+        });
+      msg.user_id = currentUserId;
+      dmMessages.push(msg);
+      dmMessages.sort(sortChatAsc);
+      renderChatMessages();
+      if (input) input.value = '';
+      setChatStatus('发送中...');
+      var res = await safeQuery(sb.from(DM_TABLE).insert({
+        from_id: currentUserId,
+        to_id: dmTargetId,
+        sender_name: getDisplayNickname(),
+        content: content,
+        created_at: created
+      }).select().single(), 'send_dm');
+      if (res.error || !res.data) {
+        dmMessages = dmMessages.filter(function(m) {
+          return String(m.id) !== String(localId);
+        });
+        renderChatMessages();
+        setChatStatus('私聊发送失败：' + ((res.error && res.error.message) || '网络错误'), 'warn');
+      } else {
+        var nm = normalizeDmMessage(res.data);
+        nm.user_id = currentUserId;
+        dmMessages = dmMessages.map(function(m) {
+          return String(m.id) === String(localId) ? nm : m;
+        });
+        renderChatMessages();
+        setChatStatus('已发送', 'ok');
+      }
     }
 
     function loadLocalChatMessages() {
@@ -15886,7 +16266,9 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
         var page = document.getElementById('chat-page');
         if (!page || !page.classList.contains('active')) return;
         cleanupExpiredChatMessages();
+        loadChatFriendList();
         if (chatMode === 'chat') loadChatMessages(true);
+        else if (chatMode === 'dm') loadDmMessages(true);
         else loadFeedbackMessages(true);
       }, 12000);
       if (chatCleanupTimer) clearInterval(chatCleanupTimer);
@@ -15902,6 +16284,15 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
           if (sb) sb.removeChannel(chatChannel);
         } catch (e) {}
         chatChannel = null;
+      }
+      if (dmChannel) {
+        try {
+          dmChannel.unsubscribe();
+        } catch (e) {}
+        try {
+          if (sb) sb.removeChannel(dmChannel);
+        } catch (e) {}
+        dmChannel = null;
       }
       if (chatPollTimer) {
         clearInterval(chatPollTimer);
@@ -15941,6 +16332,10 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
       if (content.length > 500) content = content.slice(0, 500);
       if (chatMode === 'feedback') {
         sendFeedbackMessage(content);
+        return;
+      }
+      if (chatMode === 'dm') {
+        sendDmMessage(content);
         return;
       }
       if (isOfflineMode || !sb || !currentUserId || !chatRemoteAvailable) {
@@ -16004,7 +16399,7 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
       }
       if (!silent) setChatStatus('加载反馈...');
 
-      // 优先使用独立反馈表；管理员可查全部，普通玩家只能查自己的反馈。
+      
       var fbQ = sb.from(FEEDBACK_TABLE).select('id,user_id,sender_name,content,created_at').order('created_at', {
         ascending: false
       }).limit(100);
@@ -16019,7 +16414,7 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
         return;
       }
 
-      // 兼容回退：复用现有 game_rooms 的权限边界，发送者是 host，开发者是 guest。
+      
       var roomQ = sb.from('game_rooms').select('id,host_id,guest_id,game_data,created_at').eq('status', 'feedback');
       if (isChatAdmin() && getPrimaryAdminUserId()) roomQ = roomQ.eq('guest_id', getPrimaryAdminUserId());
       else roomQ = roomQ.eq('host_id', currentUserId);
@@ -16140,8 +16535,13 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
     function startChatSystem() {
       updateChatModeUI();
       cleanupExpiredChatMessages();
+      loadChatFriendList();
       if (chatMode === 'feedback') loadFeedbackMessages(false);
+      else if (chatMode === 'dm') loadDmMessages(false);
       else loadChatMessages(false);
+      try {
+        sendHeartbeat();
+      } catch (e) {}
     }
 
     function openChatPage() {
@@ -16176,11 +16576,9 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
     });
     updateChatModeUI();
 
-    /* ================================================================
-     *  ✅ 杂栏 · 活动系统
-     * ================================================================ */
-    // 七日签到奖励（第1~7天）——可自行修改
-    // type: coins=金币, item=背包道具(需itemId), yuanbao=元宝, hero=武将(已拥有则转化为金币)
+    
+    
+    
     var SIGNIN_REWARDS = [{
       type: 'coins',
       amount: 200,
@@ -16218,7 +16616,7 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
     function openActivityPage() {
       document.getElementById('lobby-page').classList.remove('active');
       document.getElementById('activity-page').classList.add('active');
-      // 未点击任何活动时，右侧详情区留空，只显示活动栏
+      
       document.getElementById('activity-content').innerHTML = '';
       var items = document.querySelectorAll('.activity-side .side-item');
       for (var i = 0; i < items.length; i++) items[i].classList.remove('active');
@@ -16254,7 +16652,7 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
       return _fmtDate(d);
     }
 
-    // 当前签到周期进度（1~7），断签或未签返回 0
+    
     function getSignInProgress() {
       var last = userProfile.signInLast || '';
       if (last === _todayStr()) return userProfile.signInStreak || 0;
@@ -16297,7 +16695,7 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
       var today = _todayStr();
       if ((userProfile.signInLast || '') === today) return;
       var progress = getSignInProgress();
-      var day = progress >= 7 ? 1 : progress + 1; // 完成7天后开启新一轮
+      var day = progress >= 7 ? 1 : progress + 1; 
       var rw = SIGNIN_REWARDS[day - 1];
       var extra = '';
       if (rw.type === 'coins') {
@@ -16440,9 +16838,7 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
       }
     }
 
-    /* ================================================================
-     *  ✅ 主线关卡系统（通关解锁下一关，战斗逻辑同1v1）
-     * ================================================================ */
+    
     var CAMPAIGN_LEVELS = [{
       id: 1,
       name: '初出茅庐',
@@ -16650,8 +17046,95 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
       document.getElementById('response-modal').style.display = 'none';
     }
 
+    function scheduleTurn(fn, delay) {
+      setTimeout(function retry() {
+        if (gameOver) return;
+        var m = document.getElementById('response-modal');
+        if (m && m.style.display === 'flex') {
+          setTimeout(retry, 400);
+          return;
+        }
+        fn();
+      }, delay || 100);
+    }
+
+    function setAfterDying(fn) {
+      gameState._afterDying = fn;
+    }
+
+    function resumeAfterDying() {
+      var f = gameState._afterDying;
+      gameState._afterDying = null;
+      if (f) {
+        try {
+          f();
+        } catch (e) {}
+      }
+    }
+
+    function clearAfterDying() {
+      gameState._afterDying = null;
+    }
+
+    function resumeEnemyChain() {
+      setAfterDying(function() {
+        if (gameOver || gameState.isMyTurn || gameState.myHp <= 0) return;
+        setTimeout(function() {
+          if (gameOver || gameState.isMyTurn || gameState.myHp <= 0) return;
+          enemyAI_Skill(function() {
+            setTimeout(enemyAI_UseTricks, 500);
+          });
+        }, 500);
+      });
+    }
+
+    var _battleWatchdogTimer = null,
+      _wdLastLen = -1,
+      _wdQuietSince = 0;
+
+    function ensureBattleWatchdog() {
+      if (_battleWatchdogTimer) return;
+      _wdLastLen = -1;
+      _wdQuietSince = Date.now();
+      _battleWatchdogTimer = setInterval(function() {
+        try {
+          if (typeof gameState === 'undefined' || !gameState || gameOver) return;
+          if (typeof is2v2Mode !== 'undefined' && is2v2Mode) return;
+          if (!gameState.enemyHand || !gameState.myHand) return;
+          var m = document.getElementById('response-modal');
+          if (m && m.style.display === 'flex') {
+            _wdQuietSince = Date.now();
+            return;
+          }
+          var le = document.getElementById('log'),
+            cur = le ? le.innerText.length : 0;
+          if (cur !== _wdLastLen) {
+            _wdLastLen = cur;
+            _wdQuietSince = Date.now();
+            return;
+          }
+          if (Date.now() - _wdQuietSince < 8000) return;
+          _wdQuietSince = Date.now();
+          if (gameState.isMyTurn) {
+            if (!gameState.isProcessing) return;
+            gameState.isProcessing = false;
+            gameState._pts = 0;
+            log('⚠️ 操作超时，已恢复操作');
+            renderBattle();
+            return;
+          }
+          gameState.isProcessing = false;
+          log('⚠️ 敌方行动超时，已自动结束其回合');
+          renderBattle();
+          setTimeout(function() {
+            if (!gameOver && !gameState.isMyTurn && !gameState.isProcessing) finishEnemyTurnWithExtraCheck();
+          }, 600);
+        } catch (e) {}
+      }, 1000);
+    }
+
     function getKillLimit(heroId, hasW) {
-      if (heroId === 'chensicong') return 999; // ✅ 陈思聪【特种装备】无限出杀
+      if (heroId === 'chensicong') return 999; 
       if (heroId === 'xuzongwei' || heroId === 'yuchengxiao' || heroId === 'hajifeng') return 999;
       if (heroId === 'wangsheng') return 4;
       if (hasW && heroId !== 'wangsheng') return 999;
@@ -16668,7 +17151,7 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
       if (gameState.enemyHp <= 0) {
         gameOver = true;
         log('🎉 胜利！');
-        // ✅ 金币系统：每过一关 +100 金币，双倍金币卡生效时 +200
+        
         var reward = 100;
         if ((userProfile.inventory && userProfile.inventory['shuangbei'] || 0) > 0) {
           userProfile.inventory['shuangbei']--;
@@ -16677,7 +17160,7 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
         }
         userProfile.coins = (userProfile.coins || 0) + reward;
         log('💰 获得 ' + reward + ' 金币（共 ' + userProfile.coins + '）');
-        // ✅ 主线关卡：通关解锁下一关
+        
         var unlockMsg = '';
         if (currentGameMode === 'match' && selectedCampaignLevel > 0) {
           if ((userProfile.levelProgress || 0) < selectedCampaignLevel) {
@@ -16699,7 +17182,7 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
         return true;
       }
       if (gameState.myHp <= 0) {
-        // ✅ 复活币：主线死亡时自动消耗 1 枚，满血复活
+        
         if ((userProfile.inventory && userProfile.inventory['fuhuo'] || 0) > 0) {
           userProfile.inventory['fuhuo']--;
           gameState.myHp = gameState.myMaxHp;
@@ -16719,19 +17202,16 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
       }
       return false;
     }
-    // ... (1v1 skill functions remain unchanged from original - omitted for space, all original functions from triggerSkill_Chongsheng through renderBattle are preserved exactly) ...
+    
 
-    /* ================================================================
-     *  ✅ FIX: 完整的2v2系统重写
-     *  包含：全卡牌支持、弃牌阶段、判定阶段、武将技能、增强AI
-     * ================================================================ */
+    
 
 var my2v2SeatIndex = 0;
-var isInitializing2v2 = false; // ✅ FIX: 2v2初始化锁
-// ✅ FIX: 辅助函数 - 获取seat的手牌上限
+var isInitializing2v2 = false; 
+
     function getSeatHandLimit(seat) {
       var hid = seat.hero.id;
-      if (hid === 'chensicong') return 999; // ✅ 陈思聪【弹药箱】无手牌上限
+      if (hid === 'chensicong') return 999; 
       if (hid === 'xuzongwei' || hid === 'default') return 999;
       if (hid === 'liyucheng') return seat.maxHp + 2;
       if (hid === 'manhongyi') return Math.max(1, seat.hp) + 2;
@@ -16739,7 +17219,7 @@ var isInitializing2v2 = false; // ✅ FIX: 2v2初始化锁
       return Math.max(1, seat.hp);
     }
 
-      // ✅ FIX: 辅助函数 - seat受伤 (支持回调以阻塞濒死结算)
+      
       function takeDamage2v2(seatIdx, dmg, sourceSeatIdx, cb) {
       if (gameOver) { if (cb) cb(true); return true; }      var seat = seats[seatIdx];
       if (!seat || !seat.alive) return true;
@@ -16750,7 +17230,7 @@ var isInitializing2v2 = false; // ✅ FIX: 2v2初始化锁
         if (ab > 0) log('🛡️ ' + seat.hero.name + '护甲吸收' + ab + '点');
       }
       if (dmg <= 0) return false;
-      // ✅ 陈思聪【六套】持恒技：每回合最多减少3点体力
+      
       if (seat.hero.id === 'chensicong') {
         var capL = 3 - (seat._hpLossThisTurn || 0);
         if (capL <= 0) {
@@ -16764,12 +17244,12 @@ var isInitializing2v2 = false; // ✅ FIX: 2v2初始化锁
       }
       seat.hp -= dmg;
       log('💔 ' + seat.hero.name + '受到' + dmg + '点伤害(' + seat.hp + '/' + seat.maxHp + ')');
-      // 英姿
+      
       if (seat.hero.id === 'default') {
         drawCardToSeat(seat, 2);
         log('⚡ ' + seat.hero.name + '【英姿】摸两张');
       }
-      // 归心+放逐
+      
       if (seat.hero.id === 'xuzongwei') {
         drawCardToSeat(seat, 2);
         log('❤️ ' + seat.hero.name + '【归心】摸两张');
@@ -16799,11 +17279,11 @@ if (cb) cb(false);
 return false;
 }
 
-    // ✅ FIX: 2v2濒死处理
+    
     function promptForDying2v2(seatIdx) {
       var seat = seats[seatIdx];
       if (!seat || seat.hp > 0) return;
-      // ✅ 陈思聪【三角洲的希望】使命技：进入濒死时摸3张并回满，获得【禁忌之力】
+      
       if (seat.hero.id === 'chensicong' && seat._hasXiWang) {
         seat._hasXiWang = false;
         seat._hasJinji = true;
@@ -16814,7 +17294,7 @@ return false;
         render2v2Battle();
         return;
       }
-      // 尝试自救
+      
       var pi = seat.hand.findIndex(function(c) {
         return c.effect === 'heal';
       });
@@ -16822,7 +17302,7 @@ return false;
         return c.effect === 'wine';
       });
       if (seatIdx === 0) {
-        // 玩家自己濒死
+        
         var btns = [];
         if (pi !== -1) btns.push({
           text: '用桃自救',
@@ -16862,7 +17342,7 @@ return false;
         });
         showModal('⚠️ 濒死', seat.hero.name + '体力为0！', btns);
       } else {
-        // AI濒死 - 自动自救
+        
         if (pi !== -1) {
           var c = seat.hand.splice(pi, 1)[0];
           discardCard(c);
@@ -16883,7 +17363,7 @@ return false;
       }
     }
 
-    // ✅ FIX: 2v2判定阶段
+    
     function process2v2Judgments(seatIdx, cb) {
       var seat = seats[seatIdx];
       if (!seat || !seat.alive) {
@@ -16917,7 +17397,7 @@ return false;
           var dead = takeDamage2v2(seatIdx, 3);
           if (dead || gameOver) needContinue = false;
         } else {
-          // 传给下一个人
+          
           var nextIdx = (seatIdx + 1) % 4;
           var attempts = 0;
           while (!seats[nextIdx].alive && attempts < 4) {
@@ -16951,14 +17431,14 @@ return false;
       }, 600);
     }
 
-    // ✅ FIX: 2v2弃牌阶段
+    
     function discardPhase2v2(seatIdx, cb) {
       var seat = seats[seatIdx];
       if (!seat || !seat.alive) {
         if (cb) cb();
         return;
       }
-      // 皇威跳过
+      
       if (seat.hero.id === 'xuzongwei') {
         log('👑 ' + seat.hero.name + '【皇威】跳过弃牌');
         if (cb) cb();
@@ -16971,12 +17451,12 @@ return false;
         return;
       }
       if (seatIdx === 0) {
-        // 玩家弃牌
+        
         gameState.phase = 'discard';
         gameState.selectedIndices = [];
         log('--- ' + seat.hero.name + ' 弃牌阶段 --- 需弃' + ex);
         render2v2Battle();
-        // 设置弃牌回调
+        
         gameState._discardNeeded = ex;
         gameState._discardCb = cb;
         document.getElementById('btn-discard-confirm').style.display = 'inline-block';
@@ -16985,7 +17465,7 @@ return false;
         document.getElementById('btn-play').style.display = 'none';
         document.getElementById('btn-end').style.display = 'none';
       } else {
-        // AI弃牌 - 弃掉价值最低的
+        
         log('🗑️ ' + seat.hero.name + '弃' + ex + '张');
         var hv = seat.hand.map(function(c, i) {
           return {
@@ -17010,7 +17490,7 @@ return false;
       }
     }
 
-    // ✅ FIX: 2v2卡牌价值评估
+    
     function getCardValue2v2(card) {
       var v = 50;
       switch (card.effect) {
@@ -17095,7 +17575,7 @@ return false;
       return v;
     }
 
-    // ✅ FIX: 确认弃牌 (2v2模式)
+    
     function confirmDiscard2v2() {
       var ex = gameState._discardNeeded || 0;
       if (gameState.selectedIndices.length !== ex) {
@@ -17125,7 +17605,7 @@ return false;
       }
     }
 
-    // ✅ FIX: 2v2目标选择 - 获取敌方存活座位
+    
     function getAliveEnemySeats(seatIdx) {
       var isTeamA = (seatIdx === 0 || seatIdx === 1);
       var enemyIndices = isTeamA ? [2, 3] : [0, 1];
@@ -17142,7 +17622,7 @@ return false;
       });
     }
 
-    // ✅ FIX: 显示2v2目标选择弹窗
+    
     function show2v2TargetSelect(title, desc, includeAllies, includeEnemies, includeSelf, cb) {
       var btns = [];
       if (includeEnemies) {
@@ -17191,47 +17671,47 @@ return false;
       showModal(title, desc, btns);
     }
 
-    // ✅ FIX: 2v2防御 - 目标被杀时的防御逻辑
+    
     function defend2v2(targetIdx, dmg, ac, attackerIdx, cb) {
       var target = seats[targetIdx];
       if (!target || !target.alive) {
         if (cb) cb(false);
         return;
       }
-      // 免疫检查
+      
       if (target._immuneKill) {
         log('🛡️ ' + target.hero.name + '♣免疫杀');
         if (cb) cb(false);
         return;
       }
-      // 鼠鼠免疫黑色
+      
       if (target.hero.id === 'hajifeng' && target._hajiChoice && getSuitColor(ac.suit) === 'suit-black') {
         log('🐭 【鼠鼠】' + target.hero.name + '免疫黑色' + cardDesc(ac));
         if (cb) cb(false);
         return;
       }
-      // 青釭无视防具
+      
       var ignoreArmor = false;
       if (attackerIdx !== undefined && seats[attackerIdx] && seats[attackerIdx].equip && seats[attackerIdx].equip
         .weapon && seats[attackerIdx].equip.weapon.effect === 'weapon_qinggang') {
         ignoreArmor = true;
         log('⚔️ 青釭无视防具');
       }
-      // 藤甲免疫普杀
+      
       if (!ignoreArmor && target.equip.armor && target.equip.armor.effect === 'armor_tengjia' && ac.effect ===
         'damage') {
         log('🌿 藤甲免疫普杀');
         if (cb) cb(false);
         return;
       }
-      // 仁王盾免疫黑杀
+      
       if (!ignoreArmor && target.equip.armor && target.equip.armor.effect === 'armor_renwang' && getSuitColor(ac
         .suit) === 'suit-black') {
         log('🛡️ 仁王盾免疫黑杀');
         if (cb) cb(false);
         return;
       }
-      // 八卦阵
+      
       if (!ignoreArmor && target.equip.armor && target.equip.armor.effect === 'armor_bagua') {
         var jc = null;
         if (!drawPile.length && discardPile.length) {
@@ -17250,9 +17730,9 @@ return false;
           }
         }
       }
-      // 闪避
+      
       if (targetIdx === 0) {
-        // 玩家手动选择
+        
         var btns = [];
         var di = target.hand.findIndex(function(c) {
           return c.effect === 'dodge';
@@ -17282,7 +17762,7 @@ return false;
         });
         showModal('⚠️ ' + seats[attackerIdx].hero.name + '杀你', '出闪抵消' + dmg + '伤害', btns);
       } else {
-        // AI自动防御
+        
         var di = target.hand.findIndex(function(c) {
           return c.effect === 'dodge';
         });
@@ -17299,22 +17779,22 @@ return false;
       }
     }
 
-    // ✅ FIX: 2v2命中结算
+    
     function hit2v2(targetIdx, dmg, ac, attackerIdx, cb) {
       var target = seats[targetIdx];
       var attacker = attackerIdx !== undefined ? seats[attackerIdx] : null;
-      // 古锭刀空手+1
+      
       if (attacker && attacker.equip.weapon && attacker.equip.weapon.effect === 'weapon_guding' && !target.hand
         .length) {
         dmg++;
         log('🔪 古锭刀+1');
       }
-      // 藤甲火伤+1
+      
       if (target.equip.armor && target.equip.armor.effect === 'armor_tengjia' && ac.effect === 'fire_damage') {
         dmg++;
         log('🔥 藤甲火伤+1');
       }
-      // 寒冰剑
+      
       if (attacker && attacker.equip.weapon && attacker.equip.weapon.effect === 'weapon_hanbing' && target.hand.length >
         0) {
         var dn = 0,
@@ -17336,7 +17816,7 @@ return false;
       if (cb) cb(dead || target.hp <= 0);
     }
 
-    // ✅ FIX: 完整的2v2出牌逻辑 - 支持所有卡牌类型
+    
     function play2v2Card() {
       if (gameOver || !gameState.isMyTurn || gameState.phase !== 'play') return;
       if (gameState.selectedIndices.length !== 1) {
@@ -17358,7 +17838,7 @@ return false;
       var enemySeats = getAliveEnemySeats(0);
       var allySeats = getAliveAllySeats(0);
 
-      // === 杀 ===
+      
       if (isKill(card)) {
         if (!gameState.noKillLimitThisTurn && gameState.killCountThisTurn >= 1 && !hasW && seat.hero.id !==
           'xuzongwei' && seat.hero.id !== 'yuchengxiao' && seat.hero.id !== 'hajifeng') {
@@ -17369,7 +17849,7 @@ return false;
           alert('无存活目标');
           return;
         }
-        // 朱雀羽扇
+        
         if (seat.equip.weapon && seat.equip.weapon.effect === 'weapon_zhuque' && card.effect === 'damage') {
           showModal('🔥 朱雀羽扇', '是否将普通杀转为火杀？', [{
               text: '转为火杀',
@@ -17399,7 +17879,7 @@ return false;
         return;
       }
 
-      // === 桃 ===
+      
       if (card.effect === 'heal') {
         if (seat.hero.id === 'manhongyi' && seat.hp > 0) {
           alert('非濒死不能用桃');
@@ -17418,7 +17898,7 @@ return false;
         return;
       }
 
-      // === 酒 ===
+      
       if (card.effect === 'wine') {
         if (gameState.hasUsedWine) {
           alert('每回合限1酒');
@@ -17433,19 +17913,19 @@ return false;
         return;
       }
 
-      // === 无懈可击 ===
+      
       if (card.effect === 'wuxie') {
         alert('无懈只能在锦囊时用');
         return;
       }
 
-      // === 闪 ===
+      
       if (card.effect === 'dodge') {
         alert('闪只能被攻击时用');
         return;
       }
 
-      // === 武器/防具 ===
+      
       if (isWeapon(card) || isArmor(card)) {
         var sl = isWeapon(card) ? 'weapon' : 'armor';
         if (isWeapon(card) && card.effect === 'weapon_zhuge' && seat.hero.id === 'wangsheng') {
@@ -17464,12 +17944,12 @@ return false;
         return;
       }
 
-      // === 无中生有 ===
+      
       if (card.effect === 'wuzhong') {
         var c = seat.hand.splice(idx, 1)[0];
         discardCard(c);
         log('📜 ' + cardDesc(c));
-        // 检查无懈
+        
         check2v2Wuxie(enemySeats, '【无中生有】', function(neg) {
           if (!neg) {
             drawCardToSeat(seat, 2);
@@ -17481,7 +17961,7 @@ return false;
         return;
       }
 
-      // === 过河拆桥 ===
+      
       if (card.effect === 'dismantle') {
         if (!enemySeats.length) {
           alert('无目标');
@@ -17498,7 +17978,7 @@ return false;
           }
           show2v2TargetSelect('🌉 过河拆桥', '选择目标', false, true, false, function(tIdx) {
             var t = seats[tIdx];
-            // 优先拆判定区
+            
             if (t.judgments.length) {
               var j = t.judgments.shift();
               discardCard(j.card);
@@ -17526,7 +18006,7 @@ return false;
         return;
       }
 
-      // === 顺手牵羊 ===
+      
       if (card.effect === 'snatch') {
         if (!enemySeats.length) {
           alert('无目标');
@@ -17570,7 +18050,7 @@ return false;
         return;
       }
 
-      // === 决斗 ===
+      
       if (card.effect === 'duel') {
         if (!enemySeats.length) {
           alert('无目标');
@@ -17594,7 +18074,7 @@ return false;
         return;
       }
 
-      // === 南蛮入侵 ===
+      
       if (card.effect === 'nanman') {
         var c = seat.hand.splice(idx, 1)[0];
         discardCard(c);
@@ -17602,7 +18082,7 @@ return false;
         gameState.isProcessing = true;
         gameState.selectedIndices = [];
         render2v2Battle();
-        // 对除自己外所有存活角色
+        
         var targets = [];
         for (var i = 0; i < 4; i++) {
           if (i !== 0 && seats[i].alive) targets.push(i);
@@ -17615,7 +18095,7 @@ return false;
         return;
       }
 
-      // === 万箭齐发 ===
+      
       if (card.effect === 'wanjian') {
         var c = seat.hand.splice(idx, 1)[0];
         discardCard(c);
@@ -17635,7 +18115,7 @@ return false;
         return;
       }
 
-      // === 桃园结义 ===
+      
       if (card.effect === 'taoyuan') {
         var c = seat.hand.splice(idx, 1)[0];
         discardCard(c);
@@ -17651,7 +18131,7 @@ return false;
         return;
       }
 
-      // === 五谷丰登 ===
+      
       if (card.effect === 'harvest') {
         var c = seat.hand.splice(idx, 1)[0];
         discardCard(c);
@@ -17661,9 +18141,9 @@ return false;
         return;
       }
 
-      // === 闪电 ===
+      
       if (card.effect === 'lightning') {
-        // 检查场上是否已有闪电
+        
         var hasLightning = false;
         for (var i = 0; i < 4; i++) {
           if (seats[i].judgments.some(function(j) {
@@ -17688,7 +18168,7 @@ return false;
         return;
       }
 
-      // === 乐不思蜀 ===
+      
       if (card.effect === 'indulgence') {
         if (!enemySeats.length) {
           alert('无目标');
@@ -17722,7 +18202,7 @@ return false;
         return;
       }
 
-      // === 兵粮寸断 ===
+      
       if (card.effect === 'supply') {
         if (!enemySeats.length) {
           alert('无目标');
@@ -17756,7 +18236,7 @@ return false;
         return;
       }
 
-      // === 彩蛋稀有牌：合作修复 ===
+      
       if (card.effect === 'hezuo_xiufu') {
         var c = seat.hand.splice(idx, 1)[0];
         discardCard(c);
@@ -17776,7 +18256,7 @@ return false;
       alert('暂不支持此牌：' + card.name);
     }
 
-    // ✅ FIX: 2v2执行杀
+    
     function executeKill2v2(seat, originalCard, actualCard, enemySeats) {
       var idx = seat.hand.indexOf(originalCard);
       if (idx === -1) return;
@@ -17786,7 +18266,7 @@ return false;
         log('🍷 【酒】杀伤害+1');
         gameState.hasUsedWine = false;
       }
-      // ✅ 陈思聪【特种装备】红杀伤害+1
+      
       if (seat.hero.id === 'chensicong' && getSuitColor(actualCard.suit) === 'suit-red') {
         dmg += 1;
         log('🎯 ' + seat.hero.name + '【特种装备】红杀伤害+1');
@@ -17808,9 +18288,9 @@ return false;
       }
     }
 
-    // ✅ FIX: 2v2无懈可击检查（简化版 - AI自动判断）
+    
     function check2v2Wuxie(enemySeatIndices, trickName, cb) {
-      // 检查是否有敌方有无懈
+      
       var hasWuxie = false;
       for (var i = 0; i < enemySeatIndices.length; i++) {
         var s = seats[enemySeatIndices[i]];
@@ -17825,7 +18305,7 @@ return false;
         cb(false);
         return;
       }
-      // AI判断是否使用
+      
       var useIt = false;
       if (trickName.includes('乐') || trickName.includes('兵粮')) useIt = Math.random() > 0.3;
       else if (trickName.includes('决斗')) useIt = Math.random() > 0.4;
@@ -17833,7 +18313,7 @@ return false;
       else if (trickName.includes('拆桥')) useIt = Math.random() > 0.6;
       else if (trickName.includes('无中生有')) useIt = Math.random() > 0.7;
       if (useIt) {
-        // 找到第一个有无懈的敌人
+        
         for (var i = 0; i < enemySeatIndices.length; i++) {
           var s = seats[enemySeatIndices[i]];
           var wi = s.hand.findIndex(function(c) {
@@ -17852,7 +18332,7 @@ return false;
       cb(false);
     }
 
-    // ✅ FIX: 2v2决斗
+    
     function start2v2Duel(attackerIdx, defenderIdx) {
       gameState.isProcessing = true;
       log('⚔️ ' + seats[attackerIdx].hero.name + ' 与 ' + seats[defenderIdx].hero.name + ' 决斗！');
@@ -17869,7 +18349,7 @@ return false;
           return isKill(c);
         });
         if (currentTurn === 0) {
-          // 玩家回合
+          
           var btns = [];
           if (killIdx !== -1) {
             btns.push({
@@ -17897,7 +18377,7 @@ return false;
           });
           showModal('⚔️【决斗】', '轮流出【杀】：请打出一张【杀】，否则受到 1 点伤害', btns);
         } else {
-          // AI回合
+          
           if (killIdx !== -1) {
             var kc = seat.hand.splice(killIdx, 1)[0];
             discardCard(kc);
@@ -17914,8 +18394,8 @@ return false;
       setTimeout(duelStep, 800);
     }
 
-    // ✅ FIX: 2v2 AOE处理（南蛮/万箭）
-// === 修复版 endDuel2v2 开始 ===
+    
+
 function endDuel2v2(winnerIdx, loserIdx) {
     log('🏆 ' + seats[winnerIdx].hero.name + '决斗胜利');
     if (loserIdx !== undefined) {
@@ -17926,7 +18406,7 @@ function endDuel2v2(winnerIdx, loserIdx) {
     }
     render2v2Battle();
     
-    // 等待濒死弹窗处理完毕再结算决斗（含12秒超时兜底）
+    
     var waitDyingCount = 0;
     var waitDying = setInterval(function() {
         waitDyingCount++;
@@ -17936,7 +18416,7 @@ function endDuel2v2(winnerIdx, loserIdx) {
             if (!gameOver) {
                 gameState.isProcessing = false;
                 check2v2Win();
-                // AI 发起的决斗结束后，继续推进该 AI 的回合
+                
                 if (!gameOver && currentTurnSeat !== 0) {
                     setTimeout(finish2v2Turn, 600);
                 }
@@ -17944,9 +18424,9 @@ function endDuel2v2(winnerIdx, loserIdx) {
         }
     }, 300);
 }
-// === 修复版 endDuel2v2 结束 ===
 
-// === 修复版 process2v2AOE 开始 ===
+
+
 function process2v2AOE(targetIndices, responseType, sourceIdx, cb) {
     if (!targetIndices || targetIndices.length === 0) {
         if (cb) cb();
@@ -17961,7 +18441,7 @@ function process2v2AOE(targetIndices, responseType, sourceIdx, cb) {
         return;
     }
     
-    // 免疫逻辑
+    
     if (t.hero.id === 'yuchengxiao') {
         log('📡 ' + t.hero.name + '【电线杆】免疫');
         process2v2AOE(targetIndices, responseType, sourceIdx, cb);
@@ -17979,7 +18459,7 @@ function process2v2AOE(targetIndices, responseType, sourceIdx, cb) {
     }
     
     if (tIdx === 0) {
-        // 玩家处理逻辑
+        
         var needCard = responseType === 'kill' ? '杀' : '闪';
         var ci = t.hand.findIndex(function(c) {
             return responseType === 'kill' ? isKill(c) : c.effect === 'dodge';
@@ -18010,7 +18490,7 @@ function process2v2AOE(targetIndices, responseType, sourceIdx, cb) {
                 takeDamage2v2(tIdx, 1, sourceIdx);
                 render2v2Battle();
                 
-                // 玩家受伤害后，等待濒死弹窗（含12秒超时兜底）
+                
                 var waitDyingCount = 0;
                 var waitDying = setInterval(function() {
                     waitDyingCount++;
@@ -18025,13 +18505,13 @@ function process2v2AOE(targetIndices, responseType, sourceIdx, cb) {
         });
         showModal('🛡️ ' + needCard + '抵御', t.hero.name + '需要打出' + needCard, btns);
     } else {
-        // AI 处理逻辑 (修复截断部分)
+        
         var ci = t.hand.findIndex(function(c) {
             return responseType === 'kill' ? isKill(c) : c.effect === 'dodge';
         });
         
         if (ci !== -1) {
-            // AI 有牌可出
+            
             var c = t.hand.splice(ci, 1)[0];
             discardCard(c);
             var needCardName = responseType === 'kill' ? '杀' : '闪';
@@ -18041,12 +18521,12 @@ function process2v2AOE(targetIndices, responseType, sourceIdx, cb) {
                 process2v2AOE(targetIndices, responseType, sourceIdx, cb);
             }, 500);
         } else {
-            // AI 无牌可出，受到伤害
+            
             log('❌ ' + t.hero.name + '受1伤');
             takeDamage2v2(tIdx, 1, sourceIdx);
             render2v2Battle();
             
-            // AI 受伤害后，等待濒死弹窗（含12秒超时兜底）
+            
             var waitDyingCount = 0;
             var waitDying = setInterval(function() {
                 waitDyingCount++;
@@ -18060,9 +18540,9 @@ function process2v2AOE(targetIndices, responseType, sourceIdx, cb) {
         }
     }
 }
-// === 修复版 process2v2AOE 结束 ===
 
-    // ✅ FIX: 2v2五谷丰登
+
+    
     function show2v2Harvest(sourceIdx) {
       gameState.isProcessing = true;
       var tc = [];
@@ -18095,7 +18575,7 @@ function process2v2AOE(targetIndices, responseType, sourceIdx, cb) {
         var pIdx = alive[currentPicker];
         var p = seats[pIdx];
         if (pIdx === 0) {
-          // 玩家选
+          
           var m = document.getElementById('response-modal');
           document.getElementById('modal-title').innerText = '🌾 五谷丰登';
           document.getElementById('modal-desc').innerText = '你选一张';
@@ -18124,7 +18604,7 @@ function process2v2AOE(targetIndices, responseType, sourceIdx, cb) {
           });
           m.style.display = 'flex';
         } else {
-          // AI选 - 选价值最高的
+          
           var best = 0,
             bestV = 0;
           tc.forEach(function(c, i) {
@@ -18145,7 +18625,7 @@ function process2v2AOE(targetIndices, responseType, sourceIdx, cb) {
       pickNext();
     }
 
-    // ✅ FIX: 增强版2v2 AI - 支持锦囊牌
+    
     function ai2v2Turn(seat) {
       if (gameOver || !seat.alive) return;
       var seatIdx = seats.indexOf(seat);
@@ -18165,7 +18645,7 @@ function process2v2AOE(targetIndices, responseType, sourceIdx, cb) {
       var target = aliveEnemies[Math.floor(Math.random() * aliveEnemies.length)];
       var h = seat.hand;
 
-      // 1. 濒死自救
+      
       if (seat.hp <= 0) {
         var pi = h.findIndex(function(c) {
           return c.effect === 'heal';
@@ -18185,7 +18665,7 @@ function process2v2AOE(targetIndices, responseType, sourceIdx, cb) {
         }
       }
 
-      // 2. 无中生有
+      
       var wzIdx = h.findIndex(function(c) {
         return c.effect === 'wuzhong';
       });
@@ -18197,7 +18677,7 @@ function process2v2AOE(targetIndices, responseType, sourceIdx, cb) {
         render2v2Battle();
       }
 
-      // 3. 桃园（如果队友或自己残血）
+      
       if (seat.hp < seat.maxHp || (aliveAllies.length && seats[aliveAllies[0]].hp < seats[aliveAllies[0]].maxHp)) {
         var tyIdx = h.findIndex(function(c) {
           return c.effect === 'taoyuan';
@@ -18216,7 +18696,7 @@ function process2v2AOE(targetIndices, responseType, sourceIdx, cb) {
         }
       }
 
-      // 4. 装备
+      
       var wIdx = h.findIndex(function(c) {
         return isWeapon(c);
       });
@@ -18236,7 +18716,7 @@ function process2v2AOE(targetIndices, responseType, sourceIdx, cb) {
         log('🛡️ ' + seat.hero.name + '装备' + cardDesc(ac2));
       }
 
-      // 5. 延时锦囊
+      
       var ilIdx = h.findIndex(function(c) {
         return c.effect === 'indulgence';
       });
@@ -18264,7 +18744,7 @@ function process2v2AOE(targetIndices, responseType, sourceIdx, cb) {
         log('🌾 ' + seat.hero.name + '对' + seats[target].hero.name + '使用兵粮寸断');
       }
 
-      // 6. 过河拆桥/顺手牵羊
+      
       var dmIdx = h.findIndex(function(c) {
         return c.effect === 'dismantle';
       });
@@ -18322,11 +18802,11 @@ function process2v2AOE(targetIndices, responseType, sourceIdx, cb) {
         }
       }
 
-      // 7. 决斗
+      
       var duIdx = h.findIndex(function(c) {
         return c.effect === 'duel';
       });
-      // ✅ 陈思聪AI：【修甲包】限一次失去1体力获2护甲；【兴奋剂】弃两张同花色回复1体力
+      
       if (seat.hero.id === 'chensicong') {
         if (!seat._hasUsedXiujia && seat.hp > 2 && seat.armor < 2) {
           seat._hasUsedXiujia = true;
@@ -18369,7 +18849,7 @@ function process2v2AOE(targetIndices, responseType, sourceIdx, cb) {
         return;
       }
 
-      // 8. 南蛮/万箭
+      
       var nmIdx = h.findIndex(function(c) {
         return c.effect === 'nanman';
       });
@@ -18407,7 +18887,7 @@ function process2v2AOE(targetIndices, responseType, sourceIdx, cb) {
         return;
       }
 
-      // 9. 回血
+      
       if (seat.hp < seat.maxHp) {
         var peachIdx = h.findIndex(function(c) {
           return c.effect === 'heal';
@@ -18419,7 +18899,7 @@ function process2v2AOE(targetIndices, responseType, sourceIdx, cb) {
           log('💚 ' + seat.hero.name + '使用桃回1血(' + seat.hp + '/' + seat.maxHp + ')');
         }
       }
-      // 给队友回血
+      
       if (aliveAllies.length) {
         var allySeat = seats[aliveAllies[0]];
         if (allySeat.hp < allySeat.maxHp && allySeat.hp <= 2) {
@@ -18437,17 +18917,17 @@ function process2v2AOE(targetIndices, responseType, sourceIdx, cb) {
 
       render2v2Battle();
 
-      // 10. 出杀
+      
       ai2v2Kill(seat, seatIdx, aliveEnemies, function() {
         finish2v2Turn();
       });
     }
 
-    // ✅ FIX: AI出杀逻辑
+    
     function ai2v2Kill(seat, seatIdx, aliveEnemies, cb) {
       var hasW = !!seat.equip.weapon;
       var kl = 1;
-      if (seat.hero.id === 'chensicong') kl = 999; // ✅ 陈思聪【特种装备】无限出杀
+      if (seat.hero.id === 'chensicong') kl = 999; 
       if (seat.hero.id === 'xuzongwei' || seat.hero.id === 'yuchengxiao' || seat.hero.id === 'hajifeng') kl = 999;
       if (seat.hero.id === 'wangsheng') kl = 4;
       if (hasW && seat.hero.id !== 'wangsheng') kl = 999;
@@ -18472,7 +18952,7 @@ function process2v2AOE(targetIndices, responseType, sourceIdx, cb) {
       if (!seat._killCountThisTurn) seat._killCountThisTurn = 0;
       seat._killCountThisTurn++;
       var dmg = 1;
-      // ✅ 陈思聪【特种装备】红杀伤害+1
+      
       if (seat.hero.id === 'chensicong' && getSuitColor(kc.suit) === 'suit-red') {
         dmg += 1;
         log('🎯 ' + seat.hero.name + '【特种装备】红杀伤害+1');
@@ -18481,7 +18961,7 @@ function process2v2AOE(targetIndices, responseType, sourceIdx, cb) {
       render2v2Battle();
       setTimeout(function() {
         defend2v2(target, dmg, kc, seatIdx, function() {
-          // 可以继续出杀
+          
           if (seat._killCountThisTurn < kl && seat.hand.some(function(c) {
               return isKill(c);
             })) {
@@ -18493,9 +18973,9 @@ function process2v2AOE(targetIndices, responseType, sourceIdx, cb) {
       }, 600);
     }
 
-// ✅ FIX: 完整的2v2初始化
+
 function init2v2Battle(myHeroId, opHeroId) {
-if (gameState && gameState.initialized) return; // ✅ FIX: 防止重复初始化
+if (gameState && gameState.initialized) return; 
 is2v2Mode = true;
 gameOver = false;      my2v2SeatIndex = mySeatIndex;
       var myH = HEROES.find(function(h) {
@@ -18508,7 +18988,7 @@ gameOver = false;      my2v2SeatIndex = mySeatIndex;
       if (!myH) myH = HEROES[0];
       if (!tmH) tmH = HEROES[1] || HEROES[0];
       var avail = HEROES.filter(function(h) {
-        // ✅ 限定英雄（商城购买）不会作为2v2敌方AI随机出现
+        
         return h.id !== myHeroId && h.id !== tmHeroId && !isShopExclusiveHero(h.id);
       });
       var e1H = avail.length ? avail[Math.floor(Math.random() * avail.length)] : HEROES[0];
@@ -18699,7 +19179,7 @@ gameOver = false;      my2v2SeatIndex = mySeatIndex;
       }
     }
 
-    // ✅ FIX: 完整的2v2回合处理 - 包含判定、摸牌、出牌、弃牌
+    
     function process2v2Turn() {
       if (gameOver) return;
       var attempts = 0;
@@ -18713,7 +19193,7 @@ gameOver = false;      my2v2SeatIndex = mySeatIndex;
       }
       var seat = seats[currentTurnSeat];
       var isPlayerTurn = (currentTurnSeat === 0);
-      // 重置回合状态
+      
       seat._killCountThisTurn = 0;
       seat._turnFinished = false;
       seat._skipDraw = false;
@@ -18730,17 +19210,17 @@ gameOver = false;      my2v2SeatIndex = mySeatIndex;
       document.getElementById('current-turn-name').innerText = seat.hero.name + ' 的回合';
       log('🔄 === 第' + gameState.turnNumber + '回合 ' + seat.hero.name + ' ===');
 
-      // === 判定阶段 ===
+      
       process2v2Judgments(currentTurnSeat, function() {
         if (gameOver || !seat.alive) {
           nextSeat2v2();
           return;
         }
-        // === 摸牌阶段 ===
+        
         if (seat._skipDraw) {
           log('🌾 ' + seat.hero.name + '跳过摸牌');
         } else {
-          // 武将摸牌技能
+          
           if (seat.hero.id === 'liyucheng') {
             drawCardToSeat(seat, 4);
             log('🌟 ' + seat.hero.name + '【彦祖】摸4');
@@ -18748,7 +19228,7 @@ gameOver = false;      my2v2SeatIndex = mySeatIndex;
             drawCardToSeat(seat, 5);
             log('🍯 ' + seat.hero.name + '【糖浆】摸5');
           } else if (seat.hero.id === 'xuzongwei') {
-            // 当先 - 获得1杀
+            
             var ss = ['♠', '♥', '♣', '♦'],
               rs = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'],
               nk = {};
@@ -18767,12 +19247,12 @@ gameOver = false;      my2v2SeatIndex = mySeatIndex;
           }
         }
         render2v2Battle();
-        // ✅ 陈思聪【弹药箱】出牌阶段开始时无手牌则摸2张
+        
         if (seat.hero.id === 'chensicong' && seat.hand.length === 0) {
           drawCardToSeat(seat, 2);
           log('📦 ' + seat.hero.name + '【弹药箱】无手牌，摸2张');
         }
-        // ✅ 陈思聪【禁忌之力】每回合开始失去1体力并累积【桂】
+        
         if (seat.hero.id === 'chensicong' && seat._hasJinji) {
           triggerJinji2v2(currentTurnSeat);
           if (gameOver || !seat.alive || seat.hp <= 0) {
@@ -18780,7 +19260,7 @@ gameOver = false;      my2v2SeatIndex = mySeatIndex;
             return;
           }
         }
-        // === 出牌阶段 ===
+        
         if (seat._skipPlay) {
           log('😴 ' + seat.hero.name + '跳过出牌');
           render2v2Battle();
@@ -18812,7 +19292,7 @@ gameOver = false;      my2v2SeatIndex = mySeatIndex;
       });
     }
 
-    // ✅ FIX: 读-改-写合并更新 game_data，避免双方同时操作时互相覆盖
+    
     function setRoomDataPatch(patch) {
       if (!currentRoomId || !sb) return;
       if (patch.host_ready === true || patch.guest_ready === true) myReadyFlag = true;
@@ -18828,12 +19308,12 @@ gameOver = false;      my2v2SeatIndex = mySeatIndex;
       }).catch(function() {});
     }
 
-    // ✅ FIX: 2v2下一个座位
-// ✅ FIX: 2v2下一个座位 (跳过阵亡玩家)
+    
+
 function nextSeat2v2() {
 if (gameOver) return;
 var aliveCount = seats.filter(function(s) { return s && s.alive; }).length;
-if (aliveCount === 0) return; // 防止全灭时死循环
+if (aliveCount === 0) return; 
 
 var startSeat = currentTurnSeat;
 do {
@@ -18846,7 +19326,7 @@ sync2v2State();
       setTimeout(process2v2Turn, 800);
     }
 
-    // ✅ 陈思聪技能辅助（2v2）：失去体力（非伤害，护甲不吸收；受【六套】限制）
+    
     function loseHpSeat2v2(seat, n, srcName) {
       if (!seat || !seat.alive || n <= 0) return;
       if (seat.hero.id === 'chensicong') {
@@ -18864,7 +19344,7 @@ sync2v2State();
       if (seat.hp <= 0) promptForDying2v2(seats.indexOf(seat));
     }
 
-    // ✅ 陈思聪【禁忌之力】（2v2）：失去1体力+1层桂；3层后发动
+    
     function triggerJinji2v2(seatIdx) {
       var seat = seats[seatIdx];
       if (!seat || !seat.alive || !seat._hasJinji) return;
@@ -18911,20 +19391,20 @@ sync2v2State();
       }
     }
 
-    // ✅ FIX: 2v2结束回合 - 包含弃牌阶段
+    
     function end2v2Turn() {
       if (gameOver || !gameState.isMyTurn) return;
       log('⏭️ ' + seats[0].hero.name + '结束出牌');
       gameState.isMyTurn = false;
       document.getElementById('btn-play').style.display = 'none';
       document.getElementById('btn-end').style.display = 'none';
-      // 进入弃牌阶段
+      
       discardPhase2v2(0, function() {
         nextSeat2v2();
       });
     }
 
-    // ✅ FIX: 2v2 AI结束回合（原缺失，导致AI回合 ReferenceError 卡死）
+    
     function finish2v2Turn() {
       if (gameOver) return;
       var seatIdx = currentTurnSeat;
@@ -18945,7 +19425,7 @@ sync2v2State();
       }, 500);
     }
 
-    // ✅ FIX: 2v2胜负检查
+    
     function check2v2Win() {
       var myTeamAlive = seats[0].alive || seats[1].alive;
       var enemyTeamAlive = seats[2].alive || seats[3].alive;
@@ -18983,25 +19463,25 @@ sync2v2State();
       return false;
     }
 
-    // ✅ FIX: 完整的2v2渲染 - 包含所有状态
+    
     function render2v2Battle() {
       if (!seats || seats.length < 4) return;
-      // 队友信息
+      
       document.getElementById('tm-portrait').innerHTML = heroPortraitHTML(seats[1].hero, '🤝');
       document.getElementById('tm-name').innerText = seats[1].hero.name + (seats[1].alive ? '' : ' 💀');
       document.getElementById('tm-hp').innerText = '❤️ ' + seats[1].hp + '/' + seats[1].maxHp;
       document.getElementById('tm-hand-count').innerText = seats[1].hand.length;
-      // 敌人1信息
+      
       document.getElementById('e1-portrait').innerHTML = heroPortraitHTML(seats[2].hero, '👹');
       document.getElementById('e1-name').innerText = seats[2].hero.name + (seats[2].alive ? '' : ' 💀');
       document.getElementById('e1-hp').innerText = '❤️ ' + seats[2].hp + '/' + seats[2].maxHp;
       document.getElementById('e1-hand-count').innerText = seats[2].hand.length;
-      // 敌人2信息
+      
       document.getElementById('e2-portrait').innerHTML = heroPortraitHTML(seats[3].hero, '👺');
       document.getElementById('e2-name').innerText = seats[3].hero.name + (seats[3].alive ? '' : ' 💀');
       document.getElementById('e2-hp').innerText = '❤️ ' + seats[3].hp + '/' + seats[3].maxHp;
       document.getElementById('e2-hand-count').innerText = seats[3].hand.length;
-      // 自己信息
+      
       document.getElementById('my-portrait').innerHTML = heroPortraitHTML(seats[0].hero, '🧑');
       document.getElementById('my-hero-name').innerText = getDisplayNickname() + ' (' + seats[0].hero.name + ')';
       document.getElementById('my-hp').innerText = '❤️ ' + seats[0].hp + '/' + seats[0].maxHp;
@@ -19010,7 +19490,7 @@ sync2v2State();
       document.getElementById('turn-number').innerText = gameState.turnNumber;
       document.getElementById('draw-pile-count').innerText = drawPile.length;
       document.getElementById('discard-pile-count').innerText = discardPile.length;
-      // 装备区
+      
       var mw = document.getElementById('my-weapon');
       mw.innerHTML = seats[0].equip.weapon ? '<span class="equipment-tag">' + seats[0].equip.weapon.name + '</span>' :
         '';
@@ -19025,7 +19505,7 @@ sync2v2State();
         d.innerText = j.card.name;
         mj.appendChild(d);
       });
-      // 手牌
+      
       var ha = document.getElementById('hand-area');
       ha.innerHTML = '';
       ha.className = gameState.phase === 'discard' ? 'discard-mode' : '';
@@ -19060,7 +19540,7 @@ sync2v2State();
         el.onmouseleave = hideTooltip;
         ha.appendChild(el);
       });
-      // 按钮状态
+      
       var isMyTurn = gameState.isMyTurn && !gameOver && gameState.phase === 'play';
       var isDiscard = gameState.phase === 'discard';
       document.getElementById('btn-play').style.display = isMyTurn ? 'inline-block' : 'none';
@@ -19068,7 +19548,7 @@ sync2v2State();
       document.getElementById('btn-play').onclick = play2v2Card;
       document.getElementById('btn-end').onclick = end2v2Turn;
       document.getElementById('btn-discard-confirm').onclick = confirmDiscard2v2;
-      // 弃牌提示
+      
       if (isDiscard) {
         var ex = gameState._discardNeeded || 0;
         document.getElementById('discard-tip').style.display = 'block';
@@ -19081,19 +19561,19 @@ sync2v2State();
         document.getElementById('btn-discard-confirm').style.display = 'none';
         document.getElementById('discard-tip').style.display = 'none';
       }
-      // 技能显示
+      
       var pe = document.getElementById('passive-skills-display');
       if (!seats[0].alive) {
         pe.innerHTML = '<span style="color:#e74c3c;">💀 已阵亡</span>';
       } else {
         pe.innerHTML = '🎮 2v2模式 · ' + seats[0].hero.name;
       }
-      // 技能栏
+      
       var bar = document.getElementById('skills-bar');
       bar.innerHTML = '';
     }
 
-    // 1v1 functions preserved from original (all unchanged)
+    
     function handlePostLimitSkill(who) {
       gameState.isProcessing = false;
       renderBattle();
@@ -19102,7 +19582,7 @@ sync2v2State();
         log('⏳ 限定技结算完毕，强制进入你的回合');
         gameState.isMyTurn = true;
         gameState.turnNumber++;
-        setTimeout(startMyTurn, 1000);
+        scheduleTurn(startMyTurn, 1000);
       }
     }
 
@@ -19163,7 +19643,7 @@ log('❌ ' + t.hero.name + '受1伤');
 closeModal();
 takeDamage2v2(tIdx, 1, sourceIdx);
 render2v2Battle();
-// ✅ FIX: 等待濒死弹窗处理完毕再继续 AOE
+
 var waitDying = setInterval(function() {
 var modalVisible = document.getElementById('response-modal') && document.getElementById('response-modal').style.display === 'flex';
 if (!modalVisible || gameOver) {
@@ -19287,7 +19767,7 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
 
     function promptForDying() {
       if (gameState.enemyHp <= 0 && !gameOver) {
-        // ✅ 陈思聪【三角洲的希望】使命技：敌进入濒死时摸3张并回满，获得【禁忌之力】
+        
         if (gameState.enemyHeroId === 'chensicong' && gameState.enemyHasXiWang) {
           gameState.enemyHasXiWang = false;
           gameState.enemyHasJinji = true;
@@ -19311,7 +19791,7 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
           setTimeout(triggerSkill_Huamao_AI, 500);
           return;
         }
-        // ✅ AI优化3：敌人濒死时优先用桃/酒自救，而不是直接判负
+        
         var epi = gameState.enemyHand.findIndex(function(c) {
           return c.effect === 'heal';
         });
@@ -19330,7 +19810,7 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
         return;
       }
       if (gameState.myHp > 0) return;
-      // ✅ 陈思聪【三角洲的希望】使命技：你进入濒死时摸3张并回满，获得【禁忌之力】
+      
       if (gameState.heroId === 'chensicong' && gameState.myHasXiWang) {
         gameState.myHasXiWang = false;
         gameState.myHasJinji = true;
@@ -19359,6 +19839,7 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
           log('🍑 你打出【桃】自救');
           closeModal();
           renderBattle();
+          resumeAfterDying();
         }
       });
       if (wi !== -1) btns.push({
@@ -19371,6 +19852,7 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
           log('🍷 你打出【酒】自救');
           closeModal();
           renderBattle();
+          resumeAfterDying();
         }
       });
       if (gameState.heroId === 'xuyifeng' && !gameState.hasUsedChongsheng) btns.push({
@@ -19378,6 +19860,7 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
         color: '#9b59b6',
         action: function() {
           closeModal();
+          clearAfterDying();
           triggerSkill_Chongsheng();
         }
       });
@@ -19386,6 +19869,7 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
         color: '#e67e22',
         action: function() {
           closeModal();
+          clearAfterDying();
           triggerSkill_Huamao();
         }
       });
@@ -19395,6 +19879,7 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
           color: '#f39c12',
           action: function() {
             closeModal();
+            clearAfterDying();
             triggerSkill_Hajifeng_Limit();
           }
         });
@@ -19403,6 +19888,7 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
         color: '#e74c3c',
         action: function() {
           closeModal();
+          clearAfterDying();
           checkWin();
         }
       });
@@ -19423,7 +19909,7 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
         if (ab > 0) log('🛡️ ' + nm + '护甲吸收' + ab + '点');
       }
       if (dmg <= 0) return false;
-      // ✅ 陈思聪【六套】持恒技：每回合最多减少3点体力
+      
       if (heroId === 'chensicong') {
         var lossKey = isMe ? 'myHpLossThisTurn' : 'enemyHpLossThisTurn';
         var capLeft = 3 - (gameState[lossKey] || 0);
@@ -19477,7 +19963,7 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
       return false;
     }
 
-    // ✅ 陈思聪技能用：失去体力（非伤害，护甲不吸收；受【六套】每回合3点限制；可触发濒死）
+    
     function loseHp(who, n, skillName) {
       var isMe = who === 'me';
       var heroId = isMe ? gameState.heroId : gameState.enemyHeroId;
@@ -19503,14 +19989,14 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
       return n;
     }
 
-    // ✅ 陈思聪【禁忌之力】锁定技：每回合开始失去1体力并获得1层【桂】；3层后发动效果
+    
     function triggerJinji(who) {
       var isMe = who === 'me';
       var guiKey = isMe ? 'myGui' : 'enemyGui';
       var nm = isMe ? '你' : '敌人';
       loseHp(who, 1, '禁忌之力');
       if (gameOver) return;
-      if ((isMe && gameState.myHp <= 0) || (!isMe && gameState.enemyHp <= 0)) return; // 濒死处理中
+      if ((isMe && gameState.myHp <= 0) || (!isMe && gameState.enemyHp <= 0)) return; 
       gameState[guiKey] = (gameState[guiKey] || 0) + 1;
       log('🌿 ' + nm + '【禁忌之力】获得1层【桂】(' + gameState[guiKey] + '/3)');
       if (gameState[guiKey] >= 3) {
@@ -19535,7 +20021,7 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
             }
           }]);
         } else {
-          // AI：能靠5点体力流失击杀玩家则选之，否则摸10张
+          
           if (gameState.myHp <= 5) {
             loseHp('me', 5, '禁忌之力');
           } else {
@@ -20178,7 +20664,7 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
     }
 
     function getHandLimit() {
-      if (gameState.heroId === 'chensicong') return 999; // ✅ 陈思聪【弹药箱】无手牌上限
+      if (gameState.heroId === 'chensicong') return 999; 
       if (gameState.heroId === 'xuzongwei' || gameState.heroId === 'default') return 999;
       if (gameState.heroId === 'xuyifeng' && gameState.hasXianshangZuozhe) return 999;
       if (gameState.heroId === 'liyucheng') return gameState.myMaxHp + 2;
@@ -20188,7 +20674,7 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
 
     function getEnemyHandLimit() {
       var e = gameState.enemyHeroId;
-      if (e === 'chensicong') return 999; // ✅ 陈思聪【弹药箱】无手牌上限
+      if (e === 'chensicong') return 999; 
       if (e === 'default' || e === 'xuzongwei') return 999;
       if (e === 'liyucheng') return gameState.enemyMaxHp + 2;
       if (e === 'manhongyi') return Math.max(1, gameState.enemyHp) + 2;
@@ -20493,7 +20979,7 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
                 setTimeout(function() {
                   if (gameState.skipPlay) {
                     log('😴 跳过出牌');
-                    endTurn();
+                    scheduleTurn(endTurn, 100);
                   }
                 }, 500);
               });
@@ -20505,8 +20991,9 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
 
     function initBattle() {
       gameOver = false;
+      ensureBattleWatchdog();
       var hero = currentHero;
-      // ✅ 主线关卡：敌方武将按关卡固定；非关卡模式随机（排除限定英雄）
+      
       var lvEnemyId = null;
       if (currentGameMode === 'match' && selectedCampaignLevel > 0) {
         CAMPAIGN_LEVELS.forEach(function(lv) {
@@ -21215,7 +21702,7 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
         log('🍷 【酒】杀伤害+1');
         gameState.hasUsedWine = false;
       }
-      // ✅ 陈思聪【特种装备】红色杀伤害+1
+      
       if (gameState.heroId === 'chensicong' && getSuitColor(actualCard.suit) === 'suit-red') {
         dmg += 1;
         log('🎯 【特种装备】红杀伤害+1');
@@ -21435,7 +21922,7 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
       renderBattle();
     }
 
-    // ✅ 陈思聪【修甲包】出牌阶段限一次：失去1点体力，获得2点护甲
+    
     function useSkill_Xiujia() {
       if (!gameState.isMyTurn || gameState.phase !== 'play' || gameState.isProcessing || gameState.skipPlay) return;
       if (gameState.hasUsedXiujia) {
@@ -21451,7 +21938,7 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
       checkWin();
     }
 
-    // ✅ 陈思聪【兴奋剂】弃置两张同花色牌，回复1点体力
+    
     function useSkill_Xingfenji() {
       if (!gameState.isMyTurn || gameState.phase !== 'play' || gameState.isProcessing || gameState.skipPlay) return;
       if (gameState.myHp >= gameState.myMaxHp) {
@@ -22092,7 +22579,7 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
       }
       gameState.isProcessing = false;
       renderBattle();
-      // ✅ FIX: 敌方回合中发起的决斗结算完毕后，恢复敌方回合链（继续出牌/攻击/弃牌），避免卡死
+      
       if (duelAttacker === 'enemy' && !gameOver && gameState.enemyHp > 0) {
         gameState.isProcessing = true;
         setTimeout(enemyAI_UseTricks, 800);
@@ -22177,7 +22664,7 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
         });
         if (dIdx !== -1) {
           var attackerHasKillerBee = (gameState.heroId === 'hajifeng' && gameState.hajiChoice === 'backstab');
-          // ✅ 陈思聪【特种装备】：玩家黑色杀需敌方两张【闪】响应
+          
           var twoDodgeLbl = '杀人蜂';
           if (!attackerHasKillerBee && gameState.heroId === 'chensicong' && ac && getSuitColor(ac.suit) ===
             'suit-black') {
@@ -22387,12 +22874,12 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
         gameState.extraTurn = true;
         log('⏳ 【当先】跳过敌方再动');
         renderBattle();
-        setTimeout(startMyTurn, 1000);
+        scheduleTurn(startMyTurn, 1000);
       } else {
         gameState.extraTurn = false;
         log('--- 你的回合结束 ---');
         renderBattle();
-        setTimeout(startEnemyTurn, 1000);
+        scheduleTurn(startEnemyTurn, 1000);
       }
     }
 
@@ -22428,7 +22915,7 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
         renderBattle();
       }
       if (gameState.heroId === 'hajifeng') gameState.hasUsedShiwang = false;
-      // ✅ 陈思聪【禁忌之力】每回合开始失去1体力并累积【桂】
+      
       if (gameState.heroId === 'chensicong' && gameState.myHasJinji) {
         triggerJinji('me');
         if (gameOver || gameState.myHp <= 0) return;
@@ -22461,7 +22948,7 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
                       log('📚 摸2');
                     }
                   }
-                  // ✅ 陈思聪【弹药箱】出牌阶段开始时无手牌则摸2张
+                  
                   if (gameState.heroId === 'chensicong' && gameState.myHand.length === 0) {
                     drawCard('me', 2);
                     log('📦 【弹药箱】你没有手牌，摸2张');
@@ -22471,7 +22958,7 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
                   setTimeout(function() {
                     if (gameState.skipPlay) {
                       log('😴 跳过出牌');
-                      endTurn();
+                      scheduleTurn(endTurn, 100);
                     }
                   }, 800);
                 });
@@ -22605,7 +23092,7 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
       }
       log('🗑️ ' + dn.join('、'));
       renderBattle();
-      setTimeout(finishEnemyTurn, 1000);
+      scheduleTurn(finishEnemyTurn, 1000);
     }
 
     function startEnemyTurn() {
@@ -22648,7 +23135,7 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
           renderBattle();
         }
         if (gameState.enemyHeroId === 'hajifeng') gameState.enemyHasUsedShiwang = false;
-        // ✅ 陈思聪【禁忌之力】每回合开始失去1体力并累积【桂】
+        
         if (gameState.enemyHeroId === 'chensicong' && gameState.enemyHasJinji) {
           triggerJinji('enemy');
           if (gameOver || gameState.enemyHp <= 0) return;
@@ -22682,7 +23169,7 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
                         log('📚 敌摸2');
                       }
                     }
-                    // ✅ 陈思聪【弹药箱】出牌阶段开始时无手牌则摸2张
+                    
                     if (gameState.enemyHeroId === 'chensicong' && gameState.enemyHand.length === 0) {
                       drawCard('enemy', 2);
                       log('📦 敌【弹药箱】无手牌，摸2张');
@@ -22722,7 +23209,7 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
     }
 
     function enemyAI_Skill(cb) {
-      // ✅ AI优化1：【藏刀】增加自我保护判断，血量≤2时不再强行发动，避免自杀
+      
       if (gameState.enemyHeroId === 'liyucheng' && !gameState.enemyHasUsedCangdao && gameState.enemyHp > 2 && !
         gameState.enemyDisabledSkills
         .includes('藏刀')) {
@@ -22730,7 +23217,10 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
         var dead = takeDamage('me', 1);
         log('🗡️ 敌【藏刀】你-1血');
         renderBattle();
-        if (dead) return;
+        if (dead) {
+          resumeEnemyChain();
+          return;
+        }
       }
       if (gameState.enemyHeroId === 'manhongyi' && !gameState.enemyHasUsedTangyiB && gameState.enemyHp > 2 && gameState
         .enemyArmor < 2 && !gameState.enemyDisabledSkills.includes('糖衣')) {
@@ -22769,7 +23259,10 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
         gameState.enemyHp--;
         log('🎀 敌【猫娘】-1血(' + gameState.enemyHasUsedMaoniangCount + '/2)');
         var dead = takeDamage('me', 1);
-        if (dead) return;
+        if (dead) {
+          resumeEnemyChain();
+          return;
+        }
         log('🎀 你-1血');
         if (gameState.myHand.length) {
           var ri = Math.floor(Math.random() * gameState.myHand.length);
@@ -22803,7 +23296,7 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
         promptForDying();
         return;
       }
-      // ✅ AI：陈思聪【修甲包】出牌阶段限一次，失去1体力获得2护甲
+      
       if (gameState.enemyHeroId === 'chensicong' && !gameState.enemyHasUsedXiujia && gameState.enemyHp > 2 &&
         gameState.enemyArmor < 2) {
         gameState.enemyHasUsedXiujia = true;
@@ -22813,7 +23306,7 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
         log('🧰 敌【修甲包】获得2点护甲(共' + gameState.enemyArmor + '点)');
         renderBattle();
       }
-      // ✅ AI：陈思聪【兴奋剂】弃两张同花色牌回复1体力
+      
       if (gameState.enemyHeroId === 'chensicong' && gameState.enemyHp < gameState.enemyMaxHp) {
         var suitCnt = {};
         gameState.enemyHand.forEach(function(c) {
@@ -22836,7 +23329,7 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
           renderBattle();
         }
       }
-      // ✅ AI优化2：血量不高于上限一半且手牌充裕时，主动吃桃/酒回复（不再只会濒死自救）
+      
       if (!gameState.enemyHasUsedHeal && gameState.enemyHp > 0 && gameState.enemyHp * 2 <= gameState.enemyMaxHp &&
         gameState.enemyHand.length >= 3) {
         var hi = gameState.enemyHand.findIndex(function(c) {
@@ -23305,7 +23798,7 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
             log('🍷 敌【酒】杀伤害+1');
             gameState.enemyHasUsedWine = false;
           }
-          // ✅ 陈思聪【特种装备】敌方红杀伤害+1
+          
           if (gameState.enemyHeroId === 'chensicong' && getSuitColor(kc.suit) === 'suit-red') {
             dmg += 1;
             log('🎯 敌【特种装备】红杀伤害+1');
@@ -23412,7 +23905,7 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
             log('🍷 敌【酒】杀伤害+1');
             gameState.enemyHasUsedWine = false;
           }
-          // ✅ 陈思聪【特种装备】敌方红杀伤害+1
+          
           if (gameState.enemyHeroId === 'chensicong' && getSuitColor(kc.suit) === 'suit-red') {
             dmg += 1;
             log('🎯 敌【特种装备】红杀伤害+1');
@@ -23444,7 +23937,7 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
         gameState.enemyExtraTurn = true;
         log('⏳ 敌【当先】第二回合');
         renderBattle();
-        setTimeout(startEnemyTurn, 1000);
+        scheduleTurn(startEnemyTurn, 1000);
       } else {
         gameState.enemyExtraTurn = false;
         enemyDiscardPhase();
@@ -23457,7 +23950,7 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
       gameState.enemyQixinDamageBonus = 0;
       log('--- 敌回合结束 ---');
       renderBattle();
-      setTimeout(startMyTurn, 1000);
+      scheduleTurn(startMyTurn, 1000);
     }
 
     function playerDefend(dmg, ac) {
@@ -23530,7 +24023,7 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
       });
       var attackerHasKillerBeeEnemy = (gameState.enemyHeroId === 'hajifeng' && gameState.enemyHajiChoice ===
       'backstab');
-      // ✅ 陈思聪【特种装备】：敌方黑色杀需要两张【闪】响应
+      
       var twoDodgeLabel = '杀人蜂';
       if (!attackerHasKillerBeeEnemy && gameState.enemyHeroId === 'chensicong' && ac && getSuitColor(ac.suit) ===
         'suit-black') {
@@ -23735,7 +24228,15 @@ if (!gameOver) process2v2AOE(targetIndices, responseType, sourceIdx, cb);
       var dead = takeDamage('me', dmg);
       gameState.isProcessing = false;
       renderBattle();
-      if (dead) return;
+      if (dead) {
+        setAfterDying(function() {
+          if (gameOver || gameState.isMyTurn || gameState.myHp <= 0) return;
+          setTimeout(function() {
+            if (!gameOver && !gameState.isMyTurn && gameState.myHp > 0) enemyAI_WineAndKill();
+          }, 500);
+        });
+        return;
+      }
       setTimeout(function() {
         if (!gameOver && gameState.myHp > 0) enemyAI_WineAndKill();
       }, 500);
