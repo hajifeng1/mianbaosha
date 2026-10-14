@@ -10562,7 +10562,10 @@ Resources:`;
 
     .friend-info {
       flex: 1;
-      cursor: pointer
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px
     }
 
     .friend-info .name {
@@ -10851,6 +10854,24 @@ Resources:`;
 
     .btn-match {
       background: linear-gradient(to bottom, #3498db, #2980b9)
+    }
+
+    .btn-arena {
+      background: linear-gradient(to bottom, #9b59b6, #8e44ad)
+    }
+
+    .btn-announce-auth {
+      position: fixed;
+      left: 16px;
+      top: 16px;
+      background: rgba(0, 0, 0, .55);
+      border: 1px solid #888;
+      color: #eee;
+      border-radius: 20px;
+      padding: 8px 18px;
+      font-size: 14px;
+      cursor: pointer;
+      z-index: 100000
     }
 
     .bottom-nav {
@@ -12484,7 +12505,10 @@ Resources:`;
       font-size: 16px;
       font-weight: bold;
       color: #f1c40f;
-      margin-top: 2px
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      gap: 6px
     }
 
     .room-role .role-status {
@@ -12929,6 +12953,7 @@ Resources:`;
     #invite-modal,
     #receive-invite-modal,
     #room-lobby-modal,
+    #announce-modal,
     #remark-modal,
     #rename-modal,
     #uid-modal {
@@ -12942,6 +12967,10 @@ Resources:`;
       justify-content: center;
       align-items: center;
       z-index: 100
+    }
+
+    #announce-modal {
+      z-index: 100001
     }
 
   </style>
@@ -12961,6 +12990,7 @@ Resources:`;
           style="color:#bdc3c7;font-size:13px;text-decoration:underline;cursor:pointer;">忘记密码？点击找回</a></div>
       <div class="auth-msg" id="auth-msg"></div>
     </div>
+    <button class="btn-announce-auth" onclick="openModalEl('announce-modal')">📢 公告</button>
     <div class="auth-footer">🍞 面包护卫队出品</div>
   </div>
   <div id="rename-modal">
@@ -12986,6 +13016,36 @@ Resources:`;
       <h3>📝 修改备注</h3><input type="text" id="remark-input" placeholder="输入新备注" maxlength="12">
       <div class="modal-btns"><button class="btn-cancel" onclick="closeModalEl('remark-modal')">取消</button><button
           class="btn-confirm" onclick="saveRemark()">保存</button></div>
+    </div>
+  </div>
+  <div id="announce-modal">
+    <div class="modal-box" style="width:min(560px,92vw);max-height:82vh;display:flex;flex-direction:column;">
+      <h3>📢 公告</h3>
+      <div
+        style="overflow-y:auto;flex:1;text-align:left;font-size:13px;line-height:1.9;color:#ddd;white-space:pre-wrap;background:rgba(0,0,0,.25);border:1px solid #444;border-radius:8px;padding:12px 16px;margin-bottom:12px;">活动预告
+2026年10月14日 22:00
+
+亲爱的玩家们：
+
+感谢您一直以来对《面包杀》的支持与热爱！为了庆祝面包杀成功进行公测，我们将于10月16日进行活动。现将详细内容公告如下：
+
+一、核心内容概述
+生效时间：2026年10月16日 6:00—2026年11月26日 8:00
+涉及范围：面包杀固定网址
+介绍：在规定时间内上线，100元宝10000金币免费送，专属剧情【面包往事】即将上线
+
+二、详细活动
+活动名称：面包杀上线开服庆典
+活动时间：2026年10月16日 6:00至2026年11月26日 8:00
+活动奖励：100元宝，1万金币，盛世·徐翊峰体验卡
+注意事项：玩家等级须达到10级以上方可参加活动
+补充说明：本公告最终解释权归面包杀开发团队所有
+
+三、联系我们
+官方客服：微信13917196940
+
+再次感谢您的理解与支持！祝您在《面包杀》中游玩愉快！🎉</div>
+      <div class="modal-btns"><button class="btn-cancel" onclick="closeModalEl('announce-modal')">关闭</button></div>
     </div>
   </div>
   <div id="friends-modal">
@@ -13077,6 +13137,8 @@ Resources:`;
       <div class="lobby-body">
         <div class="lobby-side-nav">
           <div class="side-title">杂栏</div>
+          <div class="side-item" onclick="openTaskPage()"><i class="ic">📋</i><span>任务</span></div>
+          <div class="side-item" onclick="openModalEl('announce-modal')"><i class="ic">📢</i><span>公告</span></div>
           <div class="side-item" onclick="openActivityPage()"><i class="ic">🎡</i><span>活动</span></div>
         </div>
         <div class="lobby-main">
@@ -13092,7 +13154,8 @@ Resources:`;
           </div>
         </div><button class="btn-logout" onclick="handleLogout()">退出登录</button>
       </div>
-      <div class="main-content"><button class="big-btn btn-match" onclick="openLevelSelect()">主线</button><button
+      <div class="main-content"><button class="big-btn btn-arena" onclick="openArenaMode()">演武</button><button
+          class="big-btn btn-match" onclick="openLevelSelect()">主线</button><button
           class="big-btn btn-rank" onclick="open2v2Invite()">2v2</button></div>
       <div class="bottom-nav">
         <div class="nav-item" onclick="showHeroesPage()"><i>⚔️</i>武将</div>
@@ -13117,6 +13180,12 @@ Resources:`;
         </div>
         <div class="activity-content" id="activity-content"></div>
       </div>
+    </div>
+    <div id="task-page" class="page">
+      <div class="heroes-header"><button class="btn-back" onclick="closeSubPage('task-page')">← 返回</button>
+        <h2>📋 任务</h2>
+      </div>
+      <div id="task-content" style="padding:14px;overflow-y:auto;"></div>
     </div>
     <div id="heroes-page" class="page">
       <div class="heroes-header"><button class="btn-back" onclick="hideHeroesPage()">← 返回</button>
@@ -13372,7 +13441,19 @@ Resources:`;
       signInStreak: 0,
       inventory: {},
       ownedHeroes: [],
-      levelProgress: 0
+      levelProgress: 0,
+      tasks: {
+        daily: {
+          date: '',
+          arena: 0,
+          campaign: 0,
+          login: 0
+        },
+        weekly: {
+          week: '',
+          tv2: 0
+        }
+      }
     };
     var isSavingProfile = false,
       currentRemarkUid = '',
@@ -13381,7 +13462,7 @@ Resources:`;
       cloudProfileExisted = false,
       profileStorage = makeSafeStorage();
 
-    function safeQuery(q, label) {
+    function safeQuery(q, label, timeoutMs) {
       return new Promise(function(resolve) {
         try {
           if (!q || typeof q.then !== 'function') {
@@ -13410,7 +13491,7 @@ Resources:`;
                 message: (label || 'query') + ' ⏱ 网络超时，请检查网络'
               }
             });
-          }, 8000);
+          }, timeoutMs || 8000);
           q.then(function(r) {
             clearTimeout(timer);
             fin(r || {
@@ -13463,7 +13544,19 @@ Resources:`;
         coins: 0,
         yuanbao: 0,
         signInLast: '',
-        signInStreak: 0
+        signInStreak: 0,
+        tasks: {
+          daily: {
+            date: '',
+            arena: 0,
+            campaign: 0,
+            login: 0
+          },
+          weekly: {
+            week: '',
+            tv2: 0
+          }
+        }
       };
       authModal.style.display = 'none';
       gameWrapper.style.display = 'block';
@@ -13760,6 +13853,7 @@ Resources:`;
       if (isOfflineMode || !sb) {
         cloudProfileLoaded = true;
         isDataLoaded = true;
+        completeTask('daily', 'login');
         updateLobbyRankUI();
         renderHeroesGrid();
         return;
@@ -13795,6 +13889,19 @@ Resources:`;
           userProfile.inventory = (typeof d.inventory === 'object' && d.inventory !== null) ? d.inventory : {};
           userProfile.ownedHeroes = Array.isArray(d.ownedHeroes) ? d.ownedHeroes : [];
           userProfile.levelProgress = (typeof d.levelProgress === 'number' && d.levelProgress >= 0) ? d.levelProgress : 0;
+          userProfile.tasks = (typeof d.tasks === 'object' && d.tasks !== null) ? d.tasks : {
+            daily: {
+              date: '',
+              arena: 0,
+              campaign: 0,
+              login: 0
+            },
+            weekly: {
+              week: '',
+              tv2: 0
+            }
+          };
+          ensureTaskState();
           var localBackup = readProfileBackup();
           if (localBackup && localBackup.save_data && isProfileRegression(userProfile, localBackup.save_data)) {
             userProfile = Object.assign({}, userProfile, localBackup.save_data);
@@ -13807,6 +13914,7 @@ Resources:`;
         }
         cloudProfileLoaded = true;
         isDataLoaded = true;
+        completeTask('daily', 'login');
       } catch (e) {
         isDataLoaded = false;
         cloudProfileLoaded = false;
@@ -14034,6 +14142,17 @@ Resources:`;
       if (tab === 'list') loadFriendList();
       if (tab === 'req') loadReceivedRequests();
     }
+    function avatarImgHTML(avatar, size) {
+      var s = size || 32;
+      if (avatar && typeof avatar === 'string') {
+        return '<img src="' + esc(avatar) +
+          '" style="width:' + s + 'px;height:' + s + 'px;border-radius:50%;object-fit:cover;vertical-align:middle;flex-shrink:0;">';
+      }
+      return '<span style="display:inline-flex;width:' + s + 'px;height:' + s +
+        'px;align-items:center;justify-content:center;background:#555;border-radius:50%;font-size:' + Math.round(s *
+          0.6) + 'px;vertical-align:middle;flex-shrink:0;">👤</span>';
+    }
+
     async function loadFriendList() {
       var c = document.getElementById('friend-list-container');
       c.innerHTML = '<div style="color:#7f8c8d;text-align:center;padding:20px;">加载中...</div>';
@@ -14062,17 +14181,25 @@ Resources:`;
         'load_friend_names');
       var pm = {};
       if (pr.data) pr.data.forEach(function(p) {
-        pm[p.user_id] = p.save_data && p.save_data.nickname ? p.save_data.nickname : '';
+        pm[p.user_id] = {
+          nickname: p.save_data && p.save_data.nickname ? p.save_data.nickname : '',
+          avatar: p.save_data && typeof p.save_data.avatar === 'string' ? p.save_data.avatar : ''
+        };
       });
       var h = '';
       fm.forEach(function(rid, fid) {
-        var gn = pm[fid] || '玩家',
+        var info = pm[fid] || {
+            nickname: '',
+            avatar: ''
+          },
+          gn = info.nickname || '玩家',
           rm = (userProfile.friends_remark && userProfile.friends_remark[fid]) ? userProfile.friends_remark[fid] :
           gn;
         h += '<div class="friend-item"><div class="friend-info" onclick="openRemarkModal(\'' + esc(fid) +
-          '\',\'' + esc(rm) + '\')"><div class="name">👤 ' + esc(rm) + '</div>' + (rm !== gn ?
+          '\',\'' + esc(rm) + '\')">' + avatarImgHTML(info.avatar, 34) +
+          '<div><div class="name">' + esc(rm) + '</div>' + (rm !== gn ?
             '<div class="game-name">游戏名: ' + esc(gn) + '</div>' : '') +
-          '</div><div class="friend-actions"><button class="btn-primary" onclick="openRemarkModal(\'' + esc(fid) +
+          '</div></div><div class="friend-actions"><button class="btn-primary" onclick="openRemarkModal(\'' + esc(fid) +
           '\',\'' + esc(rm) + '\')">备注</button><button class="btn-danger" onclick="deleteFriend(\'' + esc(rid) +
           '\',\'' + esc(fid) + '\')">删除</button></div></div>';
       });
@@ -14131,12 +14258,20 @@ Resources:`;
         'load_req_names');
       var pm = {};
       if (pr.data) pr.data.forEach(function(p) {
-        pm[p.user_id] = p.save_data && p.save_data.nickname ? p.save_data.nickname : '玩家';
+        pm[p.user_id] = {
+          nickname: p.save_data && p.save_data.nickname ? p.save_data.nickname : '玩家',
+          avatar: p.save_data && typeof p.save_data.avatar === 'string' ? p.save_data.avatar : ''
+        };
       });
       var h = '';
       res.data.forEach(function(r) {
-        var n = pm[r.sender_id] || '玩家';
-        h += '<div class="req-item"><div>👤 <span style="color:#f1c40f;">' + esc(n) +
+        var info = pm[r.sender_id] || {
+            nickname: '玩家',
+            avatar: ''
+          },
+          n = info.nickname;
+        h += '<div class="req-item"><div style="display:flex;align-items:center;gap:8px;">' + avatarImgHTML(info.avatar,
+            28) + '<span style="color:#f1c40f;">' + esc(n) +
           '</span></div><div class="req-actions"><button class="btn-accept" onclick="handleReq(\'' + esc(r.id) +
           '\',\'accepted\',\'' + esc(r.sender_id) + '\',\'' + esc(n) +
           '\')">同意</button><button class="btn-reject" onclick="handleReq(\'' + esc(r.id) +
@@ -14502,6 +14637,7 @@ Resources:`;
           if (pr.data) pr.data.forEach(function(p) {
             pm[p.user_id] = {
               nickname: p.save_data && p.save_data.nickname ? p.save_data.nickname : '玩家',
+              avatar: p.save_data && typeof p.save_data.avatar === 'string' ? p.save_data.avatar : '',
               updatedAt: p.updated_at
             };
           });
@@ -14509,6 +14645,7 @@ Resources:`;
           fids.forEach(function(fid) {
             var info = pm[fid] || {
               nickname: '玩家',
+              avatar: '',
               updatedAt: null
             };
             var on = isUserOnline(fid);
@@ -14518,9 +14655,10 @@ Resources:`;
               '<button class="btn-primary" style="padding:4px 12px;font-size:12px;" onclick="send2v2Invite(\'' +
               esc(fid) + '\',\'' + esc(info.nickname) + '\')">⚔️ 邀请</button>' :
               '<button disabled style="padding:4px 12px;font-size:12px;background:#555;border:none;border-radius:4px;color:#999;">离线</button>';
-            h += '<div class="invite-item"><div><span class="online-dot ' + (on ? 'on' : 'off') +
-              '"></span>' + esc(info.nickname) + ' <span style="font-size:10px;color:' + (on ? '#2ecc71' :
-                '#7f8c8d') + ';">' + (on ? '在线' : '离线') + '</span></div><div>' + btn + '</div></div>';
+            h += '<div class="invite-item"><div style="display:flex;align-items:center;gap:8px;">' + avatarImgHTML(
+                info.avatar, 28) + '<span class="online-dot ' + (on ? 'on' : 'off') +
+              '"></span><span>' + esc(info.nickname) + ' <span style="font-size:10px;color:' + (on ? '#2ecc71' :
+                '#7f8c8d') + ';">' + (on ? '在线' : '离线') + '</span></span></div><div>' + btn + '</div></div>';
           });
           list.innerHTML = h || '<div style="text-align:center;padding:20px;color:#7f8c8d;">无可用好友</div>';
         } catch (e) {
@@ -14761,8 +14899,14 @@ Resources:`;
             .nickname : '队长';
           var gn = rs[1].data && rs[1].data.save_data && rs[1].data.save_data.nickname ? rs[1].data.save_data
             .nickname : '队员';
-          document.getElementById('room-host-name').innerText = hn;
-          document.getElementById('room-guest-name').innerText = gn;
+          var hav = rs[0].data && rs[0].data.save_data && typeof rs[0].data.save_data.avatar === 'string' ? rs[0]
+            .data.save_data.avatar : '';
+          var gav = rs[1].data && rs[1].data.save_data && typeof rs[1].data.save_data.avatar === 'string' ? rs[1]
+            .data.save_data.avatar : '';
+          document.getElementById('room-host-name').innerHTML = avatarImgHTML(hav, 24) + ' <span>' + esc(hn) +
+            '</span>';
+          document.getElementById('room-guest-name').innerHTML = avatarImgHTML(gav, 24) + ' <span>' + esc(gn) +
+            '</span>';
           var ho = isUserOnline(room.host_id) || (rs[0].data && rs[0].data.updated_at && (Date.now() - new Date(rs[0]
             .data.updated_at).getTime() < ONLINE_TIMEOUT));
           var go = isUserOnline(room.guest_id) || (rs[1].data && rs[1].data.updated_at && (Date.now() - new Date(rs[1]
@@ -15607,12 +15751,27 @@ Resources:`;
       currentGameMode = m;
       document.getElementById('lobby-page').classList.remove('active');
       document.getElementById('heroes-page').classList.add('active');
-      document.getElementById('heroes-page-title').innerText = m === 'rank' ? '2v2·选武将' : '主线·选武将';
+      var titles = {
+        rank: '2v2·选武将',
+        arena: '演武·选武将',
+        match: '主线·选武将'
+      };
+      var btns = {
+        rank: '确认选择',
+        arena: '开始演武',
+        match: '开始主线'
+      };
+      document.getElementById('heroes-page-title').innerText = titles[m] || '主线·选武将';
       document.getElementById('heroes-footer').style.display = 'flex';
       var cb = document.getElementById('btn-confirm-game');
-      cb.innerText = m === 'rank' ? '确认选择' : '开始主线';
+      cb.innerText = btns[m] || '开始主线';
       cb.className = 'btn-confirm-game ' + (m === 'rank' ? 'btn-confirm-rank' : 'btn-confirm-match');
       renderHeroesGrid();
+    }
+
+    function openArenaMode() {
+      selectedCampaignLevel = 0;
+      enterHeroSelect('arena');
     }
 
     function showHeroesPage() {
@@ -16653,7 +16812,7 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
     }
 
     function openChatPage() {
-      var pageIds = ['lobby-page', 'activity-page', 'heroes-page', 'shop-page', 'bag-page', 'rank-page', 'level-page'];
+      var pageIds = ['lobby-page', 'activity-page', 'heroes-page', 'shop-page', 'bag-page', 'rank-page', 'level-page', 'task-page'];
       pageIds.forEach(function(id) {
         var p = document.getElementById(id);
         if (p) p.classList.remove('active');
@@ -16752,6 +16911,135 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
 
     function _todayStr() {
       return _fmtDate(new Date());
+    }
+
+    var TASK_REWARDS = {
+      login: 50,
+      arena: 100,
+      campaign: 100,
+      tv2: 300
+    };
+
+    function _weekKey() {
+      var d = new Date(),
+        onejan = new Date(d.getFullYear(), 0, 1);
+      var week = Math.ceil((((d - onejan) / 86400000) + onejan.getDay() + 1) / 7);
+      return d.getFullYear() + '-W' + week;
+    }
+
+    function _defaultTasks() {
+      return {
+        daily: {
+          date: '',
+          arena: 0,
+          campaign: 0,
+          login: 0
+        },
+        weekly: {
+          week: '',
+          tv2: 0
+        }
+      };
+    }
+
+    function ensureTaskState() {
+      if (!userProfile.tasks || typeof userProfile.tasks !== 'object') userProfile.tasks = _defaultTasks();
+      var t = userProfile.tasks;
+      if (!t.daily || typeof t.daily !== 'object') t.daily = _defaultTasks().daily;
+      if (!t.weekly || typeof t.weekly !== 'object') t.weekly = _defaultTasks().weekly;
+      var today = _todayStr(),
+        wk = _weekKey();
+      if (t.daily.date !== today) {
+        t.daily = {
+          date: today,
+          arena: 0,
+          campaign: 0,
+          login: 0
+        };
+      }
+      if (t.weekly.week !== wk) {
+        t.weekly = {
+          week: wk,
+          tv2: 0
+        };
+      }
+      if (typeof t.daily.login === 'undefined') t.daily.login = 0;
+      if (typeof t.daily.arena === 'undefined') t.daily.arena = 0;
+      if (typeof t.daily.campaign === 'undefined') t.daily.campaign = 0;
+      if (typeof t.weekly.tv2 === 'undefined') t.weekly.tv2 = 0;
+    }
+
+    function completeTask(kind, key) {
+      try {
+        ensureTaskState();
+        var slot = userProfile.tasks[kind];
+        if (!slot || slot[key] !== 0) return;
+        slot[key] = 1;
+        saveProfileToCloud();
+      } catch (e) {}
+    }
+
+    function claimTask(kind, key) {
+      ensureTaskState();
+      var slot = userProfile.tasks[kind];
+      if (!slot || slot[key] !== 1) return;
+      slot[key] = 2;
+      var coins = TASK_REWARDS[key] || 0;
+      userProfile.coins = (userProfile.coins || 0) + coins;
+      saveProfileToCloud();
+      updateLobbyRankUI();
+      renderTasks();
+      alert('🎁 任务完成！获得 💰 ' + coins + ' 金币');
+    }
+
+    function openTaskPage() {
+      var pageIds = ['lobby-page', 'activity-page', 'heroes-page', 'shop-page', 'bag-page', 'rank-page', 'level-page',
+        'chat-page'
+      ];
+      pageIds.forEach(function(id) {
+        var p = document.getElementById(id);
+        if (p) p.classList.remove('active');
+      });
+      document.getElementById('task-page').classList.add('active');
+      renderTasks();
+    }
+
+    function renderTasks() {
+      ensureTaskState();
+      var box = document.getElementById('task-content');
+      if (!box) return;
+      var now = new Date(),
+        midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0),
+        dow = now.getDay() || 7,
+        monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - (dow - 1) + 7, 0, 0, 0);
+      var hLeft = Math.max(1, Math.round((midnight - now) / 3600000)),
+        dLeft = Math.max(1, Math.round((monday - now) / 86400000));
+
+      function itemHTML(kind, key, name, desc) {
+        var st = userProfile.tasks[kind][key];
+        var status;
+        if (st === 0) {
+          status = '<span style="color:#7f8c8d;white-space:nowrap;">⬜ 未完成</span>';
+        } else if (st === 1) {
+          status = '<button class="btn-primary" style="padding:5px 14px;font-size:13px;white-space:nowrap;" onclick="claimTask(\'' +
+            kind + '\',\'' + key + '\')">🎁 领取 💰' + TASK_REWARDS[key] + '</button>';
+        } else {
+          status = '<span style="color:#2ecc71;white-space:nowrap;">✅ 已领取</span>';
+        }
+        return '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;background:rgba(255,255,255,.06);border:1px solid #444;border-radius:10px;padding:12px 14px;margin-bottom:10px;">' +
+          '<div><div style="font-size:15px;color:#eee;font-weight:bold;">' + name + '</div>' +
+          '<div style="font-size:12px;color:#9aa0a6;margin-top:3px;">' + desc + '</div></div>' + status + '</div>';
+      }
+
+      box.innerHTML =
+        '<div style="font-size:15px;color:#f1c40f;margin:2px 0 10px;">📅 每日任务 <span style="font-size:12px;color:#7f8c8d;">（每天 0 点刷新 · 还剩约 ' +
+        hLeft + ' 小时）</span></div>' +
+        itemHTML('daily', 'login', '📣 每日登录', '登录游戏即可领取') +
+        itemHTML('daily', 'arena', '⚔️ 进行 1 局演武', '与 AI 进行一局单挑，胜负均计入') +
+        itemHTML('daily', 'campaign', '🗺️ 通过 1 关主线', '在主线模式通过任意一关') +
+        '<div style="font-size:15px;color:#e67e22;margin:18px 0 10px;">🗓️ 周任务 <span style="font-size:12px;color:#7f8c8d;">（每周一 0 点刷新 · 还剩约 ' +
+        dLeft + ' 天）</span></div>' +
+        itemHTML('weekly', 'tv2', '🏟️ 进行 1 局 2v2', '与好友进行一局 2v2，胜负均计入');
     }
 
     function _yesterdayStr() {
@@ -17037,7 +17325,20 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
         el.innerHTML = '<div class="lb-row" style="justify-content:center;color:#7f8c8d;">离线模式暂无法查看排行榜</div>';
         return;
       }
-      safeQuery(sb.from('user_saves').select('user_id,save_data').limit(500), 'leaderboard').then(function(r) {
+      _fetchLeaderboard(0);
+    }
+
+    function _fetchLeaderboard(retried) {
+      var el = document.getElementById('lb-list');
+      safeQuery(sb.from('user_saves').select(
+        'user_id,nickname:save_data->>nickname,wins:save_data->>wins,losses:save_data->>losses'
+      ).limit(500), 'leaderboard', 15000).then(function(r) {
+        if ((r.error || !r.data) && !retried) {
+          setTimeout(function() {
+            _fetchLeaderboard(1);
+          }, 1500);
+          return;
+        }
         lbLoading = false;
         if (r.error || !r.data) {
           el.innerHTML = '<div class="lb-row" style="justify-content:center;color:#e74c3c;">加载失败，请点右上角刷新重试</div>';
@@ -17045,10 +17346,9 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
         }
         var rows = [];
         r.data.forEach(function(row) {
-          var d = row.save_data || {};
-          var w = (typeof d.wins === 'number') ? d.wins : 0;
-          var l = (typeof d.losses === 'number') ? d.losses : 0;
-          var nick = (typeof d.nickname === 'string' && d.nickname.trim()) ? d.nickname.trim() : '玩家' + String(
+          var w = Number(row.wins) || 0,
+            l = Number(row.losses) || 0;
+          var nick = (typeof row.nickname === 'string' && row.nickname.trim()) ? row.nickname.trim() : '玩家' + String(
             row.user_id).slice(0, 6);
           rows.push({
             uid: row.user_id,
@@ -17260,15 +17560,15 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
         gameOver = true;
         log('🎉 胜利！');
         
-        var reward = 100;
+        var reward = currentGameMode === 'arena' ? 30 : 100;
         if ((userProfile.inventory && userProfile.inventory['shuangbei'] || 0) > 0) {
           userProfile.inventory['shuangbei']--;
-          reward = 200;
+          reward = reward * 2;
           log('🎫 双倍金币卡生效，金币翻倍！');
         }
         userProfile.coins = (userProfile.coins || 0) + reward;
         log('💰 获得 ' + reward + ' 金币（共 ' + userProfile.coins + '）');
-        
+
         var unlockMsg = '';
         if (currentGameMode === 'match' && selectedCampaignLevel > 0) {
           if ((userProfile.levelProgress || 0) < selectedCampaignLevel) {
@@ -17282,7 +17582,13 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
             }
           }
         }
-        saveRankToCloud(true);
+        if (currentGameMode === 'arena') {
+          completeTask('daily', 'arena');
+          saveProfileToCloud();
+        } else {
+          if (currentGameMode === 'match' && selectedCampaignLevel > 0) completeTask('daily', 'campaign');
+          saveRankToCloud(true);
+        }
         setTimeout(function() {
           alert('🎉 获胜！获得 ' + reward + ' 金币' + unlockMsg);
           backToLobby();
@@ -17301,7 +17607,12 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
         }
         gameOver = true;
         log('💀 败北...');
-        saveRankToCloud(false);
+        if (currentGameMode === 'arena') {
+          completeTask('daily', 'arena');
+          saveProfileToCloud();
+        } else {
+          saveRankToCloud(false);
+        }
         setTimeout(function() {
           alert('💀 落败...');
           backToLobby();
@@ -18107,7 +18418,7 @@ var isInitializing2v2 = false;
         alert('无效卡牌');
         return;
       }
-      var hasW = !!seat.equip.weapon;
+      var hasW = !!(seat.equip.weapon && seat.equip.weapon.effect === 'weapon_zhuge');
       var enemySeats = getAliveEnemySeats(0);
       var allySeats = getAliveAllySeats(0);
 
@@ -19487,7 +19798,7 @@ function process2v2AOE(targetIndices, responseType, sourceIdx, cb, srcCard) {
 
     
     function ai2v2Kill(seat, seatIdx, aliveEnemies, cb) {
-      var hasW = !!seat.equip.weapon;
+      var hasW = !!(seat.equip.weapon && seat.equip.weapon.effect === 'weapon_zhuge');
       var kl = 1;
       if (seat.hero.id === 'chensicong') kl = 999;
       if (seat.hero.id === 'xuzongwei' || seat.hero.id === 'yuchengxiao' || seat.hero.id === 'hajifeng') kl = 999;
@@ -20135,6 +20446,7 @@ sync2v2State();
       if (!enemyTeamAlive) {
         gameOver = true;
         log('🎉 2v2胜利！');
+        completeTask('weekly', 'tv2');
         saveRankToCloud(true);
         if (sb) safeQuery(sb.from('game_rooms').update({
           status: 'finished',
@@ -20150,6 +20462,7 @@ sync2v2State();
       } else if (!myTeamAlive) {
         gameOver = true;
         log('💀 2v2败北...');
+        completeTask('weekly', 'tv2');
         saveRankToCloud(false);
         if (sb) safeQuery(sb.from('game_rooms').update({
           status: 'finished',
@@ -22725,7 +23038,7 @@ sync2v2State();
       document.getElementById('battle-2v2-right').style.display = 'none';
       document.getElementById('battle-1v1-top').style.display = 'flex';
       renderBattle();
-      var mt = currentGameMode === 'rank' ? '2v2' : '主线';
+      var mt = currentGameMode === 'rank' ? '2v2' : (currentGameMode === 'arena' ? '演武' : '主线');
       document.getElementById('log').innerHTML = '--- ⚔️ ' + mt + ' | ' + getDisplayNickname() + '【' + hero.name +
         '】VS【' + eh.name + '】---<br>';
       log('🃏 请查看手牌...');
@@ -23122,7 +23435,7 @@ sync2v2State();
       gameState._pts = Date.now();
       var idx = gameState.selectedIndices[0],
         card = gameState.myHand[idx],
-        hasW = !!gameState.myEquipment.weapon;
+        hasW = !!(gameState.myEquipment.weapon && gameState.myEquipment.weapon.effect === 'weapon_zhuge');
       if (gameState.heroId === 'wangsheng' && isTrickCard(card) && card.effect !== 'wuxie') {
         if (!gameState.noKillLimitThisTurn && gameState.killCountThisTurn >= 4 && !hasW) {
           alert('连斩限4杀');
@@ -23429,7 +23742,8 @@ sync2v2State();
     function useSkill_Zhangba() {
       if (!gameState.isMyTurn || gameState.phase !== 'play' || gameState.isProcessing || gameState.skipPlay || gameState
         .myHand.length < 2) return;
-      var kl = getKillLimit(gameState.heroId, true);
+      var zbW = !!(gameState.myEquipment.weapon && gameState.myEquipment.weapon.effect === 'weapon_zhuge');
+      var kl = getKillLimit(gameState.heroId, zbW);
       if (!gameState.noKillLimitThisTurn && gameState.killCountThisTurn >= kl && gameState.heroId !== 'yuchengxiao') {
         alert('出杀上限');
         return;
@@ -25372,7 +25686,7 @@ sync2v2State();
 
     function enemyAI_WineAndKill() {
       if (gameOver || gameState.myHp <= 0) return;
-      var hasW = !!gameState.enemyEquipment.weapon;
+      var hasW = !!(gameState.enemyEquipment.weapon && gameState.enemyEquipment.weapon.effect === 'weapon_zhuge');
       var ekl = getKillLimit(gameState.enemyHeroId, hasW);
       if (gameState.enemyHeroId === 'manhongyi' && gameState.enemyArmor > 0 && !gameState.enemyHasUsedBeici) {
         var kI2 = gameState.enemyHand.findIndex(function(c) {
