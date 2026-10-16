@@ -13048,6 +13048,84 @@ Resources:`;
       <div class="modal-btns"><button class="btn-cancel" onclick="closeModalEl('announce-modal')">关闭</button></div>
     </div>
   </div>
+
+  <style>
+    #story-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at center, rgba(25, 20, 40, .97), rgba(5, 4, 10, .99));
+      z-index: 200000;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+      box-sizing: border-box;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    #story-title {
+      font-size: 20px;
+      color: #f1c40f;
+      font-weight: bold;
+      margin-bottom: 24px;
+      letter-spacing: 2px;
+      text-align: center;
+    }
+
+    #story-text {
+      width: min(680px, 92vw);
+      min-height: 190px;
+      font-size: 16px;
+      line-height: 2.1;
+      color: #eee;
+      text-align: justify;
+      white-space: pre-wrap;
+      background: rgba(255, 255, 255, .04);
+      border: 1px solid rgba(241, 196, 15, .35);
+      border-radius: 12px;
+      padding: 20px 22px;
+      box-sizing: border-box;
+    }
+
+    .story-hint {
+      margin-top: 22px;
+      font-size: 13px;
+      color: #9aa0a6;
+      animation: storyPulse 1.6s infinite;
+    }
+
+    @keyframes storyPulse {
+      0%, 100% {
+        opacity: .45
+      }
+
+      50% {
+        opacity: 1
+      }
+    }
+
+    .story-skip {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(0, 0, 0, .5);
+      border: 1px solid #888;
+      color: #ccc;
+      border-radius: 18px;
+      padding: 6px 14px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+  </style>
+  <div id="story-overlay" onclick="storyAdvance()">
+    <button class="story-skip" onclick="event.stopPropagation(); storySkipAll()">跳过全部 ▸▸</button>
+    <div id="story-title"></div>
+    <div id="story-text"></div>
+    <div class="story-hint">点击屏幕或按任意键跳下一句 ▼　<span id="story-progress"></span></div>
+  </div>
   <div id="friends-modal">
     <div class="modal-box" style="width:min(380px,90vw);">
       <h3>🤝 好友系统</h3>
@@ -15336,7 +15414,7 @@ Resources:`;
         }, {
           name: '鼠鼠',
           type: 'lock',
-          desc: '锁定技，免疫所有黑色基本牌与锦囊牌；不能使用黑色杀；红色杀不限次数。'
+          desc: '锁定技，即将受到伤害时判定，若为红牌则免除此次伤害；红色杀不限次数。'
         }, {
           name: '杀人蜂',
           type: 'lock',
@@ -15821,8 +15899,15 @@ Resources:`;
         }).catch(function() {});
       } else {
         document.getElementById('heroes-page').classList.remove('active');
-        document.getElementById('battle-page').classList.add('active');
-        initBattle();
+        if (currentGameMode === 'match' && selectedCampaignLevel === 1) {
+          startStorySegment(STORY_LEVEL1_PART1, '第一回 · 蜜蜂厕所三结义，马脸占山作匪首', function() {
+            document.getElementById('battle-page').classList.add('active');
+            initBattle();
+          });
+        } else {
+          document.getElementById('battle-page').classList.add('active');
+          initBattle();
+        }
       }
     }
     
@@ -17238,8 +17323,8 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
     var CAMPAIGN_LEVELS = [{
       id: 1,
       name: '初出茅庐',
-      enemyId: 'default',
-      desc: '梦的开始'
+      enemyId: 'xuyifeng',
+      desc: '厕所风云'
     }, {
       id: 2,
       name: '鸭王拦路',
@@ -17247,6 +17332,113 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
       desc: '奇怪的鸭子'
     }];
     var selectedCampaignLevel = 0;
+
+    var STORY_LEVEL1_PART1 = [
+      '话说天下大势，分久必合，合久必分。面包末年，朝政衰微，群雄割据。',
+      '主角是一只蜜蜂。',
+      '这蜜蜂不是一般的蜜蜂，他本是面包皇室之后，只是如今家道中落，无处容身，只好去上个厕所。',
+      '他在厕所中思考自己的一生，越想越觉得光阴如梭，自己啥事没干，不禁泪流满面。想到此处，长叹一声：“啊——”然后打算跳粪坑自尽。',
+      '但是，隔壁坑传来了优美的语言：“筷子，上厕所就上厕所，你叫啥呀。”',
+      '蜜蜂虎躯一震，看向隔壁，发现两人。',
+      '两人在隔壁坑中进行着一些不知名的运动，蜜蜂怒从心头起：大丈夫竟行如此苟且之事，于是骂了起来。'
+    ];
+
+    var STORY_LEVEL1_PART2 = [
+      '骂着骂着，三人竟志同道合，都认为对方是自己的知音。于是兴致大发，乃在厕所结义。蜜蜂骂人最厉害，被推选为大哥。',
+      '“我，蜜蜂！”',
+      '“我，华思辰！”',
+      '“我，马可列夫！”',
+      '“今日三人在厕所三结义，结为异性兄弟，匡扶面包汉室，不求同年同月同日生，但求同年同月同日死！”',
+      '“等等，我想死。”马可列夫突然说。“我去你冯的，你不算，你死了我们都得死，本书就完结了！”蜜蜂施展了传家唇枪舌战的本领，痛骂马可列夫一顿，美其名曰：稳定军心。',
+      '结义完了，接下来是挑武器。蜜蜂挑了一把雌雄双股剑，这两把剑手感轻盈，舞起来好似银蛇扭动，蜜蜂对此十分满意——毕竟此剑十分坚硬，适合磨牙（蜜蜂是蜂，蜂会磨牙很合理）。',
+      '然后给马华两人挑了两把大刀，两人一点用都没有，用大刀纯属摆样子。',
+      '接下来，三人决定去讨伐反贼。只因在面包山上有个马脸寨，为首徐宗伟为非作歹，占山为王，十分可恶。作为爱国青年，蜜蜂决定去把寨子抢了。',
+      '几日后，蜜蜂到达面包山下。',
+      '蜜蜂一马当先，一路上杀死好几个贼人，不禁有些飘飘然，自以为自己天下无敌。没想到，现实狠狠地打了他一巴掌。',
+      '只见远处山丘尘土飞扬，烟尘滚滚，定睛一看，乃一胖子：身着黑色铠甲，头顶中缨帽，手中大刀挥舞如风，胯下大马嘶鸣阵阵。',
+      '要问何人？答曰：吾乃马脸营下大将陈龙霸！',
+      '陈龙霸二话不说，一个偷袭，将华与马打下马去，随后刀锋一转，直取蜜蜂首级。',
+      '蜜蜂慌忙抵挡，双剑齐出，才堪堪挡下这一击。不过蜜蜂也不是等闲之辈，剑锋一转，竟向陈龙霸心口刺去！',
+      '刺中了！可奇迹突然出现，陈龙霸还没挣脱，便从怀中取出一明晃晃的东西——一面碎裂的护心镜！',
+      '蜜蜂已经绝望，陈龙霸的大刀就要落下。',
+      '此时，一杆银枪腾空袭来：“休伤吾主！”原来是一少年英豪！',
+      '“一人，一枪，一白马，胜尔百万军！”',
+      '陈龙霸大骇：“汝是何人？”',
+      '少年轻蔑一笑：“呵，匹夫，可识我小鸭子王晟！”',
+      '欲知后事如何，且听下回分解。'
+    ];
+
+    var storyRuntime = null;
+
+    function startStorySegment(sentences, title, onDone) {
+      storyRuntime = {
+        list: sentences,
+        idx: 0,
+        chars: 0,
+        timer: null,
+        onDone: onDone
+      };
+      document.getElementById('story-title').innerText = title;
+      document.getElementById('story-text').innerText = '';
+      document.getElementById('story-overlay').style.display = 'flex';
+      storyTypeNext();
+    }
+
+    function storyTypeNext() {
+      var st = storyRuntime;
+      if (!st) return;
+      if (st.idx >= st.list.length) {
+        storyFinish();
+        return;
+      }
+      st.chars = 0;
+      var el = document.getElementById('story-text');
+      clearInterval(st.timer);
+      st.timer = setInterval(function() {
+        st.chars += 2;
+        if (st.chars >= st.list[st.idx].length) {
+          st.chars = st.list[st.idx].length;
+          clearInterval(st.timer);
+          st.timer = null;
+        }
+        el.innerText = st.list[st.idx].slice(0, st.chars);
+      }, 45);
+      document.getElementById('story-progress').innerText = (st.idx + 1) + ' / ' + st.list.length;
+    }
+
+    function storyAdvance() {
+      var st = storyRuntime;
+      if (!st) return;
+      if (st.timer) {
+        clearInterval(st.timer);
+        st.timer = null;
+        document.getElementById('story-text').innerText = st.list[st.idx];
+        return;
+      }
+      st.idx++;
+      if (st.idx >= st.list.length) storyFinish();
+      else storyTypeNext();
+    }
+
+    function storySkipAll() {
+      if (storyRuntime) storyFinish();
+    }
+
+    function storyFinish() {
+      var st = storyRuntime;
+      if (!st) return;
+      clearInterval(st.timer);
+      storyRuntime = null;
+      document.getElementById('story-overlay').style.display = 'none';
+      if (st.onDone) st.onDone();
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (!storyRuntime) return;
+      e.preventDefault();
+      e.stopPropagation();
+      storyAdvance();
+    }, true);
 
     function openLevelSelect() {
       _subPageFrom = 'lobby-page';
@@ -17507,6 +17699,7 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
       _battleWatchdogTimer = setInterval(function() {
         try {
           if (typeof gameState === 'undefined' || !gameState || gameOver) return;
+          if (typeof storyRuntime !== 'undefined' && storyRuntime) return;
           if (typeof is2v2Mode !== 'undefined' && is2v2Mode) return;
           if (!gameState.enemyHand || !gameState.myHand) return;
           var m = document.getElementById('response-modal');
@@ -17591,7 +17784,13 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
         }
         setTimeout(function() {
           alert('🎉 获胜！获得 ' + reward + ' 金币' + unlockMsg);
-          backToLobby();
+          if (currentGameMode === 'match' && selectedCampaignLevel === 1) {
+            startStorySegment(STORY_LEVEL1_PART2, '第一回 · 蜜蜂厕所三结义，马脸占山作匪首（下）', function() {
+              backToLobby();
+            });
+          } else {
+            backToLobby();
+          }
         }, 1000);
         return true;
       }
@@ -17649,7 +17848,13 @@ var isInitializing2v2 = false;
         if (ab > 0) log('🛡️ ' + seat.hero.name + '护甲吸收' + ab + '点');
       }
       if (dmg <= 0) return false;
-      
+
+      if (seat.hero.id === 'hajifeng' && shushuJudge(seat.hero.name)) {
+        render2v2Battle();
+        if (cb) cb(false);
+        return false;
+      }
+
       if (seat.hero.id === 'chensicong') {
         var capL = 3 - (seat._hpLossThisTurn || 0);
         if (capL <= 0) {
@@ -18154,12 +18359,6 @@ var isInitializing2v2 = false;
         return;
       }
 
-      if (target.hero.id === 'hajifeng' && target._hajiChoice && getSuitColor(ac.suit) === 'suit-black') {
-        log('🐭 【鼠鼠】' + target.hero.name + '免疫黑色' + cardDesc(ac));
-        if (cb) cb(false);
-        return;
-      }
-
       var ignoreArmor = false;
       if (attackerIdx !== undefined && seats[attackerIdx] && seats[attackerIdx].equip && seats[attackerIdx].equip
         .weapon && seats[attackerIdx].equip.weapon.effect === 'weapon_qinggang') {
@@ -18503,10 +18702,6 @@ var isInitializing2v2 = false;
       }
 
       if (isKill(card)) {
-        if (seat.hero.id === 'hajifeng' && getSuitColor(card.suit) === 'suit-black') {
-          alert('🐭【鼠鼠】你不能使用黑色杀！');
-          return;
-        }
         var bcEx = (seat.hero.id === 'manhongyi' && seat._hasUsedBeici) ? 1 : 0;
         var kl2 = getKillLimit2v2(seat.hero.id, hasW) + bcEx;
         var isHajiRedKill = (seat.hero.id === 'hajifeng' && getSuitColor(card.suit) === 'suit-red');
@@ -19244,10 +19439,8 @@ function process2v2AOE(targetIndices, responseType, sourceIdx, cb, srcCard) {
         process2v2AOE(targetIndices, responseType, sourceIdx, cb, srcCard);
         return;
     }
-    if (t.hero.id === 'hajifeng' && t._hajiChoice && ((srcCard && getSuitColor(srcCard.suit) === 'suit-black') || t
-        ._hasChuxin)) {
-        if (t._hasChuxin) log('💚 ' + t.hero.name + '【初心】免疫');
-        else log('🐭 【鼠鼠】' + t.hero.name + '免疫黑色' + cardDesc(srcCard));
+    if (t._hasChuxin) {
+        log('💚 ' + t.hero.name + '【初心】免疫');
         process2v2AOE(targetIndices, responseType, sourceIdx, cb, srcCard);
         return;
     }
@@ -19812,7 +20005,6 @@ function process2v2AOE(targetIndices, responseType, sourceIdx, cb, srcCard) {
       var kI = -1;
       for (var i = 0; i < seat.hand.length; i++) {
         if (!isKill(seat.hand[i])) continue;
-        if (seat.hero.id === 'hajifeng' && getSuitColor(seat.hand[i].suit) === 'suit-black') continue;
         kI = i;
         break;
       }
@@ -21826,7 +22018,12 @@ sync2v2State();
         if (ab > 0) log('🛡️ ' + nm + '护甲吸收' + ab + '点');
       }
       if (dmg <= 0) return false;
-      
+
+      if (heroId === 'hajifeng' && shushuJudge(nm)) {
+        renderBattle();
+        return false;
+      }
+
       if (heroId === 'chensicong') {
         var lossKey = isMe ? 'myHpLossThisTurn' : 'enemyHpLossThisTurn';
         var capLeft = 3 - (gameState[lossKey] || 0);
@@ -21987,14 +22184,14 @@ sync2v2State();
         }
       } else if (j.type === 'indulgence') {
         if (jc.suit !== '♥') {
-          if (who === 'me') gameState.skipPlay = true;
+          gameState.skipPlay = true;
           log('😴 乐生效，' + nm + '跳过出牌');
         } else {
           log('😴 乐未生效');
         }
       } else if (j.type === 'supply') {
         if (jc.suit !== '♣') {
-          if (who === 'me') gameState.skipDraw = true;
+          gameState.skipDraw = true;
           log('🌾 兵粮生效，' + nm + '跳过摸牌');
         } else {
           log('🌾 兵粮未生效');
@@ -22543,6 +22740,25 @@ sync2v2State();
         a[i] = a[j];
         a[j] = t;
       }
+    }
+
+    function judgeDrawCard() {
+      if (!drawPile.length) {
+        if (!discardPile.length) return null;
+        drawPile = discardPile.slice();
+        discardPile = [];
+        shuffleArray(drawPile);
+      }
+      return drawPile.pop();
+    }
+
+    function shushuJudge(name) {
+      var jc = judgeDrawCard();
+      if (!jc) return false;
+      discardCard(jc);
+      var red = getSuitColor(jc.suit) === 'suit-red';
+      log('🐭 【鼠鼠】' + name + '判定' + cardDesc(jc) + (red ? '，红牌，免除此次伤害' : '，黑牌，伤害生效'));
+      return red;
     }
 
     function drawCard(who, count) {
@@ -23517,10 +23733,6 @@ sync2v2State();
         return;
       }
       if (isKill(card)) {
-        if (gameState.heroId === 'hajifeng' && getSuitColor(card.suit) === 'suit-black') {
-          alert('🐭【鼠鼠】你不能使用黑色杀！');
-          return;
-        }
         var bcEx = (gameState.heroId === 'manhongyi' && gameState.hasUsedBeici) ? 1 : 0;
         var kl = getKillLimit(gameState.heroId, hasW) + bcEx;
         var isHajiRedKill = (gameState.heroId === 'hajifeng' && getSuitColor(card.suit) === 'suit-red');
@@ -24066,12 +24278,6 @@ sync2v2State();
           renderBattle();
           return;
         }
-        if (gameState.enemyHeroId === 'hajifeng') {
-          log('🐭 【鼠鼠】敌人免疫南蛮入侵');
-          gameState.isProcessing = false;
-          renderBattle();
-          return;
-        }
         if (gameState.enemyEquipment.armor && gameState.enemyEquipment.armor.effect === 'armor_tengjia') {
           log('🌿 藤甲免疫南蛮');
           gameState.isProcessing = false;
@@ -24110,12 +24316,6 @@ sync2v2State();
       setTimeout(function() {
         if (gameState.heroId === 'hajifeng' && gameState.hasChuxin) {
           log('💚 【初心】免疫万箭齐发');
-          gameState.isProcessing = false;
-          renderBattle();
-          return;
-        }
-        if (gameState.enemyHeroId === 'hajifeng') {
-          log('🐭 【鼠鼠】敌人免疫万箭齐发');
           gameState.isProcessing = false;
           renderBattle();
           return;
@@ -24514,12 +24714,6 @@ sync2v2State();
       setTimeout(function() {
         if (gameState.enemyImmuneKill) {
           log('🛡️ ♣免疫杀');
-          handleKillDodged(dmg, ac);
-          return;
-        }
-        if (gameState.enemyHeroId === 'hajifeng' && getSuitColor(ac.suit) === 'suit-black' && (isKill(ac) ||
-            isTrickCard(ac))) {
-          log('🐭 【鼠鼠】敌人免疫黑色' + cardDesc(ac));
           handleKillDodged(dmg, ac);
           return;
         }
@@ -25274,7 +25468,7 @@ sync2v2State();
     function enemyAI_UseTricks() {
       if (gameOver) return;
       var h = gameState.enemyHand;
-      var skipBlack = (gameState.enemyHeroId === 'hajifeng');
+      var skipBlack = false;
       if (gameState.enemyHp <= 0) {
         var p = h.findIndex(function(c) {
           return c.effect === 'heal';
@@ -25878,13 +26072,6 @@ sync2v2State();
       if (gameOver || gameState.myHp <= 0) return;
       if (gameState.myImmuneKill) {
         log('🛡️ ♣免疫杀');
-        closeModal();
-        handleEnemyKillDodged(dmg, ac);
-        return;
-      }
-      if (gameState.heroId === 'hajifeng' && getSuitColor(ac.suit) === 'suit-black' && (isKill(ac) || isTrickCard(
-        ac))) {
-        log('🐭 【鼠鼠】你免疫黑色' + cardDesc(ac));
         closeModal();
         handleEnemyKillDodged(dmg, ac);
         return;
