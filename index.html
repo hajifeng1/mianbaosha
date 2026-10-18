@@ -13162,6 +13162,50 @@ Resources:`;
       text-shadow: 0 2px 8px rgba(0, 0, 0, .85)
     }
 
+    .gl-bar {
+      width: 230px;
+      max-width: 68vw;
+      height: 8px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, .14);
+      overflow: hidden
+    }
+
+    .gl-bar-fill {
+      height: 100%;
+      width: 40%;
+      border-radius: 6px;
+      background: linear-gradient(90deg, #ffd76a, #ff9f43);
+      animation: glBarSlide 1.1s ease-in-out infinite
+    }
+
+    @keyframes glBarSlide {
+      0% {
+        margin-left: -45%
+      }
+
+      100% {
+        margin-left: 105%
+      }
+    }
+
+    .inline-bar {
+      width: 180px;
+      height: 6px;
+      margin: 10px auto 0;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, .12);
+      overflow: hidden
+    }
+
+    .inline-bar-fill {
+      height: 100%;
+      width: 40%;
+      border-radius: 5px;
+      background: linear-gradient(90deg, #ffd76a, #ff9f43);
+      animation: glBarSlide 1.1s ease-in-out infinite
+    }
+
     /* ===================== 加载提示动画 ===================== */
     .loading-hint {
       color: #7f8c8d;
@@ -13213,6 +13257,7 @@ Resources:`;
   <div id="global-loading">
     <div class="gl-spinner"></div>
     <div class="gl-text" id="gl-text">加载中...</div>
+    <div class="gl-bar"><div class="gl-bar-fill"></div></div>
   </div>
 
 
@@ -13915,6 +13960,12 @@ Resources:`;
       }
     }
 
+    function clearOfflineSaveCache() {
+      try {
+        profileStorage.removeItem('bread-kill-profile-backup:null');
+      } catch (e) {}
+    }
+
     function enterOfflineMode() {
       isOfflineMode = true;
       currentUserId = null;
@@ -13946,6 +13997,7 @@ Resources:`;
           }
         }
       };
+      clearOfflineSaveCache();
       authModal.style.display = 'none';
       gameWrapper.style.display = 'block';
       document.getElementById('lobby-player-name').innerText = '离线玩家';
@@ -13963,7 +14015,6 @@ Resources:`;
       }, function() {
         hideGlobalLoading();
       });
-      devGrantChenminghan();
       updateLobbyRankUI();
       renderHeroesGrid();
     }
@@ -14054,6 +14105,7 @@ Resources:`;
     }
     async function handleLogout() {
       if (isOfflineMode) {
+        clearOfflineSaveCache();
         location.reload();
         return;
       }
@@ -14317,7 +14369,6 @@ Resources:`;
           }
           writeProfileBackup(userProfile);
         }
-        devGrantChenminghan();
         cloudProfileLoaded = true;
         isDataLoaded = true;
         completeTask('daily', 'login');
@@ -14330,19 +14381,20 @@ Resources:`;
       updateAllNicknameDisplays();
       renderHeroesGrid();
     }
-    function devGrantChenminghan() {
-      // 开发者测试通道：为本机当前账号发放武将【飞升·陈铭瀚】（仅补发一次，不影响庆典正常领取逻辑）
-      if ((userProfile.ownedHeroes || []).indexOf('chenminghan') === -1) {
-        if (!Array.isArray(userProfile.ownedHeroes)) userProfile.ownedHeroes = [];
-        userProfile.ownedHeroes.push('chenminghan');
-        if (typeof saveProfileToCloud === 'function') saveProfileToCloud();
-        if (typeof writeProfileBackup === 'function') writeProfileBackup(userProfile);
-        console.log('[测试通道] 已为当前账号发放武将：飞升·陈铭瀚');
-      }
-    }
-
     async function saveRankToCloud(w) {
-      if (isOfflineMode || !currentUserId) return;
+      if (isOfflineMode) {
+        var ol0 = userProfile.level;
+        if (w) {
+          userProfile.wins++;
+          if (userProfile.level < 100) userProfile.level++;
+        } else {
+          userProfile.losses++;
+          if (userProfile.level > 1) userProfile.level--;
+        }
+        updateLobbyRankUI(w ? '+' + (userProfile.level - ol0) + '级' : '-' + (ol0 - userProfile.level) + '级');
+        return;
+      }
+      if (!currentUserId) return;
       var ol = userProfile.level;
       if (w) {
         userProfile.wins++;
@@ -14416,6 +14468,10 @@ Resources:`;
     }
 
     async function saveAvatarToCloud() {
+      if (isOfflineMode) {
+        alert('✅ 头像已更新（离线模式，退出后不保留）');
+        return;
+      }
       var ok = await saveProfileToCloud();
       if (!ok) {
         await new Promise(function(r) {
@@ -14517,6 +14573,15 @@ Resources:`;
       m.style.color = '#f1c40f';
       var o = userProfile.nickname;
       userProfile.nickname = n;
+      if (isOfflineMode) {
+        m.innerText = '✅ 已修改（离线模式，退出后不保留）';
+        m.style.color = '#2ecc71';
+        updateAllNicknameDisplays();
+        setTimeout(function() {
+          closeModalEl('rename-modal');
+        }, 900);
+        return;
+      }
       if (!await saveProfileToCloud()) {
         userProfile.nickname = o;
         m.innerText = '❌ 失败';
@@ -14572,7 +14637,7 @@ Resources:`;
 
     async function loadFriendList() {
       var c = document.getElementById('friend-list-container');
-      c.innerHTML = '<div class="loading-hint"><span class="mini-spinner"></span>加载中...</div>';
+      c.innerHTML = '<div class="loading-hint"><span class="mini-spinner"></span>加载中...<div class="inline-bar"><div class="inline-bar-fill"></div></div></div>';
       if (isOfflineMode || !sb) {
         c.innerHTML = '<div style="color:#e74c3c;text-align:center;padding:20px;">离线无法查看</div>';
         return;
@@ -14652,7 +14717,7 @@ Resources:`;
     }
     async function loadReceivedRequests() {
       var c = document.getElementById('req-list-container');
-      c.innerHTML = '<div class="loading-hint"><span class="mini-spinner"></span>加载中...</div>';
+      c.innerHTML = '<div class="loading-hint"><span class="mini-spinner"></span>加载中...<div class="inline-bar"><div class="inline-bar-fill"></div></div></div>';
       if (isOfflineMode || !sb) {
         c.innerHTML = '<div style="color:#e74c3c;text-align:center;padding:20px;">离线无法查看</div>';
         return;
@@ -15007,19 +15072,22 @@ Resources:`;
         alert('⚠️ 登录状态失效');
         return;
       }
+      showGlobalLoading('⏳ 正在连接2v2服务器...');
       try {
         var probe = await probeGameRooms();
+        hideGlobalLoading();
         if (!probe.ok) {
           alert(probe.msg);
           return;
         }
       } catch (e) {
+        hideGlobalLoading();
         alert('❌ 异常: ' + e.message);
         return;
       }
       openModalEl('invite-modal');
       var list = document.getElementById('invite-friend-list');
-      list.innerHTML = '<div style="text-align:center;padding:20px;color:#7f8c8d;">🔍 检测在线好友...</div>';
+      list.innerHTML = '<div style="text-align:center;padding:20px;color:#7f8c8d;">🔍 检测在线好友...<div class="inline-bar"><div class="inline-bar-fill"></div></div></div>';
       try {
         if (broadcastChannel && currentUserId) broadcastChannel.send({
           type: 'broadcast',
@@ -15821,7 +15889,7 @@ Resources:`;
         title: '科技飞升朱元璋',
         hp: 4,
         maxHp: 4,
-        faction: '马脸',
+        faction: '马',
         portrait: '🚀',
         skills: [{
           name: '灵动',
@@ -16226,7 +16294,7 @@ Resources:`;
         rank: '2v2·选武将',
         arena: '演武·选武将',
         match: '主线·选武将',
-        story: '面包往事·选武将（仅面包阵营）'
+        story: ((STORY_LEVELS.filter(function(l) { return l.id === selectedStoryLevel; })[0] || {}).allowHeroes ? '面包往事·选武将（本关限定武将）' : '面包往事·选武将（仅面包阵营）')
       };
       var btns = {
         rank: '确认选择',
@@ -16279,7 +16347,11 @@ Resources:`;
         alert('请先选武将！');
         return;
       }
-      if (!isHeroUnlocked(currentHero.id)) {
+      var _cfSlv = currentGameMode === 'story' ? STORY_LEVELS.filter(function(l) {
+        return l.id === selectedStoryLevel;
+      })[0] : null;
+      var _cfTrial = _cfSlv && _cfSlv.allowHeroes && _cfSlv.allowHeroes.indexOf(currentHero.id) !== -1;
+      if (!isHeroUnlocked(currentHero.id) && !_cfTrial) {
         if (currentHero.id === 'hajifeng') alert('🛒 哈基峰为限定武将，需前往商城购买');
         else alert('需LV.' + HERO_UNLOCK_LEVELS[currentHero.id] + '解锁');
         return;
@@ -16300,11 +16372,19 @@ Resources:`;
         }).catch(function() {});
       } else {
         document.getElementById('heroes-page').classList.remove('active');
-        if (currentGameMode === 'story' && selectedStoryLevel === 1) {
-          startStorySegment(STORY_LEVEL1_PRE, '🍞 面包往事 · 第一关 梦的开始', function() {
+        if (currentGameMode === 'story') {
+          var _spre = STORY_PRE_TEXTS[selectedStoryLevel];
+          var _slv = STORY_LEVELS.filter(function(l) {
+            return l.id === selectedStoryLevel;
+          })[0];
+          var _sname = _slv ? _slv.name : '';
+          var _snum = STORY_LEVEL_NAMES[selectedStoryLevel - 1] || selectedStoryLevel;
+          var _sgo = function() {
             document.getElementById('battle-page').classList.add('active');
             initBattle();
-          });
+          };
+          if (_spre) startStorySegment(_spre, '🍞 面包往事 · 第' + _snum + '关 ' + _sname, _sgo);
+          else _sgo();
         } else if (currentGameMode === 'match' && selectedCampaignLevel === 1) {
           startStorySegment(STORY_LEVEL1_PART1, '第一回 · 蜜蜂厕所三结义，马脸占山作匪首', function() {
             document.getElementById('battle-page').classList.add('active');
@@ -16368,7 +16448,11 @@ Resources:`;
     }
 
     function selectHero(id) {
-      if (!isHeroUnlocked(id)) {
+      var _selSlv = currentGameMode === 'story' ? STORY_LEVELS.filter(function(l) {
+        return l.id === selectedStoryLevel;
+      })[0] : null;
+      var _selTrial = _selSlv && _selSlv.allowHeroes && _selSlv.allowHeroes.indexOf(id) !== -1;
+      if (!isHeroUnlocked(id) && !_selTrial) {
         if (id === 'hajifeng') alert('🛒 哈基峰为限定武将，需前往商城购买（1000金币）');
         else alert('🔒 需LV.' + (HERO_UNLOCK_LEVELS[id] || 1));
         return;
@@ -16394,6 +16478,10 @@ Resources:`;
         '面': {
           c: 'faction-mian',
           l: '面'
+        },
+        '马脸': {
+          c: 'faction-ma',
+          l: '马脸'
         }
       };
       return m[f] ? '<span class="faction-tag ' + m[f].c + '">' + m[f].l + '</span>' : '';
@@ -16409,14 +16497,18 @@ Resources:`;
       g.innerHTML = '';
       HEROES.forEach(function(hero) {
         var storyBan = false;
+        var storyAllow = null;
         if (currentGameMode === 'story') {
-          if (hero.faction !== '面') return;
           var slv = STORY_LEVELS.filter(function(l) {
             return l.id === selectedStoryLevel;
           })[0];
+          if (slv && slv.allowHeroes) {
+            storyAllow = slv.allowHeroes;
+            if (storyAllow.indexOf(hero.id) === -1) return;
+          } else if (hero.faction !== '面') return;
           if (slv && (slv.banHeroes || []).indexOf(hero.id) !== -1) storyBan = true;
         }
-        var u = isHeroUnlocked(hero.id) && !storyBan,
+        var u = (storyAllow ? true : isHeroUnlocked(hero.id)) && !storyBan,
           s = hero.id === selectedHeroId && u,
           c = document.createElement('div');
         c.className = 'hero-card' + (s ? ' selected' : '') + (!u ? ' locked' : '');
@@ -17923,7 +18015,8 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
       saveProfileToCloud();
       renderShop();
       renderHeroesGrid();
-      alert('🎉 购买成功！' + gd.name + ' 已解锁，可在武将页出战');
+      if (isOfflineMode) alert('🎉 购买成功！' + gd.name + ' 已解锁（离线模式，退出后不保留）');
+      else alert('🎉 购买成功！' + gd.name + ' 已解锁，可在武将页出战');
     }
 
     function buyShopItem(itemId) {
@@ -17941,7 +18034,8 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
       userProfile.inventory[itemId] = (userProfile.inventory[itemId] || 0) + 1;
       saveProfileToCloud();
       renderShop();
-      alert('🛒 购买成功：' + it.name + ' ×1，可在背包查看');
+      if (isOfflineMode) alert('🛒 购买成功：' + it.name + ' ×1，可在背包查看（离线模式，退出后不保留）');
+      else alert('🛒 购买成功：' + it.name + ' ×1，可在背包查看');
     }
 
     function renderBag() {
@@ -18155,12 +18249,24 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
       }
     }, {
       id: 2,
-      name: '第二章',
-      locked: true
+      name: '众说风云',
+      enemyId: 'wangsheng',
+      desc: '诡异鸭子王晟来袭 · 大胆闪击',
+      banHeroes: ['chensicong', 'wangsheng'],
+      reward: {
+        fengmi: 2,
+        yuanbao: 10
+      }
     }, {
       id: 3,
-      name: '第三章',
-      locked: true
+      name: '面包盛世',
+      enemyId: 'chenminghan',
+      desc: '决战飞升·陈铭瀚 · 落井下石',
+      allowHeroes: ['xuyifeng', 'chensicong'],
+      reward: {
+        fengmi: 10,
+        yuanbao: 0
+      }
     }, {
       id: 4,
       name: '第四章',
@@ -18182,8 +18288,28 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
     var STORY_LEVEL1_POST = [
       '徐宗威狼狈败退，马脸组织的气焰被暂时压了下去。',
       '然而，面包的守护之路才刚刚开始……',
-      '（面包往事 · 第二关即将开放）'
+      '（面包往事 · 第二关「众说风云」现已开放）'
     ];
+    var STORY_LEVEL2_PRE = [
+      '徐宗伟暂时失利，但很显然，他并不会善罢甘休。',
+      '在最近的一段时间内，马脸组织一直在与我们正面对抗。',
+      '但我们也迎来了新的成员——孙量呈和王晟。',
+      '诡异的鸭子王晟，竟想和我来一场身体对抗。',
+      '哼，这时候，我们就应该大胆闪击！'
+    ];
+    var STORY_LEVEL_NAMES = ['一', '二', '三', '四', '五'];
+    var STORY_LEVEL3_PRE = [
+      '在王晟和孙量呈加入之后，更多的成员加入了我们的队伍。',
+      '我们也招募到了更多的伙伴，甚至还有别班的成员加入。',
+      '我们正式更名为——面包护卫队，为护卫面包的事业而奋斗！',
+      '至于马脸，他们内斗不断，已经不足为惧。',
+      '面包护卫队已进入发展的顶峰时期，是时候复仇，落井下石一下了。'
+    ];
+    var STORY_PRE_TEXTS = {
+      1: STORY_LEVEL1_PRE,
+      2: STORY_LEVEL2_PRE,
+      3: STORY_LEVEL3_PRE
+    };
 
     function festivalStoryHTML() {
       var prog = userProfile.storyProgress || 0;
@@ -18289,7 +18415,7 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
         return;
       }
       lbLoading = true;
-      el.innerHTML = '<div class="lb-row loading-hint" style="justify-content:center;color:#7f8c8d;">加载中...</div>';
+      el.innerHTML = '<div class="lb-row loading-hint" style="justify-content:center;color:#7f8c8d;flex-direction:column;gap:10px;">加载中...<div class="inline-bar"><div class="inline-bar-fill"></div></div></div>';
       if (isOfflineMode || !sb || !currentUserId) {
         lbLoading = false;
         el.innerHTML = '<div class="lb-row" style="justify-content:center;color:#7f8c8d;">离线模式暂无法查看排行榜</div>';
@@ -18598,6 +18724,7 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
         }
         setTimeout(function() {
           var winMsg = reward > 0 ? ('🎉 获胜！获得 ' + reward + ' 金币' + unlockMsg) : ('🎉 获胜！' + unlockMsg);
+          if (isOfflineMode) winMsg += '\n（离线模式，进度与金币退出后不保留）';
           alert(winMsg);
           if (currentGameMode === 'story' && selectedStoryLevel === 1) {
             startStorySegment(STORY_LEVEL1_POST, '🍞 面包往事 · 第一关 通关', function() {
