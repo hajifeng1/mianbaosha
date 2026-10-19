@@ -10258,7 +10258,7 @@ Resources:`;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, .9);
+      background: linear-gradient(180deg, rgba(10, 6, 20, .45) 0%, rgba(10, 6, 20, .72) 100%), url('登录界面背景图.jpg') center / cover no-repeat #0a0618;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -10268,7 +10268,9 @@ Resources:`;
     }
 
     .auth-box {
-      background: linear-gradient(135deg, #2c3e50, #34495e);
+      background: rgba(22, 27, 43, .82);
+      -webkit-backdrop-filter: blur(6px);
+      backdrop-filter: blur(6px);
       padding: 30px 24px;
       border-radius: 16px;
       width: min(340px, 90vw);
@@ -10277,6 +10279,17 @@ Resources:`;
       border: 2px solid #f1c40f;
       margin: 20px 0;
       flex-shrink: 0
+    }
+
+    .auth-style-box {
+      background: rgba(22, 27, 43, .85);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+      border: 2px solid #f1c40f
+    }
+
+    #reset-modal {
+      z-index: 100000
     }
 
     .auth-box input {
@@ -11834,6 +11847,46 @@ Resources:`;
       flex-shrink: 0
     }
 
+    #turn-timer {
+      display: none;
+      position: relative;
+      height: 14px;
+      background: rgba(0, 0, 0, .5);
+      border-radius: 7px;
+      overflow: hidden;
+      flex-shrink: 0;
+      margin: 2px 0;
+      border: 1px solid #444
+    }
+
+    #turn-timer-fill {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, #f1c40f, #f39c12);
+      transition: width .1s linear
+    }
+
+    #turn-timer.low #turn-timer-fill {
+      background: linear-gradient(90deg, #e67e22, #d35400)
+    }
+
+    #turn-timer.critical #turn-timer-fill {
+      background: linear-gradient(90deg, #e74c3c, #c0392b)
+    }
+
+    #turn-timer-text {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 10px;
+      line-height: 14px;
+      color: #fff;
+      font-weight: bold;
+      text-shadow: 0 0 3px #000
+    }
+
     #log {
       flex: 1;
       min-height: 50px;
@@ -12964,7 +13017,8 @@ Resources:`;
     #announce-modal,
     #remark-modal,
     #rename-modal,
-    #uid-modal {
+    #uid-modal,
+    #reset-modal {
       display: none;
       position: fixed;
       top: 0;
@@ -12974,7 +13028,7 @@ Resources:`;
       background: rgba(0, 0, 0, .85);
       justify-content: center;
       align-items: center;
-      z-index: 100
+      z-index: 100000
     }
 
     #announce-modal {
@@ -13264,18 +13318,28 @@ Resources:`;
 
   <div id="auth-modal">
     <div class="auth-box">
-      <h2>🍞 面包杀</h2><input type="email" id="email" placeholder="邮箱" autocomplete="email" inputmode="email">
+      <h2>🍞 面包杀</h2><input type="text" id="email" placeholder="邮箱 / 手机号" autocomplete="username"><input type="email" id="bind-email" placeholder="绑定邮箱（手机号注册时必填，用于找回密码）" style="display:none;margin-top:-6px;">
       <div class="pwd-wrap"><input type="password" id="password" placeholder="密码（至少6位）"
           autocomplete="current-password"><button type="button" class="pwd-toggle" id="pwd-toggle"
           onclick="togglePasswordVisibility()" title="显示/隐藏密码">🙈</button></div><button class="btn-login"
         onclick="handleLogin()">登 录</button><button class="btn-register" onclick="handleRegister()">注 册</button><button
         class="btn-offline" onclick="enterOfflineMode()">📴 离线模式 (无需联网)</button>
-      <div style="margin-top:8px;"><a href="javascript:void(0)" onclick="handleForgotPassword()"
+      <div style="margin-top:8px;"><a href="javascript:void(0)" onclick="openResetModal()"
           style="color:#bdc3c7;font-size:13px;text-decoration:underline;cursor:pointer;">忘记密码？点击找回</a></div>
       <div class="auth-msg" id="auth-msg"></div>
     </div>
     <button class="btn-announce-auth" onclick="openModalEl('announce-modal')">📢 公告</button>
     <div class="auth-footer">🍞 面包护卫队出品</div>
+  </div>
+  <div id="reset-modal">
+    <div class="modal-box auth-style-box">
+      <h3>🔑 找回密码</h3>
+      <div style="font-size:12px;color:#95a5a6;margin-bottom:12px;">输入注册时的邮箱或手机号，我们将向对应邮箱发送重置密码邮件</div>
+      <input type="text" id="reset-account" placeholder="邮箱 / 手机号" autocomplete="off">
+      <div class="modal-btns"><button class="btn-cancel" onclick="closeModalEl('reset-modal')">取消</button><button
+          class="btn-confirm" onclick="submitReset()">发送重置邮件</button></div>
+      <div class="modal-msg" id="reset-msg"></div>
+    </div>
   </div>
   <div id="rename-modal">
     <div class="modal-box">
@@ -13680,6 +13744,9 @@ Resources:`;
         <div class="deck-info">📚 摸牌堆: <span id="draw-pile-count">0</span> | 🗑️ 弃牌堆: <span
             id="discard-pile-count">0</span></div>
         <div id="phase-indicator"></div>
+        <div id="turn-timer">
+          <div id="turn-timer-fill"></div><span id="turn-timer-text"></span>
+        </div>
         <div id="log">--- 欢迎来到战场 ---</div>
         <div id="discard-tip"></div>
       </div>
@@ -14030,10 +14097,78 @@ Resources:`;
         setTimeout(r, ms);
       });
     }
+    var PHONE_EMAIL_SUFFIX = '@phone.breadkill.local';
+    var PHONE_BIND_KEY = 'bread-kill-phone-bind';
+
+    function isPhoneNumber(s) {
+      return /^1\d{10}$/.test(s);
+    }
+
+    function phoneToEmail(phone) {
+      return phone + PHONE_EMAIL_SUFFIX;
+    }
+
+    function getPhoneBindMap() {
+      try {
+        return JSON.parse(localStorage.getItem(PHONE_BIND_KEY) || '{}');
+      } catch (e) {
+        return {};
+      }
+    }
+
+    var _pendingLogin = null;
+
+    function setPendingLogin(phone, email) {
+      _pendingLogin = {
+        phone: phone,
+        email: email
+      };
+    }
+
+    async function findPhoneOwner(phone) {
+      try {
+        var local = getPhoneBindMap()[phone];
+        if (local) return local;
+        var res = await safeQuery(sb.from('user_saves').select('save_data').eq('save_data->>phone', phone).limit(1),
+          'phone_lookup');
+        if (res.data && res.data.length && res.data[0].save_data) {
+          return res.data[0].save_data.loginEmail || null;
+        }
+      } catch (e) {}
+      return null;
+    }
+
+    function setPhoneBind(phone, email) {
+      try {
+        var m = getPhoneBindMap();
+        m[phone] = email;
+        localStorage.setItem(PHONE_BIND_KEY, JSON.stringify(m));
+      } catch (e) {}
+    }
+
+    var _emailInput = document.getElementById('email');
+    if (_emailInput) {
+      _emailInput.addEventListener('input', function() {
+        var be = document.getElementById('bind-email');
+        if (be) be.style.display = isPhoneNumber(_emailInput.value.trim()) ? 'block' : 'none';
+      });
+    }
+
     async function handleLogin() {
       var e = document.getElementById('email').value.trim(),
         p = document.getElementById('password').value;
-      if (!e || !p) return showAuthMsg('请填写邮箱和密码', 'error');
+      if (!e || !p) return showAuthMsg('请填写账号和密码', 'error');
+      if (isPhoneNumber(e)) {
+        var rawPhone = e;
+        showAuthMsg('⏳ 正在解析手机号...', '');
+        var mapped = await findPhoneOwner(rawPhone);
+        if (mapped) {
+          e = mapped;
+          setPendingLogin(rawPhone, mapped);
+        } else {
+          e = phoneToEmail(rawPhone);
+        }
+      } else if (e.indexOf('@') === -1) return showAuthMsg('请输入正确的邮箱或11位手机号', 'error');
       if (!sb) return showAuthMsg('❌ 组件加载失败，请用离线模式', 'error');
       if (navigator.onLine === false) {
         return showAuthMsg('❌ 当前设备无网络连接\n请开启网络（WiFi/流量）后重试，或点下方「离线模式」先游玩', 'error');
@@ -14075,8 +14210,47 @@ Resources:`;
     async function handleRegister() {
       var e = document.getElementById('email').value.trim(),
         p = document.getElementById('password').value;
-      if (!e || !p) return showAuthMsg('请填写邮箱和密码', 'error');
+      if (!e || !p) return showAuthMsg('请填写账号和密码', 'error');
       if (p.length < 6) return showAuthMsg('密码至少6位', 'error');
+      var isPhone = isPhoneNumber(e),
+        bindEmail = '';
+      if (isPhone) {
+        var rawPhone = e;
+        bindEmail = (document.getElementById('bind-email').value || '').trim();
+        if (!bindEmail) return showAuthMsg('手机号注册需要填写绑定邮箱（用于找回密码）', 'error');
+        if (bindEmail.indexOf('@') === -1) return showAuthMsg('绑定邮箱格式不正确', 'error');
+        if (!sb) return showAuthMsg('❌ 组件加载失败', 'error');
+        showAuthMsg('⏳ 正在校验手机号...', '');
+        try {
+          var owner = await findPhoneOwner(rawPhone);
+          if (owner && owner !== bindEmail) return showAuthMsg('❌ 该手机号已绑定其他账号', 'error');
+          var r = await sb.auth.signUp({
+            email: bindEmail,
+            password: p
+          });
+          if (r.error) {
+            var em = (r.error.message || '').toLowerCase();
+            if (em.indexOf('already') === -1 && em.indexOf('registered') === -1) {
+              return showAuthMsg('❌ ' + r.error.message, 'error');
+            }
+            var si = await sb.auth.signInWithPassword({
+              email: bindEmail,
+              password: p
+            });
+            if (si.error) return showAuthMsg('❌ 该邮箱已有账号且密码不一致，请先用邮箱登录后再绑定手机号', 'error');
+            setPhoneBind(rawPhone, bindEmail);
+            setPendingLogin(rawPhone, bindEmail);
+            return showAuthMsg('✅ 该邮箱已有账号，已为其开通手机号登录！', 'success');
+          }
+          setPhoneBind(rawPhone, bindEmail);
+          setPendingLogin(rawPhone, bindEmail);
+          return showAuthMsg('✅ 注册成功！请登录', 'success');
+        } catch (err) {
+          return showAuthMsg('❌ ' + err.message, 'error');
+        }
+      } else if (e.indexOf('@') === -1) {
+        return showAuthMsg('请输入正确的邮箱或11位手机号', 'error');
+      }
       if (!sb) return showAuthMsg('❌ 组件加载失败', 'error');
       showAuthMsg('⏳ 注册中...', '');
       try {
@@ -14090,18 +14264,64 @@ Resources:`;
         showAuthMsg('❌ ' + err.message, 'error');
       }
     }
-    async function handleForgotPassword() {
-      var e = document.getElementById('email').value.trim();
-      if (!e) return showAuthMsg('请先填写邮箱', 'error');
-      if (!sb) return showAuthMsg('❌ 组件加载失败', 'error');
-      showAuthMsg('⏳ 邮件发送中...', '');
-      try {
-        var r = await sb.auth.resetPasswordForEmail(e);
-        if (r.error) return showAuthMsg('❌ ' + r.error.message, 'error');
-        showAuthMsg('✅ 邮件已发送', 'success');
-      } catch (err) {
-        showAuthMsg('❌ ' + err.message, 'error');
+    function openResetModal() {
+      var acc = document.getElementById('email').value.trim();
+      var ra = document.getElementById('reset-account');
+      if (ra) ra.value = acc;
+      var m = document.getElementById('reset-msg');
+      if (m) m.innerText = '';
+      openModalEl('reset-modal');
+    }
+
+    async function submitReset() {
+      var a = (document.getElementById('reset-account').value || '').trim(),
+        m = document.getElementById('reset-msg');
+      if (!a) {
+        m.innerText = '❌ 请输入邮箱或手机号';
+        m.style.color = '#e74c3c';
+        return;
       }
+      if (!sb) {
+        m.innerText = '❌ 组件加载失败';
+        m.style.color = '#e74c3c';
+        return;
+      }
+      var target = a;
+      if (isPhoneNumber(a)) {
+        var bm = await findPhoneOwner(a);
+        if (!bm) {
+          m.innerText = '❌ 未找到该手机号绑定的账号';
+          m.style.color = '#e74c3c';
+          return;
+        }
+        target = bm;
+      } else if (a.indexOf('@') === -1) {
+        m.innerText = '❌ 请输入正确的邮箱或11位手机号';
+        m.style.color = '#e74c3c';
+        return;
+      }
+      m.innerText = '⏳ 邮件发送中...';
+      m.style.color = '#f1c40f';
+      try {
+        var r = await sb.auth.resetPasswordForEmail(target);
+        if (r.error) {
+          m.innerText = '❌ ' + r.error.message;
+          m.style.color = '#e74c3c';
+          return;
+        }
+        m.innerText = '✅ 重置邮件已发送至 ' + target + '，请按邮件提示修改密码';
+        m.style.color = '#2ecc71';
+      } catch (err) {
+        m.innerText = '❌ ' + err.message;
+        m.style.color = '#e74c3c';
+      }
+    }
+
+    var _resetInput = document.getElementById('reset-account');
+    if (_resetInput) {
+      _resetInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') submitReset();
+      });
     }
     async function handleLogout() {
       if (isOfflineMode) {
@@ -14368,6 +14588,12 @@ Resources:`;
             }, 800);
           }
           writeProfileBackup(userProfile);
+        }
+        if (_pendingLogin) {
+          if (_pendingLogin.phone) userProfile.phone = _pendingLogin.phone;
+          if (_pendingLogin.email) userProfile.loginEmail = _pendingLogin.email;
+          _pendingLogin = null;
+          saveProfileToCloud();
         }
         cloudProfileLoaded = true;
         isDataLoaded = true;
@@ -18609,6 +18835,24 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
       });
     }
 
+    window.addEventListener('error', function(ev) {
+      try {
+        if (typeof gameState === 'undefined' || !gameState || gameOver) return;
+        if (typeof storyRuntime !== 'undefined' && storyRuntime) return;
+        if (typeof is2v2Mode !== 'undefined' && is2v2Mode) return;
+        if (gameState.isMyTurn) return;
+        if (gameState.isProcessing) {
+          console.warn('敌方AI异常已自动恢复:', ev && ev.message);
+          gameState.isProcessing = false;
+          log('⚠️ 敌方AI出现异常，已自动恢复并结束其回合');
+          renderBattle();
+          setTimeout(function() {
+            if (!gameOver && !gameState.isMyTurn && !gameState.isProcessing) finishEnemyTurnWithExtraCheck();
+          }, 600);
+        }
+      } catch (e) {}
+    });
+
     var _battleWatchdogTimer = null,
       _wdLastLen = -1,
       _wdQuietSince = 0;
@@ -18625,6 +18869,10 @@ var tl = sk.type === 'lock' ? '<span class="skill-type-lock">锁定</span>' : (s
           if (!gameState.enemyHand || !gameState.myHand) return;
           var m = document.getElementById('response-modal');
           if (m && m.style.display === 'flex') {
+            _wdQuietSince = Date.now();
+            return;
+          }
+          if (gameState._forcedDiscard) {
             _wdQuietSince = Date.now();
             return;
           }
@@ -23312,6 +23560,17 @@ sync2v2State();
       var curHp = isMe ? gameState.myHp : gameState.enemyHp,
         maxHp = isMe ? gameState.myMaxHp : gameState.enemyMaxHp;
       log('💔 ' + nm + '受到' + dmg + '点伤害(' + curHp + '/' + maxHp + ')');
+      if (isMe && !gameState._noKuanggu && dmg > 0 && gameState.enemyHeroId === 'wangsheng' &&
+        (gameState.enemyDisabledSkills || []).indexOf('狂骨') === -1) {
+        if (gameState.enemyHp < gameState.enemyMaxHp) {
+          gameState.enemyHp = Math.min(gameState.enemyMaxHp, gameState.enemyHp + 1);
+          drawCard('enemy', 1);
+          log('🦴 敌人【狂骨】回1血摸1牌');
+        } else {
+          drawCard('enemy', 3);
+          log('🦴 敌人【狂骨】满血摸3');
+        }
+      }
       if (isMe && gameState.heroId === 'chenminghan') {
         var _stolenNames = [];
         ['weapon', 'armor'].forEach(function(sl) {
@@ -23339,6 +23598,22 @@ sync2v2State();
           log('❤️ ' + nm + '【归心】摸两张');
           var targetHand = isMe ? gameState.enemyHand : gameState.myHand;
           if (targetHand.length >= 2) {
+            if (!isMe) {
+              renderBattle();
+              startForcedDiscard(2, '🚫【放逐】请弃置2张牌', function(cards) {
+                var dn = [];
+                cards.forEach(function(dc) {
+                  discardCard(dc);
+                  playerLoseCard(dc, 'discard');
+                  dn.push(dc.name);
+                });
+                gameState.skipDraw = true;
+                log('🚫 ' + nm + '【放逐】你弃置了' + dn.join('、'));
+                renderBattle();
+                if (gameState.myHp <= 0 || gameState.enemyHp <= 0) promptForDying();
+              });
+              return true;
+            }
             var dn = [];
             for (var i = 0; i < 2 && targetHand.length > 0; i++) {
               var ri = Math.floor(Math.random() * targetHand.length);
@@ -23470,7 +23745,9 @@ sync2v2State();
         var rv = getRankValue(jc.rank);
         if (jc.suit === '♠' && rv >= 2 && rv <= 9) {
           log('⚡ 闪电命中' + nm + '！3点雷伤');
+          gameState._noKuanggu = true;
           var dead = takeDamage(who, 3);
+          gameState._noKuanggu = false;
           if (dead || gameOver) {
             needContinue = false;
           }
@@ -23789,10 +24066,10 @@ sync2v2State();
       document.getElementById('btn-discard-confirm').style.display = isD ? 'inline-block' : 'none';
       document.getElementById('discard-tip').style.display = isD ? 'block' : 'none';
       if (isD) {
-        var hl = getHandLimit(),
-          ex = gameState.myHand.length - hl;
-        document.getElementById('discard-tip').innerText = '选' + ex + '张弃置(' + gameState.selectedIndices.length + '/' +
-          ex + ')';
+        var fdr2 = gameState._forcedDiscard,
+          ex = fdr2 ? fdr2.count : gameState.myHand.length - getHandLimit();
+        document.getElementById('discard-tip').innerText = (fdr2 ? fdr2.tip : '选' + ex + '张弃置') + '(' + gameState
+          .selectedIndices.length + '/' + ex + ')';
       }
       if (gameState.phase === 'haoqing_select') {
         document.getElementById('discard-tip').style.display = 'block';
@@ -23973,9 +24250,20 @@ sync2v2State();
       var mp = (gameState.phase === 'discard' || gameState.phase === 'haoqing_select' || gameState.phase ===
         'tangyi_select' || gameState.phase === 'zhangba_select' || gameState.phase === 'malou_select');
       if (mp) {
-        var pos = gameState.selectedIndices.indexOf(index);
-        if (pos === -1) gameState.selectedIndices.push(index);
-        else gameState.selectedIndices.splice(pos, 1);
+        if (gameState.phase === 'discard') {
+          var fdrMax = gameState._forcedDiscard ? gameState._forcedDiscard.count : Math.max(1, gameState.myHand.length -
+            getHandLimit());
+          var dPos = gameState.selectedIndices.indexOf(index);
+          if (dPos !== -1) gameState.selectedIndices.splice(dPos, 1);
+          else if (gameState.selectedIndices.length >= fdrMax) {
+            gameState.selectedIndices.shift();
+            gameState.selectedIndices.push(index);
+          } else gameState.selectedIndices.push(index);
+        } else {
+          var pos = gameState.selectedIndices.indexOf(index);
+          if (pos === -1) gameState.selectedIndices.push(index);
+          else gameState.selectedIndices.splice(pos, 1);
+        }
       } else {
         if (gameState.selectedIndices.indexOf(index) !== -1) gameState.selectedIndices = [];
         else gameState.selectedIndices = [index];
@@ -24667,6 +24955,7 @@ sync2v2State();
     }
 
     function playerLoseCard(card, reason) {
+      if (reason === 'play' && !gameOver && gameState.isMyTurn && _turnTimerInt) startTurnTimer();
       if (gameState.heroId === 'wangsheng' && isKill(card) && (reason === 'play' || reason === 'discard')) {
         drawCard('me', 2);
         log('👻 【武魂】摸两张');
@@ -24972,6 +25261,7 @@ sync2v2State();
 
     function endTurn() {
       if (gameOver || gameState.isProcessing) return;
+      if (gameState._forcedDiscard) return;
       if (document.getElementById('response-modal').style.display === 'flex') {
         alert('⚠️ 先处理弹窗');
         return;
@@ -25292,6 +25582,7 @@ sync2v2State();
         gameState._pts = 0;
       }
       if (gameOver || !gameState.isMyTurn || gameState.isProcessing || gameState.phase !== 'play') return;
+      if (gameState._forcedDiscard) return;
       if (gameState.selectedIndices.length !== 1) {
         alert('先选一张牌');
         return;
@@ -26486,18 +26777,18 @@ sync2v2State();
           text: '弃2牌',
           color: '#e67e22',
           action: function() {
-            var dn = 0;
-            while (dn < 2 && gameState.myHand.length) {
-              var ri = Math.floor(Math.random() * gameState.myHand.length);
-              gameState.myHand.splice(ri, 1);
-              dn++;
-            }
-            log('🪓 强制命中');
             closeModal();
-            renderBattle();
-            setTimeout(function() {
-              handleKillHit(dmg, ac);
-            }, 500);
+            startForcedDiscard(2, '🪓【贯石斧】请弃置2张牌', function(cards) {
+              cards.forEach(function(dc) {
+                discardCard(dc);
+                playerLoseCard(dc, 'discard');
+              });
+              log('🪓 强制命中');
+              renderBattle();
+              setTimeout(function() {
+                handleKillHit(dmg, ac);
+              }, 500);
+            });
           }
         }, {
           text: '不发动',
@@ -26594,7 +26885,39 @@ sync2v2State();
       renderBattle();
     }
 
+    function startForcedDiscard(count, tip, onDone) {
+      gameState._forcedDiscard = {
+        count: count,
+        tip: tip,
+        onDone: onDone,
+        prevPhase: gameState.phase
+      };
+      gameState.phase = 'discard';
+      gameState.selectedIndices = [];
+      renderBattle();
+    }
+
     function confirmDiscard() {
+      var fdr = gameState._forcedDiscard;
+      if (fdr) {
+        if (gameState.selectedIndices.length !== fdr.count) {
+          alert('选' + fdr.count + '张');
+          return;
+        }
+        var fs = gameState.selectedIndices.slice().sort(function(a, b) {
+            return b - a;
+          }),
+          fcards = [];
+        fs.forEach(function(i) {
+          fcards.unshift(gameState.myHand.splice(i, 1)[0]);
+        });
+        gameState.selectedIndices = [];
+        gameState.phase = fdr.prevPhase || 'play';
+        gameState._forcedDiscard = null;
+        renderBattle();
+        if (fdr.onDone) fdr.onDone(fcards);
+        return;
+      }
       var hl = getHandLimit(),
         ex = gameState.myHand.length - hl;
       if (gameState.selectedIndices.length !== ex) {
@@ -26617,7 +26940,90 @@ sync2v2State();
       finishMyTurn();
     }
 
+    var _turnTimerInt = null,
+      _turnTimerLeft = 0,
+      _turnTimerTotal = 60000;
+
+    function _responseModalOpen() {
+      var m = document.getElementById('response-modal');
+      return !!(m && m.style.display === 'flex');
+    }
+
+    function startTurnTimer() {
+      stopTurnTimer();
+      if (typeof gameOver !== 'undefined' && gameOver) return;
+      if (typeof is2v2Mode !== 'undefined' && is2v2Mode) return;
+      var t = document.getElementById('turn-timer');
+      if (!t) return;
+      _turnTimerLeft = _turnTimerTotal;
+      t.style.display = 'block';
+      t.className = '';
+      _turnTimerInt = setInterval(function() {
+        try {
+          if (gameOver || !gameState.isMyTurn) {
+            stopTurnTimer();
+            return;
+          }
+          if (gameState.isProcessing || _responseModalOpen() || gameState._forcedDiscard) return;
+          _turnTimerLeft -= 100;
+          var fill = document.getElementById('turn-timer-fill'),
+            txt = document.getElementById('turn-timer-text');
+          if (!fill) return;
+          var pct = Math.max(0, _turnTimerLeft / _turnTimerTotal * 100);
+          fill.style.width = pct + '%';
+          if (txt) txt.innerText = Math.ceil(_turnTimerLeft / 1000) + 's';
+          t.className = pct > 50 ? '' : (pct > 20 ? 'low' : 'critical');
+          if (_turnTimerLeft <= 0) turnTimerAutoSkip();
+        } catch (e) {}
+      }, 100);
+    }
+
+    function stopTurnTimer() {
+      if (_turnTimerInt) {
+        clearInterval(_turnTimerInt);
+        _turnTimerInt = null;
+      }
+      var t = document.getElementById('turn-timer');
+      if (t) t.style.display = 'none';
+    }
+
+    function turnTimerAutoSkip() {
+      stopTurnTimer();
+      if (gameOver || !gameState.isMyTurn) return;
+      log('⏰ 操作超时，自动跳过你的回合');
+      if (gameState.phase === 'discard') {
+        var hl = getHandLimit(),
+          ex = gameState.myHand.length - hl;
+        if (ex > 0) {
+          var idxs = gameState.myHand.map(function(c, i) {
+            return {
+              i: i,
+              v: getCardValue(c)
+            };
+          }).sort(function(a, b) {
+            return a.v - b.v;
+          }).slice(0, ex).map(function(o) {
+            return o.i;
+          }).sort(function(a, b) {
+            return b - a;
+          });
+          idxs.forEach(function(i) {
+            var c = gameState.myHand.splice(i, 1)[0];
+            discardCard(c);
+            playerLoseCard(c, 'discard');
+          });
+          gameState.selectedIndices = [];
+          gameState.phase = 'play';
+          log('🗑️ 自动弃' + idxs.length + '张牌');
+        }
+      }
+      gameState.selectedIndices = [];
+      renderBattle();
+      finishMyTurn();
+    }
+
     function finishMyTurn() {
+      stopTurnTimer();
       gameState.isMyTurn = false;
       gameState.killCountThisTurn = 0;
       gameState.hasUsedKill = false;
@@ -26737,9 +27143,11 @@ sync2v2State();
                   }
                   gameState.isProcessing = false;
                   renderBattle();
+                  startTurnTimer();
                   setTimeout(function() {
                     if (gameState.skipPlay) {
                       log('😴 跳过出牌');
+                      stopTurnTimer();
                       scheduleTurn(endTurn, 100);
                     }
                   }, 800);
@@ -26897,6 +27305,8 @@ sync2v2State();
       gameState.enemyHasUsedBeici = false;
       gameState.enemyHasUsedFanke = false;
       gameState.enemyHasUsedHeal = false;
+      gameState.enemyHasUsedTouxi = false;
+      gameState.enemyHasUsedMalou = false;
       gameState.enemyHpLossThisTurn = 0;
       gameState.enemyHasUsedXiujia = false;
       gameState.enemyKillCountThisTurn = 0;
@@ -27134,13 +27544,80 @@ sync2v2State();
           renderBattle();
         }
       }
+      if (gameState.enemyHeroId === 'chenminghan' && !gameState.enemyHasUsedTouxi && gameState.enemyHp > 0 &&
+        gameState.myHp > 0) {
+        var txI = gameState.enemyHand.findIndex(function(c) {
+          return c.suit === '\u2663';
+        });
+        if (txI !== -1) {
+          gameState.enemyHasUsedTouxi = true;
+          var txC = gameState.enemyHand.splice(txI, 1)[0];
+          discardCard(txC);
+          enemyLoseCard(txC, 'play');
+          log('\ud83e\udd2b 敌【偷袭】弃置' + cardDesc(txC) + '，令你失去1点体力');
+          loseHp('me', 1, '\u5077\u88ad');
+          if (gameOver) return;
+        }
+      }
+      if (gameState.enemyHeroId === 'chenminghan' && !gameState.enemyHasUsedMalou && gameState.enemyHp > 1 &&
+        gameState.myHand.length >= 3 && gameState.enemyHand.length >= 3) {
+        gameState.enemyHasUsedMalou = true;
+        var mlPick = gameState.enemyHand.map(function(c, i) {
+          return {
+            i: i,
+            v: getCardValue(c)
+          };
+        }).sort(function(a, b) {
+          return a.v - b.v;
+        }).slice(0, 2).sort(function(a, b) {
+          return b.i - a.i;
+        });
+        var mlNames = [];
+        mlPick.forEach(function(o) {
+          var c = gameState.enemyHand.splice(o.i, 1)[0];
+          discardCard(c);
+          enemyLoseCard(c, 'discard');
+          mlNames.push(c.name);
+        });
+        var mlStripped = [];
+        while (gameState.myHand.length) {
+          var mc = gameState.myHand.pop();
+          discardCard(mc);
+          playerLoseCard(mc, 'discard');
+          mlStripped.push(mc.name);
+        }
+        log('\ud83d\udc12 敌【吗喽】弃置' + mlNames.join('\u3001') + '\uff0c你失去所有手牌(' + mlStripped.join('\u3001') +
+          ')\u5e76\u5931\u53bb1\u70b9\u4f53\u529b');
+        loseHp('me', 1, '\u5417\u55d2');
+        if (gameOver) return;
+      }
       if (cb) cb();
+    }
+
+    function enemyWumouTryPay(allowHp) {
+      // 敌王晟【无谋】：使用锦囊需弃一张杀或失去1点体力，都无法做到则不能用该锦囊
+      if (gameState.enemyHeroId !== 'wangsheng') return true;
+      if ((gameState.enemyDisabledSkills || []).indexOf('无谋') !== -1) return true;
+      var ki = gameState.enemyHand.findIndex(function(c) {
+        return isKill(c);
+      });
+      if (ki !== -1) {
+        var kc = gameState.enemyHand.splice(ki, 1)[0];
+        discardCard(kc);
+        enemyLoseCard(kc, 'discard');
+        log('🧠 敌【无谋】弃杀发动');
+        return true;
+      }
+      if (allowHp && gameState.enemyHp > 2) {
+        loseHp('enemy', 1, '无谋');
+        return true;
+      }
+      return false;
     }
 
     function enemyAI_UseTricks() {
       if (gameOver) return;
       var h = gameState.enemyHand;
-      var skipBlack = false;
       if (gameState.enemyHp <= 0) {
         var p = h.findIndex(function(c) {
           return c.effect === 'heal';
@@ -27170,9 +27647,9 @@ sync2v2State();
         return;
       }
       var wz = h.findIndex(function(c) {
-        return c.effect === 'wuzhong' && !(skipBlack && getSuitColor(c.suit) === 'suit-black');
+        return c.effect === 'wuzhong';
       });
-      if (wz !== -1) {
+      if (wz !== -1 && enemyWumouTryPay(true)) {
         var c = h.splice(wz, 1)[0];
         discardCard(c);
         log('📜 敌无中生有');
@@ -27187,9 +27664,9 @@ sync2v2State();
         return;
       }
       var ty = h.findIndex(function(c) {
-        return c.effect === 'taoyuan' && !(skipBlack && getSuitColor(c.suit) === 'suit-black');
+        return c.effect === 'taoyuan';
       });
-      if (ty !== -1 && gameState.enemyHp < gameState.enemyMaxHp) {
+      if (ty !== -1 && gameState.enemyHp < gameState.enemyMaxHp && enemyWumouTryPay(false)) {
         var c = h.splice(ty, 1)[0];
         discardCard(c);
         log('🌸 敌桃园');
@@ -27203,9 +27680,9 @@ sync2v2State();
         return;
       }
       var hv = h.findIndex(function(c) {
-        return c.effect === 'harvest' && !(skipBlack && getSuitColor(c.suit) === 'suit-black');
+        return c.effect === 'harvest';
       });
-      if (hv !== -1 && h.length < 3) {
+      if (hv !== -1 && h.length < 3 && enemyWumouTryPay(false)) {
         var c = h.splice(hv, 1)[0];
         discardCard(c);
         log('🌾 敌五谷');
@@ -27213,13 +27690,13 @@ sync2v2State();
         return;
       }
       var l = h.findIndex(function(c) {
-        return c.effect === 'lightning' && !(skipBlack && getSuitColor(c.suit) === 'suit-black');
+        return c.effect === 'lightning';
       });
       if (l !== -1 && !gameState.enemyJudgments.some(function(j) {
           return j.type === 'lightning';
         }) && !gameState.myJudgments.some(function(j) {
           return j.type === 'lightning';
-        })) {
+        }) && enemyWumouTryPay(true)) {
         var c = h.splice(l, 1)[0];
         gameState.enemyJudgments.push({
           type: 'lightning',
@@ -27231,11 +27708,11 @@ sync2v2State();
         return;
       }
       var il = h.findIndex(function(c) {
-        return c.effect === 'indulgence' && !(skipBlack && getSuitColor(c.suit) === 'suit-black');
+        return c.effect === 'indulgence';
       });
       if (il !== -1 && !gameState.myJudgments.some(function(j) {
           return j.type === 'indulgence';
-        })) {
+        }) && enemyWumouTryPay(true)) {
         var c = h.splice(il, 1)[0];
         discardCard(c);
         log('😴 敌乐你');
@@ -27250,11 +27727,11 @@ sync2v2State();
         return;
       }
       var sp = h.findIndex(function(c) {
-        return c.effect === 'supply' && !(skipBlack && getSuitColor(c.suit) === 'suit-black');
+        return c.effect === 'supply';
       });
       if (sp !== -1 && !gameState.myJudgments.some(function(j) {
           return j.type === 'supply';
-        })) {
+        }) && enemyWumouTryPay(true)) {
         var c = h.splice(sp, 1)[0];
         discardCard(c);
         log('🌾 敌兵粮你');
@@ -27269,11 +27746,11 @@ sync2v2State();
         return;
       }
       var du = h.findIndex(function(c) {
-        return c.effect === 'duel' && !(skipBlack && getSuitColor(c.suit) === 'suit-black');
+        return c.effect === 'duel';
       });
       if (du !== -1 && countCards(h, function(c) {
           return isKill(c);
-        }) >= 2) {
+        }) >= 2 && enemyWumouTryPay(true)) {
         var c = h.splice(du, 1)[0];
         discardCard(c);
         log('⚔️ 敌方对你使用【决斗】');
@@ -27290,11 +27767,11 @@ sync2v2State();
         return;
       }
       var sn = h.findIndex(function(c) {
-        return c.effect === 'snatch' && !(skipBlack && getSuitColor(c.suit) === 'suit-black');
+        return c.effect === 'snatch';
       });
       var hasST = gameState.myHand.length > 0 || gameState.myEquipment.weapon || gameState.myEquipment.armor ||
         gameState.myJudgments.length > 0;
-      if (sn !== -1 && hasST) {
+      if (sn !== -1 && hasST && enemyWumouTryPay(false)) {
         var c = h.splice(sn, 1)[0];
         discardCard(c);
         log('🐑 敌方对你使用【顺手牵羊】');
@@ -27344,11 +27821,11 @@ sync2v2State();
         return;
       }
       var dm = h.findIndex(function(c) {
-        return c.effect === 'dismantle' && !(skipBlack && getSuitColor(c.suit) === 'suit-black');
+        return c.effect === 'dismantle';
       });
       var hasDT = gameState.myHand.length > 0 || gameState.myEquipment.weapon || gameState.myEquipment.armor ||
         gameState.myJudgments.length > 0;
-      if (dm !== -1 && hasDT) {
+      if (dm !== -1 && hasDT && enemyWumouTryPay(false)) {
         var c = h.splice(dm, 1)[0];
         discardCard(c);
         log('🌉 敌方对你使用【过河拆桥】');
@@ -28014,22 +28491,21 @@ sync2v2State();
       if (gameState.enemyEquipment.weapon && gameState.enemyEquipment.weapon.effect === 'weapon_hanbing' && gameState
         .myHand.length > 0) {
         log('❄️ 敌发动寒冰剑弃你2牌');
-        var dn = 0,
-          nm = [];
-        while (dn < 2 && gameState.myHand.length) {
-          var ri = Math.floor(Math.random() * gameState.myHand.length);
-          var dc = gameState.myHand.splice(ri, 1)[0];
-          discardCard(dc);
-          playerLoseCard(dc, 'discard');
-          nm.push(dc.name);
-          dn++;
-        }
-        if (dn) log('🗑️ 你弃' + nm.join('、'));
-        gameState.isProcessing = false;
-        renderBattle();
-        setTimeout(function() {
-          if (!gameOver && gameState.myHp > 0) enemyAI_WineAndKill();
-        }, 500);
+        gameState.isProcessing = true;
+        startForcedDiscard(Math.min(2, gameState.myHand.length), '❄️【寒冰剑】请弃置2张牌', function(cards) {
+          var nm = [];
+          cards.forEach(function(dc) {
+            discardCard(dc);
+            playerLoseCard(dc, 'discard');
+            nm.push(dc.name);
+          });
+          if (nm.length) log('🗑️ 你弃' + nm.join('、'));
+          gameState.isProcessing = false;
+          renderBattle();
+          setTimeout(function() {
+            if (!gameOver && gameState.myHp > 0) enemyAI_WineAndKill();
+          }, 500);
+        });
         return;
       }
       var dead = takeDamage('me', dmg);
