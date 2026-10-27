@@ -6,6 +6,13 @@
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <link rel="preconnect" href="https://xhehybtjnvyksjaznlla.supabase.co">
   <link rel="dns-prefetch" href="https://xhehybtjnvyksjaznlla.supabase.co">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#0a0618">
+  <link rel="icon" type="image/png" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-180.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="面包杀">
   <title>面包杀 · 群雄争霸</title>
   <script>
     
@@ -13060,6 +13067,16 @@ Resources:`;
       accent-color: #f39c12
     }
 
+    .set-row select {
+      flex: 1;
+      background: #2c3e50;
+      color: #fff;
+      border: 1px solid #f39c12;
+      border-radius: 6px;
+      padding: 6px;
+      font-size: 13px
+    }
+
     .equipment-tag {
       background: #f39c12;
       color: #2c3e50;
@@ -14505,6 +14522,20 @@ Resources:`;
       animation: introLogoIn 1.5s cubic-bezier(.22, 1, .36, 1) forwards
     }
 
+    #intro-loading {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+      justify-content: center;
+      color: #ddd;
+      font-size: 13px;
+      pointer-events: none;
+      z-index: 1
+    }
+
     @keyframes introLogoIn {
       0% {
         opacity: 0;
@@ -14820,6 +14851,10 @@ Resources:`;
   <div id="intro-screen">
     <video id="intro-video" src="1.mp4" playsinline preload="auto"></video>
     <div id="intro-logo"><span>面包杀</span></div>
+    <div id="intro-loading">
+      <div class="start-spinner"></div>
+      <div class="intro-loading-text">开场视频加载中…</div>
+    </div>
     <button id="intro-skip" type="button" onclick="skipIntroVideo()">⏭ 跳过</button>
   </div>
   <div id="start-screen">
@@ -15383,10 +15418,13 @@ Resources:`;
       <div class="set-row"><span class="set-label">🔇 静音</span><input type="checkbox" id="set-mute" onchange="onSetMute(this.checked)"></div>
       <div class="set-row"><span class="set-label">🔅 画面亮度</span><input type="range" id="set-brightness" min="60" max="130" step="5" oninput="onSetBrightness(this.value)"><b class="set-val" id="set-brightness-num">100%</b></div>
       <div class="set-row"><span class="set-label">💥 战斗特效</span><input type="checkbox" id="set-battlefx" onchange="onSetBattleFx(this.checked)" checked><span class="set-hint">受击晃动/血印/治疗光环</span></div>
+      <div class="set-row"><span class="set-label">🎵 主页音乐</span><select id="set-lobby-music" onchange="onSetLobbyMusic(this.value)"></select></div>
+      <div class="set-row"><span class="set-label">⚔️ 战斗音乐</span><select id="set-battle-music" onchange="onSetBattleMusic(this.value)"></select></div>
       <div style="text-align:center;margin-top:14px;"><button class="action-btn" onclick="closeSettings()">关 闭</button></div>
     </div>
   </div>
   <audio id="lobby-bgm" loop preload="auto" src="Salder4cash - 【FREE】lucky.mp3"></audio>
+  <audio id="battle-bgm" loop preload="none"></audio>
   <script>
     
     // ============ 出场视频（进入起始界面前播放，每个会话一次，可跳过） ============
@@ -15405,6 +15443,27 @@ Resources:`;
       }
       window.skipIntroVideo = function() { endIntro(); };
       var ended = false;
+      var il = document.getElementById('intro-loading');
+      vid.addEventListener('playing', function() {
+        if (il) il.style.display = 'none';
+      });
+      vid.addEventListener('waiting', function() {
+        if (il && !ended) il.style.display = '';
+      });
+      // 看门狗：视频数据迟迟没来（网络慢/解码不支持）时不再干等，直接跳过
+      var _wd = setInterval(function() {
+        if (ended) {
+          clearInterval(_wd);
+          return;
+        }
+        if (vid.readyState === 0) {
+          clearInterval(_wd);
+          endIntro();
+        }
+      }, 5000);
+      vid.addEventListener('playing', function() {
+        clearInterval(_wd);
+      });
 
       function releaseVideo() {
         try {
@@ -15472,19 +15531,58 @@ Resources:`;
       return lobbyBgmEl;
     }
 
+    var MUSIC_LIB = [{
+      id: 'lucky',
+      name: 'Free Lucky',
+      file: 'Salder4cash - 【FREE】lucky.mp3'
+    }, {
+      id: 'bendan',
+      name: '像个笨蛋一样',
+      file: 'Caspian - 像个笨蛋一样.mp3'
+    }, {
+      id: 'jiahao',
+      name: '嘉豪进行曲',
+      file: 'N2UtheHartlocker - †TAKEDISKRUSH!†（嘉豪进行曲）.mp3'
+    }];
+
+    function ensureBgmSrc(el, musicId) {
+      if (!el) return;
+      var t = MUSIC_LIB[0];
+      MUSIC_LIB.forEach(function(m) {
+        if (m.id === musicId) t = m;
+      });
+      if ((el.getAttribute('src') || '') !== t.file) {
+        el.src = t.file;
+        el.load();
+      }
+    }
+
     function syncLobbyBgm() {
       try {
         if (!getLobbyBgmEl()) return;
+        var battleEl = document.getElementById('battle-bgm');
         var gw = document.getElementById('game-wrapper');
         var bp = document.getElementById('battle-page');
         var inGameShell = gw && gw.style.display !== 'none';
         var inBattle = bp && bp.classList.contains('active');
+        ensureBgmSrc(lobbyBgmEl, SETTINGS.lobbyMusic);
+        if (battleEl) ensureBgmSrc(battleEl, SETTINGS.battleMusic);
+        var vol = SETTINGS.muted ? 0 : SETTINGS.volume / 100;
+        lobbyBgmEl.volume = vol;
+        if (battleEl) battleEl.volume = vol;
         if (inGameShell && !inBattle) {
-          lobbyBgmEl.volume = SETTINGS.muted ? 0 : SETTINGS.volume / 100;
+          if (battleEl) battleEl.pause();
           var pr = lobbyBgmEl.play();
           if (pr && pr.catch) pr.catch(function() {});
+        } else if (inGameShell && inBattle) {
+          lobbyBgmEl.pause();
+          if (battleEl) {
+            var pr2 = battleEl.play();
+            if (pr2 && pr2.catch) pr2.catch(function() {});
+          }
         } else {
           lobbyBgmEl.pause();
+          if (battleEl) battleEl.pause();
         }
       } catch (e) {}
     }
@@ -15523,7 +15621,9 @@ Resources:`;
       volume: 40,
       muted: false,
       brightness: 100,
-      battleFx: true
+      battleFx: true,
+      lobbyMusic: 'lucky',
+      battleMusic: 'jiahao'
     };
     try {
       var _st = JSON.parse(localStorage.getItem('mb_settings_v1') || 'null');
@@ -15555,6 +15655,24 @@ Resources:`;
       if (bn) bn.innerText = SETTINGS.brightness + '%';
       var fEl = document.getElementById('set-battlefx');
       if (fEl) fEl.checked = SETTINGS.battleFx !== false;
+      var lm = document.getElementById('set-lobby-music');
+      if (lm) {
+        var lh = '';
+        MUSIC_LIB.forEach(function(m) {
+          lh += '<option value="' + m.id + '"' + (SETTINGS.lobbyMusic === m.id ? ' selected' : '') + '>' + m.name +
+            '</option>';
+        });
+        lm.innerHTML = lh;
+      }
+      var bm = document.getElementById('set-battle-music');
+      if (bm) {
+        var bh2 = '';
+        MUSIC_LIB.forEach(function(m) {
+          bh2 += '<option value="' + m.id + '"' + (SETTINGS.battleMusic === m.id ? ' selected' : '') + '>' + m
+            .name + '</option>';
+        });
+        bm.innerHTML = bh2;
+      }
       applyBrightness();
       var be = getLobbyBgmEl();
       if (be) be.volume = SETTINGS.muted ? 0 : SETTINGS.volume / 100;
@@ -15596,7 +15714,29 @@ Resources:`;
       saveSettings();
     }
 
+    function onSetLobbyMusic(v) {
+      SETTINGS.lobbyMusic = v;
+      saveSettings();
+      syncLobbyBgm();
+    }
+
+    function onSetBattleMusic(v) {
+      SETTINGS.battleMusic = v;
+      saveSettings();
+      syncLobbyBgm();
+    }
+
     applySettings();
+
+    // ============ PWA：注册 Service Worker（离线缓存，可安装为应用） ============
+    // 注意：APK 内嵌 WebView（UA 含 "; wv)"）不注册 SW——部分机型 WebView 的 SW 缓存会导致资源请求挂起
+    if ('serviceWorker' in navigator && !/\bwv\b\)/.test(navigator.userAgent) && (location.protocol === 'https:' ||
+        location.hostname === 'localhost' ||
+        location.hostname === '127.0.0.1')) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('sw.js').catch(function() {});
+      });
+    }
 
     function esc(s) {
       return String(s == null ? '' : s).replace(/\\/g, '\\\\').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(
@@ -15805,11 +15945,17 @@ Resources:`;
 
     function preloadImage(src) {
       return new Promise(function(res) {
-        var im = new Image();
-        im.onload = im.onerror = function() {
+        var done = false;
+        var finish = function() {
+          if (done) return;
+          done = true;
           res();
         };
+        var im = new Image();
+        im.onload = im.onerror = finish;
         im.src = src;
+        // 单张资源最多等 6 秒，网络慢也不能卡死预加载
+        setTimeout(finish, 6000);
       });
     }
 
@@ -16483,7 +16629,7 @@ Resources:`;
       renderHeroesGrid();
     }
     function xpNeedForLevel(lv) {
-      return Math.round(100 * lv + 15 * lv * lv);
+      return Math.round(60 * lv + 8 * lv * lv);
     }
 
     function xpTotalForLevel(lv) {
@@ -18197,6 +18343,28 @@ Resources:`;
           type: 'limit',
           desc: '限定技，令一名角色弃置所有装备牌与锦囊牌；之后两回合内你免疫任何会使体力减少的操作，且该角色立刻进入濒死状态。'
         }]
+      },
+      {
+        id: 'sunxinxin',
+        name: '孙昕昕',
+        title: '孙星星女士',
+        hp: 4,
+        maxHp: 4,
+        faction: '群',
+        portrait: '😶',
+        skills: [{
+          name: '我的妈呀',
+          type: 'active',
+          desc: '锁定技，你每次使用基本牌获得一层【妈呀】；你可以消耗X层【妈呀】重铸X张牌并摸X张牌。'
+        }, {
+          name: '问号',
+          type: 'lock',
+          desc: '游戏开始时，你锁定一名敌人施加【问号】：其摸牌阶段摸牌数-1，手牌上限永久为4。'
+        }, {
+          name: '感叹号',
+          type: 'lock',
+          desc: '你对【问号】拥有者伤害+1，且你对其造成伤害后，获得其一张手牌。'
+        }]
       }
     ];
     var HEROES = [],
@@ -18231,6 +18399,7 @@ Resources:`;
       if (id === 'sunjiayuan') return (userProfile.ownedHeroes || []).indexOf('sunjiayuan') !== -1;
       if (id === 'zhangchenrui') return (userProfile.ownedHeroes || []).indexOf('zhangchenrui') !== -1;
       if (id === 'chenqilong') return (userProfile.ownedHeroes || []).indexOf('chenqilong') !== -1;
+      if (id === 'sunxinxin') return (userProfile.ownedHeroes || []).indexOf('sunxinxin') !== -1;
       var r = HERO_UNLOCK_LEVELS[id];
       return r === undefined ? true : userProfile.level >= r;
     }
@@ -18652,6 +18821,7 @@ Resources:`;
         else if (id === 'shengshixuyifeng' || id === 'sunjiayuan' || id === 'zhangchenrui')
           obtain = '🎁 限定招募获取';
         else if (id === 'chenqilong') obtain = '🛒 元宝商城 · 20元宝购买 ／ 🎁 限定招募';
+        else if (id === 'sunxinxin') obtain = '🔮 将魂商城 · 1000将魂购买';
         else obtain = '🔒 等级达到 LV.' + (HERO_UNLOCK_LEVELS[id] || 1) + ' 解锁';
       }
       var sh = '';
@@ -18987,6 +19157,9 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
           } else if (hero.id === 'chenminghan') {
             lr = '<div class="lock-requirement">🎉 参加开服庆典活动获取</div>';
             btnHtml = '<button class="hero-select-btn" onclick="openActivityPage();openActivityDetail(\'festival\')">🎉 去庆典获取</button>';
+          } else if (hero.id === 'sunxinxin') {
+            lr = '<div class="lock-requirement">🔮 将魂商城 · 1000将魂购买</div>';
+            btnHtml = '<button class="hero-select-btn" onclick="openShopPage()">🛒 去商城购买</button>';
           } else if (hero.id === 'shengshixuyifeng' || hero.id === 'sunjiayuan' || hero.id === 'zhangchenrui' ||
             hero.id === 'chenqilong') {
             lr = '<div class="lock-requirement">🎁 限定招募获取</div>';
@@ -19049,6 +19222,13 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
       price: 20,
       currency: 'yuanbao',
       desc: '限定武将「一只有着大胃袋的龙」。售价 20 元宝，购买后永久解锁，可出战主线与2v2。'
+    }, {
+      heroId: 'sunxinxin',
+      name: '孙昕昕',
+      icon: '😶',
+      price: 1000,
+      currency: 'jianghun',
+      desc: '武将「孙星星女士」。售价 1000 将魂，购买后永久解锁，可出战主线与2v2。'
     }];
     var SHOP_ITEMS = [{
       id: 'fuhuo',
@@ -21210,11 +21390,12 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
       xuyifeng: 4,
       chenqilong: 4,
       chenminghan: 4,
-      hajifeng: 3
+      hajifeng: 3,
+      sunxinxin: 3
     };
     var FORGE_ORDER = ['default', 'wangsheng', 'liyucheng', 'manhongyi', 'sunliangcheng', 'zhangchenrui',
       'sunjiayuan', 'xuzongwei', 'chensicong', 'yuchengxiao', 'shengshixuyifeng', 'xuyifeng', 'chenqilong', 'chenminghan',
-      'hajifeng'
+      'hajifeng', 'sunxinxin'
     ];
 
     function openForgePage() {
@@ -29127,7 +29308,8 @@ sync2v2State();
       'manhongyi': '获得技能【糖域】：限定技，开启后三回合每当有人使用基本牌，你获得一层糖衣(护甲)',
       'yuchengxiao': '获得技能【游鱼】：敌方回合限一次，当敌方对你使用杀时，你获得敌方2张手牌，若不足两张，你从牌堆里补全剩余牌',
       'sunjiayuan': '获得技能【顶级智豆】：当场上除你外有人使用锦囊牌时，你可以弃置一枚豆标记然后获得此锦囊牌并摸两张牌',
-      'zhangchenrui': '获得技能【树影】：限定技，当你受到伤害或被封禁技能时，你可以获得5层【影】，影可以抵消一次伤害或失去一点体力；你可以失去所有影并选择一项：1对一名角色造成3点伤害；2恢复你被封禁的所有技能并使这些技能更改为持恒技；3你之后三回合的杀伤害+1'
+      'zhangchenrui': '获得技能【树影】：限定技，当你受到伤害或被封禁技能时，你可以获得5层【影】，影可以抵消一次伤害或失去一点体力；你可以失去所有影并选择一项：1对一名角色造成3点伤害；2恢复你被封禁的所有技能并使这些技能更改为持恒技；3你之后三回合的杀伤害+1',
+      'sunxinxin': '获得技能【省略号】：限定技，你可令一名角色弃置所有手牌，跳过其下次出牌与摸牌阶段，然后你对其造成1点伤害；若该角色发动技能，你重复该效果'
     };
 
     function cons4SkillName(heroId) {
@@ -30148,10 +30330,33 @@ sync2v2State();
         if (gameState.myHasQiongtu) skq += '|🐲穷途';
         if (gameState.myHasDalong) skq += '|🐲大龙出击(' + (3 - gameState.myDalongCount) + ')';
         pe.innerHTML = skq;
+      } else if (gameState.heroId === 'sunxinxin') {
+        pe.innerHTML = '😱我的妈呀(' + (gameState.myMaya || 0) + ')|❓问号→' + (gameState.wenhaoTarget === 'enemy' ?
+          '敌人' : '你') + '|❗感叹号';
       } else pe.innerHTML = '⚡英姿|💨飒爽' + (hasXinshouBaohu() ? '|🛡️新手保护' : '');
       if (cons4On(gameState.heroId)) pe.innerHTML += '|✨' + cons4SkillName(gameState.heroId) + '(命星4层)';
       var bar = document.getElementById('skills-bar');
       bar.innerHTML = '';
+      if (gameState.heroId === 'sunxinxin') {
+        var bmx = document.createElement('button');
+        bmx.className = 'skill-btn';
+        bmx.style.background = '#e17055';
+        bmx.innerText = '😱妈呀(' + (gameState.myMaya || 0) + ')';
+        bmx.disabled = !gameState.isMyTurn || gameState.phase !== 'play' || gameState.isProcessing || (gameState
+          .myMaya || 0) < 1 || gameState.myHand.length < 1;
+        bmx.onclick = useSkill_WoDeMaya;
+        bar.appendChild(bmx);
+        if (cons4On('sunxinxin')) {
+          var bsg = document.createElement('button');
+          bsg.className = 'skill-btn';
+          bsg.style.background = '#8e44ad';
+          bsg.innerText = '💬省略号' + (gameState.myShenglueUsed ? '(已用)' : '');
+          bsg.disabled = !gameState.isMyTurn || gameState.phase !== 'play' || gameState.isProcessing || gameState
+            .myShenglueUsed;
+          bsg.onclick = useSkill_Shenglue;
+          bar.appendChild(bsg);
+        }
+      }
       if (gameState.heroId === 'yuchengxiao') {
         var b1 = document.createElement('button');
         b1.className = 'skill-btn';
@@ -30959,6 +31164,7 @@ sync2v2State();
     }
 
     function getHandLimit() {
+      if (gameState.wenhaoTarget === 'me') return 4;
       if (gameState.heroId === 'chensicong') return 999; 
       if (gameState.heroId === 'xuzongwei' || gameState.heroId === 'default') return 999;
       if (gameState.heroId === 'chenqilong' && gameState.myDwdDiamond) return 999;
@@ -30969,6 +31175,7 @@ sync2v2State();
     }
 
     function getEnemyHandLimit() {
+      if (gameState.wenhaoTarget === 'enemy') return 4;
       var e = gameState.enemyHeroId;
       if (e === 'chensicong') return 999; 
       if (e === 'default' || e === 'xuzongwei') return 999;
@@ -30988,8 +31195,18 @@ sync2v2State();
         dmg += gameState.myDamageBonus;
         log('🔥 伤害加成+' + gameState.myDamageBonus);
       }
+      if (gameState.wenhaoTarget === 'enemy' && gameState.heroId === 'sunxinxin' && !skillSealedMe('感叹号')) {
+        dmg += 1;
+        log('❗ 【感叹号】对【问号】拥有者伤害+1');
+      }
       var dead = takeDamage('enemy', dmg);
       if (dead) return;
+      if (gameState.wenhaoTarget === 'enemy' && gameState.heroId === 'sunxinxin' && !skillSealedMe('感叹号') && gameState
+        .enemyHand.length > 0) {
+        var _sc = gameState.enemyHand.splice(Math.floor(Math.random() * gameState.enemyHand.length), 1)[0];
+        gameState.myHand.push(_sc);
+        log('❗ 【感叹号】你获得敌人一张手牌');
+      }
       if (gameState.heroId === 'wangsheng' && !skillSealedMe('狂骨')) {
         if (gameState.myHp < gameState.myMaxHp) {
           gameState.myHp = Math.min(gameState.myMaxHp, gameState.myHp + 1);
@@ -31353,6 +31570,13 @@ sync2v2State();
         },
         myBeans: hero.id === 'sunjiayuan' ? 3 : 0,
         enemyBeans: eh.id === 'sunjiayuan' ? 3 : 0,
+        myMaya: 0,
+        enemyMaya: 0,
+        wenhaoTarget: hero.id === 'sunxinxin' ? 'enemy' : (eh.id === 'sunxinxin' ? 'me' : null),
+        myShenglueUsed: false,
+        enemyShenglueUsed: false,
+        _shenglueMark: null,
+        _shenglueSnap: null,
         myCixinHeal: 0,
         myUsedCixinDmg: false,
         myUsedDounai: false,
@@ -31769,6 +31993,11 @@ sync2v2State();
 
     function playerLoseCard(card, reason) {
       if (reason === 'play' && !gameOver && gameState.isMyTurn && _turnTimerInt) startTurnTimer();
+      if (reason === 'play' && gameState.heroId === 'sunxinxin' && !skillSealedMe('我的妈呀') && card && (isKill(card) ||
+          isBasicEffect(card.effect))) {
+        gameState.myMaya = (gameState.myMaya || 0) + 1;
+        log('😱 【我的妈呀】使用' + card.name + '，+1层妈呀(共' + gameState.myMaya + ')');
+      }
       if (gameState.heroId === 'wangsheng' && !skillSealedMe('武魂') && isKill(card) && (reason === 'play' || reason === 'discard')) {
         drawCard('me', 2);
         log('👻 【武魂】摸两张');
@@ -31780,6 +32009,11 @@ sync2v2State();
     }
 
     function enemyLoseCard(card, reason) {
+      if (reason === 'play' && gameState.enemyHeroId === 'sunxinxin' && !skillSealedEnemy('我的妈呀') && card && (isKill(
+          card) || isBasicEffect(card.effect))) {
+        gameState.enemyMaya = (gameState.enemyMaya || 0) + 1;
+        log('😱 敌【我的妈呀】+1层妈呀(共' + gameState.enemyMaya + ')');
+      }
       if (gameState.enemyHeroId === 'wangsheng' && !skillSealedEnemy('武魂') && isKill(card) && (reason === 'play' || reason === 'discard')) {
         drawCard('enemy', 2);
         log('👻 敌人【武魂】摸两张');
@@ -34109,6 +34343,124 @@ sync2v2State();
       renderBattle();
     }
 
+    // ============ 孙昕昕技能 ============
+    function sunxinxinCollectFlags() {
+      var m = {};
+      for (var k in gameState) {
+        if (/^(enemyHasUsed|hasUsed|myUsed|enemyUsed|used)/.test(k) && gameState[k]) m[k] = 1;
+      }
+      return m;
+    }
+
+    function sunxinxinDiffFlags(snap) {
+      for (var k in gameState) {
+        if (/^(enemyHasUsed|hasUsed|myUsed|enemyUsed|used)/.test(k) && gameState[k] && !snap[k]) return true;
+      }
+      return false;
+    }
+
+    function useSkill_WoDeMaya() {
+      if (!gameState.isMyTurn || gameState.phase !== 'play' || gameState.isProcessing) return;
+      if (skillSealedMe('我的妈呀')) {
+        alert('【我的妈呀】已被封禁');
+        return;
+      }
+      var maxX = Math.min(gameState.myMaya || 0, gameState.myHand.length);
+      if (maxX < 1) return;
+      var picks = [];
+      for (var x = 1; x <= maxX && x <= 5; x++) picks.push(x);
+      if (picks.indexOf(maxX) === -1) picks.push(maxX);
+      var btns = picks.map(function(xn) {
+        return {
+          text: '消耗' + xn + '层',
+          color: xn === maxX ? '#e67e22' : '#7f8c8d',
+          action: function() {
+            closeModal();
+            gameState.myMaya -= xn;
+            startForcedDiscard(xn, '😱【我的妈呀】请选择' + xn + '张牌重铸', function(cards) {
+              cards.forEach(function(c) {
+                discardCard(c);
+                playerLoseCard(c, 'discard');
+              });
+              drawCard('me', xn);
+              log('😱 【我的妈呀】消耗' + xn + '层，重铸' + xn + '张并摸' + xn + '张');
+              renderBattle();
+            });
+          }
+        };
+      });
+      btns.push({
+        text: '取消',
+        color: '#95a5a6',
+        action: closeModal
+      });
+      showModal('😱 我的妈呀', '当前 ' + (gameState.myMaya || 0) + ' 层【妈呀】。选择消耗层数：消耗X层，重铸X张牌并摸X张牌',
+        btns);
+    }
+
+    // 省略号效果（target: 'enemy'/'me'；isRepeat=重复效果不再挂标记）
+    function applyShenglue1v1(target, isRepeat) {
+      if (!isRepeat && !gameOver) {
+        // 先打快照：效果生效期间目标连锁触发的技能（如受伤摸牌）都算
+        gameState._shenglueMark = target;
+        gameState._shenglueSnap = sunxinxinCollectFlags();
+      }
+      if (target === 'enemy') {
+        var n = gameState.enemyHand.length;
+        gameState.enemyHand.forEach(function(c) {
+          discardCard(c);
+        });
+        gameState.enemyHand = [];
+        gameState._maojiaoEnemy = true;
+        log('💬 【省略号】敌人弃置所有手牌(' + n + '张)，跳过下次摸牌与出牌阶段');
+        renderBattle();
+        dealDamageToEnemy(1);
+      } else {
+        var n2 = gameState.myHand.length;
+        gameState.myHand.forEach(function(c) {
+          discardCard(c);
+          playerLoseCard(c, 'discard');
+        });
+        gameState.myHand = [];
+        gameState.skipDraw = true;
+        gameState.skipPlay = true;
+        log('💬 敌【省略号】你弃置所有手牌(' + n2 + '张)，跳过下次摸牌与出牌阶段');
+        renderBattle();
+        var dead = takeDamage('me', 1);
+        if (dead) return;
+      }
+      if (!isRepeat && !gameOver) {
+        // 连锁判定：效果结算后若目标因本次效果触发了技能，1.8秒后重复一次
+        var markAtSet = target;
+        setTimeout(function() {
+          if (gameOver || gameState._shenglueMark !== markAtSet || !gameState._shenglueSnap) return;
+          var fired = sunxinxinDiffFlags(gameState._shenglueSnap);
+          gameState._shenglueMark = null;
+          gameState._shenglueSnap = null;
+          if (fired) {
+            log('💬 【省略号】目标因本次效果触发了技能，重复效果！');
+            applyShenglue1v1(markAtSet, true);
+          }
+        }, 1800);
+      }
+    }
+
+    function useSkill_Shenglue() {
+      if (!gameState.isMyTurn || gameState.phase !== 'play' || gameState.isProcessing) return;
+      if (!cons4On('sunxinxin')) return;
+      if (gameState.myShenglueUsed) {
+        alert('【省略号】每局游戏限一次');
+        return;
+      }
+      if (skillSealedMe('省略号')) {
+        alert('【省略号】已被封禁');
+        return;
+      }
+      gameState.myShenglueUsed = true;
+      applyShenglue1v1('enemy', false);
+    }
+
+    // startForcedDiscard 原函数保留在下方
     function startForcedDiscard(count, tip, onDone) {
       gameState._forcedDiscard = {
         count: count,
@@ -34404,8 +34756,9 @@ sync2v2State();
                       drawCard('me', 4 + _cons2);
                       log('🐉【大胃袋·方片】摸' + (4 + _cons2));
                     } else {
-                      drawCard('me', 2 + _cons2);
-                      log('📚 摸' + (2 + _cons2) + (_cons2 ? '(命星+1)' : ''));
+                      var _whCut = gameState.wenhaoTarget === 'me' ? 1 : 0;
+                      drawCard('me', 2 + _cons2 - _whCut);
+                      log('📚 摸' + (2 + _cons2 - _whCut) + (_cons2 ? '(命星+1)' : '') + (_whCut ? ' ❓【问号】-1' : ''));
                     }
                   }
                   
@@ -34600,6 +34953,14 @@ sync2v2State();
       gameState.enemyQixinDamageBonus = 0;
       gameState.skipDraw = false;
       gameState.skipPlay = false;
+      // 敌方AI：省略号（命星4层限定技）
+      if (gameState.enemyHeroId === 'sunxinxin' && cons4On('sunxinxin', 'enemy') && !gameState.enemyShenglueUsed &&
+        !gameOver && gameState.myHand.length >= 2) {
+        gameState.enemyShenglueUsed = true;
+        log('🤖 敌【省略号】发动！');
+        applyShenglue1v1('me', false);
+        if (gameOver || gameState.myHp <= 0) return;
+      }
       // 猫叫（命星4层）：敌人被跳过下个摸牌与出牌阶段
       if (gameState._maojiaoEnemy) {
         gameState._maojiaoEnemy = false;
@@ -34735,14 +35096,28 @@ sync2v2State();
                         drawCard('enemy', 4);
                         log('🐉 敌【大胃袋·方片】摸4');
                       } else {
-                        drawCard('enemy', 2 + (AI_CONS_LEVEL >= 2 ? 1 : 0));
-                        log('📚 敌摸' + (2 + (AI_CONS_LEVEL >= 2 ? 1 : 0)));
+                        var _whCutE = gameState.wenhaoTarget === 'enemy' ? 1 : 0;
+                        drawCard('enemy', 2 + (AI_CONS_LEVEL >= 2 ? 1 : 0) - _whCutE);
+                        log('📚 敌摸' + (2 + (AI_CONS_LEVEL >= 2 ? 1 : 0) - _whCutE) + (_whCutE ? ' ❓【问号】-1' : ''));
                       }
                     }
 
                     if (gameState.enemyHeroId === 'chensicong' && !skillSealedEnemy('弹药箱') && gameState.enemyHand.length === 0) {
                       drawCard('enemy', 2);
                       log('📦 敌【弹药箱】无手牌，摸2张');
+                    }
+                    // 敌方AI：我的妈呀（≥2层且有手牌时重铸）
+                    if (gameState.enemyHeroId === 'sunxinxin' && !skillSealedEnemy('我的妈呀') && (gameState.enemyMaya || 0) >= 2 &&
+                      gameState.enemyHand.length >= 2 && !gameOver) {
+                      var _mx = Math.min(gameState.enemyMaya, gameState.enemyHand.length, 4);
+                      gameState.enemyMaya -= _mx;
+                      for (var _mi = 0; _mi < _mx; _mi++) {
+                        var _mc = gameState.enemyHand.splice(Math.floor(Math.random() * gameState.enemyHand.length), 1)[0];
+                        discardCard(_mc);
+                      }
+                      drawCard('enemy', _mx);
+                      log('😱 敌【我的妈呀】消耗' + _mx + '层，重铸' + _mx + '张并摸' + _mx + '张');
+                      renderBattle();
                     }
                     enemyPlayPhase();
                   });
@@ -36616,7 +36991,17 @@ sync2v2State();
         });
         return;
       }
+      if (gameState.wenhaoTarget === 'me' && gameState.enemyHeroId === 'sunxinxin' && !skillSealedEnemy('感叹号')) {
+        dmg += 1;
+        log('❗ 敌【感叹号】对【问号】拥有者(你)伤害+1');
+      }
       var dead = takeDamage('me', dmg);
+      if (!dead && gameState.wenhaoTarget === 'me' && gameState.enemyHeroId === 'sunxinxin' && !skillSealedEnemy('感叹号') &&
+        gameState.myHand.length > 0) {
+        var _sc2 = gameState.myHand.splice(Math.floor(Math.random() * gameState.myHand.length), 1)[0];
+        gameState.enemyHand.push(_sc2);
+        log('❗ 敌【感叹号】获得你一张手牌');
+      }
       gameState.isProcessing = false;
       renderBattle();
       if (dead) {
