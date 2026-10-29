@@ -1,5 +1,5 @@
 /* 面包杀 Service Worker：静态资源缓存优先，网络兜底，支持离线游玩 */
-var CACHE_NAME = 'mianbaosha-v2';
+var CACHE_NAME = 'mianbaosha-v4';
 
 var CORE_ASSETS = [
   './index.html',
