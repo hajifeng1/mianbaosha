@@ -1,5 +1,5 @@
 /* 面包杀 Service Worker：静态资源缓存优先，网络兜底，支持离线游玩 */
-var CACHE_NAME = 'mianbaosha-v4';
+var CACHE_NAME = 'mianbaosha-v16';
 
 var CORE_ASSETS = [
   './index.html',
@@ -10,7 +10,9 @@ var CORE_ASSETS = [
   './start-bg.jpg',
   './home-background.jpg',
   './登录界面背景图.jpg',
-  './1.mp4'
+  './1.mp4',
+  './麦田流星与面包.mp4',
+  './麦田流星与面包.png'
 ];
 
 self.addEventListener('install', function(e) {
