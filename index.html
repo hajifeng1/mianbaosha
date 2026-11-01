@@ -10955,7 +10955,162 @@ Resources:`;
       padding-bottom: env(safe-area-inset-bottom)
     }
 
-    
+    .summon-fab {
+      position: fixed;
+      right: 14px;
+      bottom: calc(74px + env(safe-area-inset-bottom));
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      border: 2px solid #ffd700;
+      background: radial-gradient(circle at 30% 30%, #f7d774, #c0392b 75%);
+      box-shadow: 0 4px 16px rgba(0,0,0,.55), 0 0 14px rgba(255,215,0,.35);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      cursor: pointer;
+      z-index: 60;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      line-height: 1.25;
+      animation: fab-breathe 2.6s ease-in-out infinite;
+    }
+    .summon-fab .fab-ic { font-size: 20px; }
+    @keyframes fab-breathe {
+      0%,100% { transform: scale(1); }
+      50% { transform: scale(1.07); }
+    }
+
+    /* 召唤全屏动画层（招募动画.mp4，可跳过） */
+    #summon-anim {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      background: #000;
+      align-items: center;
+      justify-content: center;
+    }
+    #summon-anim video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #000;
+    }
+    .summon-loading {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: rgba(255, 255, 255, .8);
+      font-size: 14px;
+      letter-spacing: 2px;
+    }
+    .sl-spin {
+      width: 22px;
+      height: 22px;
+      border: 3px solid rgba(255, 255, 255, .25);
+      border-top-color: #f1c40f;
+      border-radius: 50%;
+      animation: sl-rot 0.9s linear infinite;
+    }
+    @keyframes sl-rot {
+      to { transform: rotate(360deg); }
+    }
+    .summon-skip {
+      position: absolute;
+      top: calc(env(safe-area-inset-top, 0px) + 16px);
+      right: 16px;
+      z-index: 100000;
+      padding: 8px 18px;
+      border: 1px solid rgba(255,255,255,.6);
+      border-radius: 20px;
+      background: rgba(0,0,0,.45);
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+      letter-spacing: 1px;
+    }
+
+    /* 恭喜获得动画 */
+    #gain-popup {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 99998;
+      background: rgba(0, 0, 0, .62);
+      align-items: center;
+      justify-content: center;
+    }
+    .gain-card-box {
+      background: linear-gradient(160deg, #3a2b12, #1e1508);
+      border: 2px solid #f1c40f;
+      border-radius: 16px;
+      padding: 22px 26px;
+      text-align: center;
+      box-shadow: 0 0 32px rgba(241, 196, 15, .55);
+      animation: gain-pop .45s cubic-bezier(.2, 1.6, .4, 1);
+      max-width: 86vw;
+    }
+    @keyframes gain-pop {
+      0% { transform: scale(.3); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .gain-title {
+      font-size: 20px;
+      font-weight: 900;
+      color: #f1c40f;
+      letter-spacing: 3px;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, .6);
+      margin-bottom: 14px;
+    }
+    .gain-items {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .gain-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      animation: gain-item-in .4s both;
+    }
+    .gain-item .gi-ic img { width: 40px; height: 40px; border-radius: 8px; }
+    .gain-item .gi-ic {
+      font-size: 36px;
+      filter: drop-shadow(0 0 8px rgba(241, 196, 15, .7));
+      animation: gain-bounce 1.2s ease-in-out infinite;
+    }
+    .gain-item .gi-nm { font-size: 12px; color: #eee; }
+    .gain-item .gi-ct { font-size: 13px; font-weight: bold; color: #f39c12; }
+    @keyframes gain-item-in {
+      0% { transform: translateY(14px) scale(.6); opacity: 0; }
+      100% { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    @keyframes gain-bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+    .gain-hint {
+      margin-top: 14px;
+      font-size: 11px;
+      color: rgba(255, 255, 255, .5);
+      letter-spacing: 1px;
+      animation: gain-hint-blink 1.4s ease-in-out infinite;
+    }
+    @keyframes gain-hint-blink {
+      0%, 100% { opacity: .45; }
+      50% { opacity: 1; }
+    }
+
+
     .lobby-body,
     .activity-body {
       display: flex;
@@ -13077,6 +13232,71 @@ Resources:`;
       font-size: 13px
     }
 
+    .music-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 180px;
+      overflow-y: auto;
+      padding: 4px 2px;
+      margin: -6px 0 4px 98px;
+      scrollbar-width: thin
+    }
+
+    .music-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #2c3e50;
+      border: 1px solid #4a6076;
+      border-radius: 8px;
+      padding: 6px 10px;
+      cursor: pointer;
+      transition: border-color .15s, background .15s
+    }
+
+    .music-item:hover {
+      background: #34495e
+    }
+
+    .music-item.on {
+      border-color: #f39c12;
+      background: #3d4f3a;
+      box-shadow: 0 0 8px rgba(243, 156, 18, .35)
+    }
+
+    .music-item-name {
+      flex: 1;
+      font-size: 13px;
+      color: #ecf0f1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .music-item.on .music-item-name::before {
+      content: '♪ ';
+      color: #f1c40f
+    }
+
+    .music-item-play {
+      flex-shrink: 0;
+      width: 30px;
+      height: 26px;
+      border-radius: 6px;
+      border: 1px solid #f39c12;
+      background: #233240;
+      color: #f1c40f;
+      font-size: 12px;
+      cursor: pointer;
+      line-height: 1
+    }
+
+    .music-item-play.playing {
+      background: #f39c12;
+      color: #2c3e50
+    }
+
     .equipment-tag {
       background: #f39c12;
       color: #2c3e50;
@@ -13881,7 +14101,8 @@ Resources:`;
       flex-shrink: 0
     }
 
-    .chat-input-bar input {
+    .chat-input-bar input,
+    .chat-input-bar textarea {
       flex: 1;
       min-width: 0;
       padding: 12px 14px;
@@ -13894,7 +14115,20 @@ Resources:`;
       box-sizing: border-box
     }
 
-    .chat-input-bar input:focus {
+    .chat-input-bar textarea {
+      resize: none;
+      line-height: 1.45;
+      font-family: inherit;
+      max-height: 130px;
+      overflow-y: auto;
+      padding: 10px 14px;
+      border-radius: 18px;
+      align-self: center;
+      display: block
+    }
+
+    .chat-input-bar input:focus,
+    .chat-input-bar textarea:focus {
       border-color: #f1c40f
     }
 
@@ -13915,6 +14149,114 @@ Resources:`;
     .chat-mode-btn:active {
       transform: scale(.97);
       opacity: .88
+    }
+
+    /* 聊天表情包系统 */
+    .chat-emoji-btn {
+      flex-shrink: 0;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 1px solid #555;
+      background: rgba(255, 255, 255, .08);
+      font-size: 20px;
+      cursor: pointer;
+      touch-action: manipulation;
+      align-self: center
+    }
+    .chat-emoji-btn.on {
+      border-color: #f1c40f;
+      background: rgba(241, 196, 15, .18)
+    }
+    .chat-sticker-panel {
+      flex-shrink: 0;
+      max-height: 240px;
+      overflow-y: auto;
+      background: rgba(10, 10, 14, .96);
+      border-top: 1px solid #444;
+      padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+      -webkit-overflow-scrolling: touch
+    }
+    .csp-section-title {
+      font-size: 11px;
+      color: #95a5a6;
+      margin: 4px 0 6px
+    }
+    .csp-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px
+    }
+    .csp-emoji {
+      width: 40px;
+      height: 40px;
+      font-size: 24px;
+      border: 1px solid #444;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .06);
+      cursor: pointer;
+      touch-action: manipulation
+    }
+    .csp-emoji:active { background: rgba(241, 196, 15, .25); }
+    .csp-custom-grid { min-height: 40px; }
+    .csp-custom {
+      width: 64px;
+      height: 64px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid #555;
+      cursor: pointer;
+      touch-action: manipulation;
+      background: #222
+    }
+    .csp-custom:active { border-color: #f1c40f; }
+    .csp-empty {
+      width: 100%;
+      font-size: 12px;
+      color: #7f8c8d;
+      text-align: center;
+      padding: 8px 0;
+      line-height: 1.7
+    }
+    .csp-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+    .csp-upload {
+      padding: 8px 14px;
+      border: 1px dashed #f1c40f;
+      border-radius: 8px;
+      background: rgba(241, 196, 15, .1);
+      color: #f1c40f;
+      font-size: 13px;
+      cursor: pointer;
+      touch-action: manipulation
+    }
+    .csp-hint { font-size: 11px; color: #7f8c8d; }
+    .chat-sticker-img {
+      display: block;
+      max-width: 200px;
+      max-height: 200px;
+      border-radius: 10px
+    }
+    .chat-sticker-emoji { font-size: 42px; line-height: 1.2; }
+    .chat-toast {
+      display: none;
+      position: fixed;
+      left: 50%;
+      bottom: 180px;
+      transform: translateX(-50%);
+      z-index: 99997;
+      background: rgba(0, 0, 0, .82);
+      color: #fff;
+      border: 1px solid rgba(241, 196, 15, .5);
+      border-radius: 20px;
+      padding: 8px 18px;
+      font-size: 13px;
+      transition: opacity .3s;
+      pointer-events: none
     }
 
     .chat-body {
@@ -15159,6 +15501,7 @@ Resources:`;
       </div>
         </div>
       </div>
+      <button class="summon-fab" onclick="openSummonPage()"><span class="fab-ic">🍞</span><span>召唤</span></button>
     </div>
     <div id="arena-enemy-page" class="page">
       <div class="arena-enemy-body">
@@ -15261,6 +15604,13 @@ Resources:`;
             onclick="bbConfirm()">确认</button></div>
       </div>
     </div>
+    <div id="summon-page" class="page">
+      <div class="heroes-header"><button class="btn-back" onclick="closeSummonPage()">← 返回</button>
+        <h2>🍞 面包召唤</h2>
+        <div class="shop-coins" style="color:#e67e22;">🌾 <span id="summon-honey-num">0</span></div>
+      </div>
+      <div id="summon-content" style="flex:1;overflow-y:auto;padding:0 16px 20px;-webkit-overflow-scrolling:touch;"></div>
+    </div>
     <div id="bag-page" class="page">
       <div class="heroes-header"><button class="btn-back" onclick="closeSubPage('bag-page')">← 返回</button>
         <h2>🎒 背包</h2>
@@ -15294,14 +15644,28 @@ Resources:`;
           <div class="chat-status" id="chat-status">准备加载...</div>
           <div class="chat-messages" id="chat-messages"></div>
           <div class="chat-input-bar">
-            <input type="text" id="chat-input" maxlength="500" placeholder="说点什么..." autocomplete="off">
-            <button class="chat-send-btn" onclick="sendChatMessage()">发送</button>
+            <textarea id="chat-input" rows="1" maxlength="500" placeholder="说点什么..." autocomplete="off"></textarea>
+            <button class="chat-emoji-btn" id="chat-emoji-btn" onclick="toggleStickerPanel()">😀</button>
+            <button class="chat-send-btn" id="chat-send-btn" onclick="sendChatMessage()">发送</button>
+          </div>
+          <div class="chat-sticker-panel" id="chat-sticker-panel" style="display:none;">
+            <div class="csp-section-title">常用表情 · 点一下插入输入框</div>
+            <div class="csp-grid" id="csp-emoji-grid"></div>
+            <div class="csp-section-title">我的表情 · 点一下直接发送 · 长按可删除</div>
+            <div class="csp-grid csp-custom-grid" id="csp-custom-grid"></div>
+            <div class="csp-actions">
+              <button class="csp-upload" onclick="triggerStickerUpload()">＋ 上传图片制作表情</button>
+              <span class="csp-hint">图片自动缩小 · 最多 24 个</span>
+            </div>
           </div>
         </div>
       </div>
     </div>
     <input type="file" id="avatar-file-input" accept="image/*" style="display:none"
       onchange="handleAvatarFileSelected(event)">
+    <input type="file" id="sticker-file-input" accept="image/*" style="display:none"
+      onchange="handleStickerFileSelected(event)">
+    <div class="chat-toast" id="chat-toast"></div>
     <div id="level-page" class="page">
       <div class="heroes-header"><button class="btn-back" onclick="closeSubPage('level-page')">← 返回</button>
         <h2>🗺️ 主线关卡</h2>
@@ -15418,13 +15782,26 @@ Resources:`;
       <div class="set-row"><span class="set-label">🔇 静音</span><input type="checkbox" id="set-mute" onchange="onSetMute(this.checked)"></div>
       <div class="set-row"><span class="set-label">🔅 画面亮度</span><input type="range" id="set-brightness" min="60" max="130" step="5" oninput="onSetBrightness(this.value)"><b class="set-val" id="set-brightness-num">100%</b></div>
       <div class="set-row"><span class="set-label">💥 战斗特效</span><input type="checkbox" id="set-battlefx" onchange="onSetBattleFx(this.checked)" checked><span class="set-hint">受击晃动/血印/治疗光环</span></div>
-      <div class="set-row"><span class="set-label">🎵 主页音乐</span><select id="set-lobby-music" onchange="onSetLobbyMusic(this.value)"></select></div>
-      <div class="set-row"><span class="set-label">⚔️ 战斗音乐</span><select id="set-battle-music" onchange="onSetBattleMusic(this.value)"></select></div>
+      <div class="set-row" style="margin-bottom:2px;"><span class="set-label" style="color:#f1c40f;">🎵 主页音乐</span><span class="set-hint">点歌曲名选择 · 点 ▶ 试听</span></div>
+      <div class="music-list" id="set-lobby-music-list"></div>
+      <div class="set-row" style="margin-bottom:2px;"><span class="set-label" style="color:#f1c40f;">⚔️ 战斗音乐</span><span class="set-hint">点歌曲名选择 · 点 ▶ 试听</span></div>
+      <div class="music-list" id="set-battle-music-list"></div>
       <div style="text-align:center;margin-top:14px;"><button class="action-btn" onclick="closeSettings()">关 闭</button></div>
     </div>
   </div>
   <audio id="lobby-bgm" loop preload="auto" src="Salder4cash - 【FREE】lucky.mp3"></audio>
   <audio id="battle-bgm" loop preload="none"></audio>
+  <div id="summon-anim">
+    <video id="summon-anim-video" src="麦田流星与面包.mp4" poster="麦田流星与面包.png" playsinline webkit-playsinline preload="auto" onended="finishSummonAnim()" onerror="finishSummonAnim()"></video>
+    <div class="summon-loading" id="summon-loading"><span class="sl-spin"></span>动画加载中…</div>
+  </div>
+  <div id="gain-popup" onclick="closeGainAnim()">
+    <div class="gain-card-box" onclick="event.stopPropagation()">
+      <div class="gain-title">🎉 恭喜获得</div>
+      <div class="gain-items" id="gain-items"></div>
+      <div class="gain-hint" id="gain-hint">点击任意处关闭</div>
+    </div>
+  </div>
   <script>
     
     // ============ 出场视频（进入起始界面前播放，每个会话一次，可跳过） ============
@@ -15543,6 +15920,38 @@ Resources:`;
       id: 'jiahao',
       name: '嘉豪进行曲',
       file: 'N2UtheHartlocker - †TAKEDISKRUSH!†（嘉豪进行曲）.mp3'
+    }, {
+      id: 'xinghe',
+      name: '星河追梦',
+      file: '三角洲行动 - 星河追梦.mp3'
+    }, {
+      id: 'summer',
+      name: 'In The Summer',
+      file: 'David Stephen Goldsmith,Andrew Michael Britton,Wayne Anthony Murray - In The Summer.mp3'
+    }, {
+      id: 'paradise',
+      name: 'The Other Side Of Paradise',
+      file: 'Reverse - The Other Side Of Paradise.mp3'
+    }, {
+      id: 'fear',
+      name: 'THE FEAR（无惧）',
+      file: '三角洲行动,Charlotte Churchman - THE FEAR (无惧).mp3'
+    }, {
+      id: 'guiling',
+      name: 'GOT YOU（归零）',
+      file: '三角洲行动,Lana Mel.,汪晨蕊 - GOT YOU (归零).mp3'
+    }, {
+      id: 'dawn',
+      name: 'Dawn（黎明将至）',
+      file: '三角洲行动,Lithium Done - Dawn（黎明将至）（《三角洲行动》红狼蚀金玫瑰皮肤主题曲）.mp3'
+    }, {
+      id: 'spotlight',
+      name: 'SPOTLIGHT HUNTER',
+      file: '三角洲行动,SIENA - SPOTLIGHT HUNTER.mp3'
+    }, {
+      id: 'kamimani',
+      name: '神のまにまに',
+      file: '初音ミク,鏡音リン,GUMI - 神のまにまに.mp3'
     }];
 
     function ensureBgmSrc(el, musicId) {
@@ -15555,6 +15964,80 @@ Resources:`;
         el.src = t.file;
         el.load();
       }
+    }
+
+    // 音乐试听预览（设置面板里点 ▶ 播放，再点停止；试听时暂停大厅/战斗BGM）
+    var previewAudio = null;
+    var previewBtn = null;
+
+    function stopMusicPreview(resumeBgm) {
+      if (previewAudio) {
+        try {
+          previewAudio.pause();
+        } catch (e) {}
+        previewAudio = null;
+      }
+      if (previewBtn) {
+        previewBtn.classList.remove('playing');
+        previewBtn.innerText = '▶';
+        previewBtn = null;
+      }
+      if (resumeBgm) {
+        try {
+          syncLobbyBgm();
+        } catch (e) {}
+      }
+    }
+
+    function previewMusic(musicId, btn) {
+      var t = null;
+      MUSIC_LIB.forEach(function(m) {
+        if (m.id === musicId) t = m;
+      });
+      if (!t) return;
+      if (previewAudio && previewBtn === btn) {
+        stopMusicPreview(true);
+        return;
+      }
+      stopMusicPreview(false);
+      var a = new Audio();
+      a.src = t.file;
+      a.volume = SETTINGS.muted ? 0 : SETTINGS.volume / 100;
+      previewAudio = a;
+      previewBtn = btn;
+      btn.classList.add('playing');
+      btn.innerText = '⏸';
+      try {
+        var lb = getLobbyBgmEl();
+        if (lb) lb.pause();
+        var be = document.getElementById('battle-bgm');
+        if (be) be.pause();
+      } catch (e) {}
+      a.addEventListener('ended', function() {
+        stopMusicPreview(true);
+      });
+      a.addEventListener('error', function() {
+        stopMusicPreview(true);
+      });
+      var pr = a.play();
+      if (pr && pr.catch) pr.catch(function() {
+        stopMusicPreview(true);
+      });
+    }
+
+    function buildMusicListHtml(kind) {
+      var h = '';
+      var cur = kind === 'lobby' ? SETTINGS.lobbyMusic : SETTINGS.battleMusic;
+      var fn = kind === 'lobby' ? 'onSetLobbyMusic' : 'onSetBattleMusic';
+      MUSIC_LIB.forEach(function(m) {
+        h += '<div class="music-item' + (cur === m.id ? ' on' : '') + '" onclick="' + fn + '(\'' + m.id +
+          '\')">' +
+          '<span class="music-item-name">' + m.name + '</span>' +
+          '<button class="music-item-play" onclick="event.stopPropagation();previewMusic(\'' + m.id +
+          '\',this)">▶</button>' +
+          '</div>';
+      });
+      return h;
     }
 
     function syncLobbyBgm() {
@@ -15623,7 +16106,8 @@ Resources:`;
       brightness: 100,
       battleFx: true,
       lobbyMusic: 'lucky',
-      battleMusic: 'jiahao'
+      battleMusic: 'jiahao',
+      skipSummonAnim: false
     };
     try {
       var _st = JSON.parse(localStorage.getItem('mb_settings_v1') || 'null');
@@ -15655,24 +16139,10 @@ Resources:`;
       if (bn) bn.innerText = SETTINGS.brightness + '%';
       var fEl = document.getElementById('set-battlefx');
       if (fEl) fEl.checked = SETTINGS.battleFx !== false;
-      var lm = document.getElementById('set-lobby-music');
-      if (lm) {
-        var lh = '';
-        MUSIC_LIB.forEach(function(m) {
-          lh += '<option value="' + m.id + '"' + (SETTINGS.lobbyMusic === m.id ? ' selected' : '') + '>' + m.name +
-            '</option>';
-        });
-        lm.innerHTML = lh;
-      }
-      var bm = document.getElementById('set-battle-music');
-      if (bm) {
-        var bh2 = '';
-        MUSIC_LIB.forEach(function(m) {
-          bh2 += '<option value="' + m.id + '"' + (SETTINGS.battleMusic === m.id ? ' selected' : '') + '>' + m
-            .name + '</option>';
-        });
-        bm.innerHTML = bh2;
-      }
+      var lm = document.getElementById('set-lobby-music-list');
+      if (lm) lm.innerHTML = buildMusicListHtml('lobby');
+      var bm = document.getElementById('set-battle-music-list');
+      if (bm) bm.innerHTML = buildMusicListHtml('battle');
       applyBrightness();
       var be = getLobbyBgmEl();
       if (be) be.volume = SETTINGS.muted ? 0 : SETTINGS.volume / 100;
@@ -15684,6 +16154,7 @@ Resources:`;
     }
 
     function closeSettings() {
+      stopMusicPreview(true);
       closeModalEl('settings-modal');
     }
 
@@ -15717,12 +16188,16 @@ Resources:`;
     function onSetLobbyMusic(v) {
       SETTINGS.lobbyMusic = v;
       saveSettings();
+      var lm = document.getElementById('set-lobby-music-list');
+      if (lm) lm.innerHTML = buildMusicListHtml('lobby');
       syncLobbyBgm();
     }
 
     function onSetBattleMusic(v) {
       SETTINGS.battleMusic = v;
       saveSettings();
+      var bm = document.getElementById('set-battle-music-list');
+      if (bm) bm.innerHTML = buildMusicListHtml('battle');
       syncLobbyBgm();
     }
 
@@ -16559,6 +17034,11 @@ Resources:`;
           userProfile.yuanbao = typeof d.yuanbao === 'number' ? d.yuanbao : 0;
           userProfile.jianghun = typeof d.jianghun === 'number' ? d.jianghun : 0;
           userProfile.recruitPity = typeof d.recruitPity === 'number' ? d.recruitPity : 0;
+          userProfile.summonPity = typeof d.summonPity === 'number' ? d.summonPity : 0;
+          userProfile.flourDaily = (typeof d.flourDaily === 'object' && d.flourDaily !== null) ? d.flourDaily : {
+            date: '',
+            count: 0
+          };
           userProfile.signInLast = typeof d.signInLast === 'string' ? d.signInLast : '';
           userProfile.signInStreak = typeof d.signInStreak === 'number' ? d.signInStreak : 0;
           userProfile.festival = (typeof d.festival === 'object' && d.festival !== null) ? d.festival : {
@@ -19244,6 +19724,13 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
       price: 300,
       currency: 'coins',
       desc: '下一次主线胜利获得的金币翻倍（+200），生效后自动消失。'
+    }, {
+      id: 'mianfen',
+      name: '面粉',
+      icon: '🌾',
+      price: 50,
+      currency: 'yuanbao',
+      desc: '面包召唤专用道具。在主页右下角的「面包召唤」中消耗，每50次必得一名武将。每日限购100个。'
     }];
 
     function isShopExclusiveHero(id) {
@@ -19621,6 +20108,9 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
     function renderChatMessages() {
       var box = document.getElementById('chat-messages');
       if (!box) return;
+      var eb0 = document.getElementById('chat-emoji-btn');
+      if (eb0) eb0.style.display = chatMode === 'feedback' ? 'none' : '';
+      if (chatMode === 'feedback' && _stickerPanelOpen) toggleStickerPanel(false);
       var rows = chatMode === 'feedback' ? feedbackMessages : (chatMode === 'dm' ? dmMessages : chatMessages);
       if (!rows.length) {
         box.innerHTML = '<div class="chat-empty">' + (chatMode === 'feedback' ?
@@ -19640,8 +20130,12 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
         else if (chatMode === 'dm') expiry = '<div class="chat-expiry">🔒 私聊 · 仅你们两人可见</div>';
         else expiry = '<div class="chat-expiry">🔒 仅开发者可见' + (isChatAdmin() && !own ? ' · 玩家反馈' : '') +
           '</div>';
+        var stk = parseStickerToken(m.content);
+        var contentHtml = stk ? (stk.type === 'img' ?
+          '<img class="chat-sticker-img" src="' + stk.src + '" alt="表情">' :
+          '<span class="chat-sticker-emoji">' + stk.emoji + '</span>') : esc(m.content);
         html += '<div class="' + cls + '"><div class="chat-meta"><span class="chat-author">' + author +
-          '</span><span class="chat-time">' + time + '</span></div><div class="chat-content">' + esc(m.content) +
+          '</span><span class="chat-time">' + time + '</span></div><div class="chat-content">' + contentHtml +
           '</div>' + expiry + '</div>';
       });
       box.innerHTML = html;
@@ -19846,7 +20340,7 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
       dmMessages.push(msg);
       dmMessages.sort(sortChatAsc);
       renderChatMessages();
-      if (input) input.value = '';
+      clearChatInput();
       setChatStatus('发送中...');
       var res = await safeQuery(sb.from(DM_TABLE).insert({
         from_id: currentUserId,
@@ -19860,7 +20354,12 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
           return String(m.id) !== String(localId);
         });
         renderChatMessages();
-        setChatStatus('私聊发送失败：' + ((res.error && res.error.message) || '网络错误'), 'warn');
+        var emsg2 = String((res.error && (res.error.message || res.error.code)) || '网络错误');
+        if (/too long|too_large|value too long|22001|payload|check constraint/i.test(emsg2)) {
+          setChatStatus('表情图片过大被服务器拒绝（数据库长度限制），请让开发者执行 drop constraint SQL 扩容', 'error');
+        } else {
+          setChatStatus('私聊发送失败：' + emsg2, 'warn');
+        }
       } else {
         var nm = normalizeDmMessage(res.data);
         nm.user_id = currentUserId;
@@ -20028,15 +20527,17 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
       }
     }
 
-    async function sendChatMessage() {
+    async function sendChatMessage(opts) {
+      opts = opts || {};
       var input = document.getElementById('chat-input');
       if (!input) return;
-      var content = input.value.trim();
+      var isSticker = !!opts.sticker;
+      var content = opts.content !== undefined ? String(opts.content) : input.value.trim();
       if (!content) {
-        setChatStatus('请输入内容', 'warn');
+        if (!isSticker) setChatStatus('请输入内容', 'warn');
         return;
       }
-      if (content.length > 500) content = content.slice(0, 500);
+      if (!isSticker && content.length > 500) content = content.slice(0, 500);
       if (chatMode === 'feedback') {
         sendFeedbackMessage(content);
         return;
@@ -20051,7 +20552,7 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
           sender_name: getDisplayNickname(),
           content: content
         });
-        input.value = '';
+        clearChatInput();
         setChatStatus(isOfflineMode ? '离线消息已保存到本机' : '聊天服务未连接，消息已保存到本机', 'warn');
         return;
       }
@@ -20066,7 +20567,7 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
           expires_at: new Date(Date.now() + CHAT_TTL_MS).toISOString()
         });
       appendChatMessage(msg);
-      input.value = '';
+      clearChatInput();
       setChatStatus('发送中...');
       var res = await safeQuery(sb.from(CHAT_TABLE).insert({
         user_id: currentUserId,
@@ -20079,14 +20580,325 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
         chatMessages = chatMessages.filter(function(m) {
           return String(m.id) !== String(localId);
         });
-        chatRemoteAvailable = false;
-        saveLocalChatMessage(msg);
-        setChatStatus('发送失败，已保存到本机', 'warn');
+        var emsg = String((res.error && (res.error.message || res.error.code)) || '');
+        if (/too long|too_large|value too long|22001|payload|check constraint/i.test(emsg)) {
+          setChatStatus('表情图片过大被服务器拒绝（数据库长度限制），请让开发者执行 drop constraint SQL 扩容', 'error');
+        } else {
+          if (/failed to fetch|network|timeout|econn/i.test(emsg)) chatRemoteAvailable = false;
+          saveLocalChatMessage(msg);
+          setChatStatus('发送失败：' + (emsg ? String(emsg).slice(0, 120) : '未知错误') + '，已保存到本机', 'warn');
+        }
       } else {
         replaceChatMessage(localId, res.data);
         setChatStatus('已发送', 'ok');
       }
     }
+
+    // ============ 聊天表情包系统（微信式：表情插入输入框，自定义图片点按直接发） ============
+    var STICKER_BUILTINS = ['😂', '🤣', '😭', '😅', '🥹', '😡', '🤔', '😴', '🤯', '👍', '👎', '🙏', '👏', '💪', '❤️', '💔', '🎉', '🔥', '💀', '🍞', '🐝', '🌾'];
+    var STICKER_MAX_CUSTOM = 24;
+    var _stickerPanelOpen = false;
+    var _stkDeletedAt = 0;
+
+    function getCustomStickers() {
+      try {
+        var a = JSON.parse(localStorage.getItem('mb_custom_stickers') || '[]');
+        return Array.isArray(a) ? a : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveCustomStickers(a) {
+      try {
+        localStorage.setItem('mb_custom_stickers', JSON.stringify(a.slice(0, STICKER_MAX_CUSTOM)));
+      } catch (e) {}
+    }
+
+    function toggleStickerPanel(force) {
+      var p = document.getElementById('chat-sticker-panel');
+      var b = document.getElementById('chat-emoji-btn');
+      if (!p) return;
+      _stickerPanelOpen = force !== undefined ? force : !_stickerPanelOpen;
+      p.style.display = _stickerPanelOpen ? 'block' : 'none';
+      if (b) b.classList.toggle('on', _stickerPanelOpen);
+      if (_stickerPanelOpen) renderStickerPanel();
+    }
+
+    function renderStickerPanel() {
+      var g = document.getElementById('csp-emoji-grid');
+      if (g) {
+        var h = '';
+        STICKER_BUILTINS.forEach(function(em) {
+          h += '<button class="csp-emoji" onclick="insertEmojiToInput(this.innerText)">' + em + '</button>';
+        });
+        g.innerHTML = h;
+      }
+      var c = document.getElementById('csp-custom-grid');
+      if (c) {
+        var arr = getCustomStickers();
+        var h2 = '';
+        arr.forEach(function(src, i) {
+          h2 += '<img class="csp-custom" data-idx="' + i + '" src="' + src + '" onclick="sendCustomSticker(' + i +
+            ')" alt="表情">';
+        });
+        if (!arr.length) h2 = '<div class="csp-empty">还没有自定义表情<br>点下方按钮上传一张图片</div>';
+        c.innerHTML = h2;
+      }
+    }
+
+    function insertEmojiToInput(em) {
+      var input = document.getElementById('chat-input');
+      if (!input || !em) return;
+      var s = input.selectionStart !== undefined && input.selectionStart !== null ? input.selectionStart : input.value.length;
+      var e2 = input.selectionEnd !== undefined && input.selectionEnd !== null ? input.selectionEnd : s;
+      input.value = input.value.slice(0, s) + em + input.value.slice(e2);
+      var pos = s + em.length;
+      input.focus();
+      try {
+        input.setSelectionRange(pos, pos);
+      } catch (e) {}
+      syncChatSendBtn();
+      autoResizeChatInput();
+    }
+
+    function sendCustomSticker(idx) {
+      if (Date.now() - _stkDeletedAt < 400) return; // 刚长按删除，忽略随后的click
+      var arr = getCustomStickers();
+      if (!arr[idx]) return;
+      sendStickerContent('[sticker:' + arr[idx] + ']');
+    }
+
+    function deleteCustomSticker(idx) {
+      var arr = getCustomStickers();
+      if (!arr[idx]) return;
+      arr.splice(idx, 1);
+      saveCustomStickers(arr);
+      _stkDeletedAt = Date.now();
+      renderStickerPanel();
+      showChatToast('已删除该表情');
+    }
+
+    function triggerStickerUpload() {
+      var f = document.getElementById('sticker-file-input');
+      if (f) f.click();
+    }
+
+    function encodeStickerCanvas(img, max, quality) {
+      var w = img.width,
+        h = img.height;
+      if (w > max || h > max) {
+        var k = max / Math.max(w, h);
+        w = Math.max(1, Math.round(w * k));
+        h = Math.max(1, Math.round(h * k));
+      }
+      var cv = document.createElement('canvas');
+      cv.width = w;
+      cv.height = h;
+      cv.getContext('2d').drawImage(img, 0, 0, w, h);
+      return cv.toDataURL('image/jpeg', quality);
+    }
+
+    function handleStickerFileSelected(ev) {
+      var file = ev.target && ev.target.files && ev.target.files[0];
+      ev.target.value = '';
+      if (!file) return;
+      if (file.size > 8 * 1024 * 1024) {
+        showChatToast('图片不能超过 8MB');
+        return;
+      }
+      var reader = new FileReader();
+      reader.onload = function() {
+        var img = new Image();
+        img.onload = function() {
+          var dataUrl = encodeStickerCanvas(img, 180, 0.75);
+          if (dataUrl.length > 90000) dataUrl = encodeStickerCanvas(img, 120, 0.6);
+          var arr = getCustomStickers();
+          arr.unshift(dataUrl);
+          saveCustomStickers(arr);
+          renderStickerPanel();
+          showChatToast('表情已添加 ✓');
+        };
+        img.onerror = function() {
+          showChatToast('图片读取失败');
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function sendStickerContent(token) {
+      if (chatMode === 'feedback') {
+        showChatToast('反馈模式请用文字描述哦');
+        return;
+      }
+      await sendChatMessage({
+        sticker: true,
+        content: token
+      });
+      toggleStickerPanel(false);
+    }
+
+    function parseStickerToken(content) {
+      var s = String(content || '');
+      if (s.indexOf('[sticker:') !== 0 || s.charAt(s.length - 1) !== ']') return null;
+      var payload = s.slice(9, -1);
+      if (!payload) return null;
+      if (payload.indexOf('data:image') === 0) return {
+        type: 'img',
+        src: payload
+      };
+      return {
+        type: 'emoji',
+        emoji: payload
+      };
+    }
+
+    var _chatToastTimer = null;
+
+    function showChatToast(text) {
+      var t = document.getElementById('chat-toast');
+      if (!t) return;
+      t.innerText = text;
+      t.style.display = 'block';
+      t.style.opacity = '1';
+      clearTimeout(_chatToastTimer);
+      _chatToastTimer = setTimeout(function() {
+        t.style.opacity = '0';
+        setTimeout(function() {
+          t.style.display = 'none';
+        }, 300);
+      }, 1400);
+    }
+
+    function legacyCopyText(text) {
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0;';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      } catch (e) {}
+    }
+
+    function copyChatText(text) {
+      if (!text) return;
+      var done = function() {
+        showChatToast('已复制 📋');
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, function() {
+          legacyCopyText(text);
+          done();
+        });
+      } else {
+        legacyCopyText(text);
+        done();
+      }
+    }
+
+    // 发送按钮微信式：有内容才显示
+    function syncChatSendBtn() {
+      var input = document.getElementById('chat-input');
+      var btn = document.getElementById('chat-send-btn');
+      if (input && btn) btn.style.visibility = input.value.trim() ? 'visible' : 'hidden';
+    }
+
+    // 输入框自动变高（最多约5行，超出可滚动）
+    function autoResizeChatInput() {
+      var input = document.getElementById('chat-input');
+      if (!input || input.tagName !== 'TEXTAREA') return;
+      input.style.height = 'auto';
+      input.style.height = Math.min(input.scrollHeight, 130) + 'px';
+    }
+
+    function clearChatInput() {
+      var input = document.getElementById('chat-input');
+      if (!input) return;
+      input.value = '';
+      input.style.height = 'auto';
+      syncChatSendBtn();
+    }
+
+    // 消息复制：点击或长按（事件委托，只绑定一次）
+    (function initChatCopy() {
+      var box = document.getElementById('chat-messages');
+      if (!box) return;
+      var pressTimer = null,
+        moved = false,
+        pressFired = false,
+        target = null;
+
+      function doCopy(el) {
+        if (!el) return;
+        var c = el.querySelector('.chat-content');
+        if (!c) return;
+        if (c.querySelector('.chat-sticker-img')) {
+          showChatToast('图片表情不支持复制');
+          return;
+        }
+        var txt = c.innerText || '';
+        if (!txt.trim()) return;
+        copyChatText(txt);
+      }
+      box.addEventListener('pointerdown', function(e) {
+        var el = e.target && e.target.closest ? e.target.closest('.chat-message') : null;
+        if (!el) return;
+        moved = false;
+        pressFired = false;
+        target = el;
+        clearTimeout(pressTimer);
+        pressTimer = setTimeout(function() {
+          if (!moved && target) {
+            pressFired = true;
+            doCopy(target);
+          }
+        }, 500);
+      });
+      box.addEventListener('pointermove', function() {
+        moved = true;
+      });
+      box.addEventListener('pointerup', function() {
+        clearTimeout(pressTimer);
+      });
+      box.addEventListener('pointercancel', function() {
+        clearTimeout(pressTimer);
+      });
+      box.addEventListener('click', function(e) {
+        var el = e.target && e.target.closest ? e.target.closest('.chat-message') : null;
+        if (el && !moved && !pressFired) doCopy(el);
+      });
+    })();
+
+    // 自定义表情长按删除（事件委托，只绑定一次）
+    (function initStickerLongPress() {
+      var grid = document.getElementById('csp-custom-grid');
+      if (!grid) return;
+      var timer = null,
+        idx = -1,
+        moved = false;
+      grid.addEventListener('pointerdown', function(e) {
+        var t = e.target;
+        if (!t || t.tagName !== 'IMG') return;
+        idx = parseInt(t.getAttribute('data-idx') || '-1', 10);
+        moved = false;
+        clearTimeout(timer);
+        timer = setTimeout(function() {
+          if (!moved && idx >= 0) deleteCustomSticker(idx);
+        }, 550);
+      });
+      grid.addEventListener('pointermove', function() {
+        moved = true;
+      });
+      ['pointerup', 'pointerleave', 'pointercancel'].forEach(function(ev) {
+        grid.addEventListener(ev, function() {
+          clearTimeout(timer);
+        });
+      });
+    })();
 
     function isMissingFeedbackTableError(err) {
       var msg = ((err && err.message) || String(err || '')).toLowerCase();
@@ -20175,7 +20987,7 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
           sender_name: getDisplayNickname(),
           content: content
         });
-        document.getElementById('chat-input').value = '';
+        clearChatInput();
         setChatStatus('离线反馈已保存到本机', 'warn');
         return;
       }
@@ -20198,7 +21010,7 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
         if (!tableRes.error && tableRes.data) {
           feedbackRemoteMode = 'table';
           appendFeedbackMessage(tableRes.data);
-          document.getElementById('chat-input').value = '';
+          clearChatInput();
           setChatStatus('✅ 反馈已发送给开发者', 'ok');
           return;
         }
@@ -20279,8 +21091,16 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
       startChatSystem();
     }
 
+    document.getElementById('chat-input').addEventListener('input', function() {
+      syncChatSendBtn();
+      autoResizeChatInput();
+    });
+    syncChatSendBtn();
     document.getElementById('chat-input').addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') sendChatMessage();
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendChatMessage();
+      }
     });
     updateChatModeUI();
 
@@ -20624,23 +21444,32 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
       userProfile.signInLast = today;
       userProfile.signInStreak = day;
       try { saveProfileToCloud(); } catch (e) {}
-      var extra = '';
+      var _gainItems = [];
       try {
         if (rw.type === 'multi') {
           rw.parts.forEach(function(p) {
-            extra += grantSignInOne(p);
+            var ex = grantSignInOne(p);
+            var gi = _signInGainItem(p);
+            if (p.type === 'hero' && ex) {
+              if (ex.indexOf('命星') !== -1) gi = { icon: '⭐', name: '命星·' + _heroNameById(p.heroId), count: 1 };
+              else if (ex.indexOf('100 金币') !== -1) gi = { icon: '💰', name: '金币', count: 100 };
+            }
+            if (gi) _gainItems.push(gi);
           });
         } else {
-          extra = grantSignInOne(rw);
+          var ex2 = grantSignInOne(rw);
+          var gi2 = _signInGainItem(rw);
+          if (rw.type === 'hero' && ex2) {
+            if (ex2.indexOf('命星') !== -1) gi2 = { icon: '⭐', name: '命星·' + _heroNameById(rw.heroId), count: 1 };
+            else if (ex2.indexOf('100 金币') !== -1) gi2 = { icon: '💰', name: '金币', count: 100 };
+          }
+          if (gi2) _gainItems.push(gi2);
         }
-      } catch (e) {
-        extra = '\n⚠️ 部分奖励发放异常：' + e.message;
-      }
+      } catch (e) {}
       try { saveProfileToCloud(); } catch (e) {}
       try { updateLobbyRankUI(); } catch (e) {}
       try { renderSignIn(); } catch (e) {}
-      alert('🎉 签到成功！第 ' + day + ' 天' + (loop >= 1 ? '（第 ' + (loop + 1) + ' 轮）' : '') + '，获得 ' +
-        rw.label.replace(/<br\s*\/?>/gi, '、') + extra);
+      try { showGainAnim(_gainItems); } catch (e) {}
     }
 
     
@@ -20721,6 +21550,11 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
       name: '蜂蜜',
       icon: '🍯',
       desc: '新武将招募道具。积累一定数量后，可在「开服庆典-新武将招募」中招募全新武将。'
+    }, {
+      id: 'mianfen',
+      name: '面粉',
+      icon: '🌾',
+      desc: '面包召唤道具。在主页右下角的「面包召唤」中消耗（每50次必得一名武将）。可在商城-元宝页购买，50元宝/个，每日限购100个。'
     }, {
       id: 'qunxing',
       name: '群星碎片',
@@ -21035,6 +21869,376 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
       return h;
     }
 
+    // ============ 面包召唤（主页右下角入口，50连保底武将） ============
+    var SUMMON_PITY_MAX = 50;
+    var SUMMON_PROB = {
+      heroNormal: 0.30, // 普通武将总概率
+      heroRare: 0.24, // 稀有武将总概率（比普通低约20%）
+      fillers: [{
+        type: 'jianghun',
+        amount: 10,
+        label: '🔮 将魂×10'
+      }, {
+        type: 'coins',
+        amount: 100,
+        label: '💰 金币×100'
+      }, {
+        type: 'yuanbao',
+        amount: 2,
+        label: '💎 元宝×2'
+      }, {
+        type: 'none',
+        label: '💨 空空如也'
+      }]
+    };
+
+    function summonHeroPools() {
+      var normal = [],
+        rare = [];
+      HEROES.forEach(function(h) {
+        if (!h || !h.id) return;
+        if (h.id === 'shengshixuyifeng' || h.id === 'chenminghan') return; // 不进入奖池
+        if (isShopExclusiveHero(h.id)) rare.push(h);
+        else normal.push(h);
+      });
+      return {
+        normal: normal,
+        rare: rare
+      };
+    }
+
+    function summonPickHero(force) {
+      var pools = summonHeroPools();
+
+      function pickFrom(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+      }
+      if (force) {
+        var total = SUMMON_PROB.heroNormal + SUMMON_PROB.heroRare;
+        var useNormal = pools.normal.length > 0 && (Math.random() * total < SUMMON_PROB.heroNormal || !pools.rare
+          .length);
+        return {
+          hero: useNormal ? pickFrom(pools.normal) : pickFrom(pools.rare),
+          tier: useNormal ? 'normal' : 'rare'
+        };
+      }
+      var r = Math.random();
+      if (r < SUMMON_PROB.heroNormal && pools.normal.length) return {
+        hero: pickFrom(pools.normal),
+        tier: 'normal'
+      };
+      if (r < SUMMON_PROB.heroNormal + SUMMON_PROB.heroRare && pools.rare.length) return {
+        hero: pickFrom(pools.rare),
+        tier: 'rare'
+      };
+      return null;
+    }
+
+    function summonRollOne(forceHero) {
+      var lines = [],
+        pity = userProfile.summonPity || 0,
+        hit = summonPickHero(!!forceHero),
+        tier;
+      if (hit && hit.hero) {
+        var h = hit.hero;
+        if (_recruitOwned(h.id)) {
+          grantHeroStar(h.id, null, 1);
+          lines.push('⭐ 已有【' + h.name + '】，转化为' + h.name + '的命星×1');
+        } else {
+          userProfile.ownedHeroes.push(h.id);
+          renderHeroesGrid();
+          lines.push('🎭 武将【' + h.name + '】');
+        }
+        userProfile.summonPity = forceHero ? 0 : pity; // 幸运抽到武将不清空保底进度，仅保底出货时重置
+        tier = hit.tier;
+      } else {
+        var f = SUMMON_PROB.fillers[Math.floor(Math.random() * SUMMON_PROB.fillers.length)];
+        if (f.type === 'jianghun') userProfile.jianghun = (userProfile.jianghun || 0) + f.amount;
+        else if (f.type === 'coins') userProfile.coins = (userProfile.coins || 0) + f.amount;
+        else if (f.type === 'yuanbao') userProfile.yuanbao = (userProfile.yuanbao || 0) + f.amount;
+        lines.push(f.label);
+        userProfile.summonPity = pity + 1;
+        tier = 'filler';
+      }
+      return {
+        tier: tier,
+        title: tier === 'rare' ? '💠 稀有武将' : (tier === 'normal' ? '🎭 普通武将' : '🍞 安慰奖'),
+        lines: lines
+      };
+    }
+
+    function doSummonPull(count) {
+      if (!userProfile.inventory) userProfile.inventory = {};
+      var flour = userProfile.inventory['mianfen'] || 0;
+      if (flour < count) {
+        var shortage = count - flour;
+        var remain = flourRemainingToday();
+        var canBuy = Math.min(shortage, remain);
+        var cost = canBuy * 50;
+        var yb = userProfile.yuanbao || 0;
+        if (remain <= 0) {
+          alert('🌾 面粉不足！需要 ' + count + ' 个，当前 ' + flour + ' 个\n今日购买已达限购（' + FLOUR_DAILY_MAX +
+            '个/天），明天 0 点后再来\n也可先在商城-元宝页购买（50元宝/个）');
+          return;
+        }
+        if (yb >= cost) {
+          var tip = canBuy < shortage ?
+            '（今日限购仅剩 ' + remain + ' 个，补全后仍缺 ' + (shortage - canBuy) + ' 个，将先召唤 ' + (flour +
+              canBuy) + ' 次）' : '';
+          showModal('🌾 面粉不足 · 一键补全', '召唤' + count + '次需面粉×' + count + '，当前 ' + flour +
+            ' 个。\n一键补全：花费 💎' + cost + ' 购买 ' + canBuy + ' 个面粉' + tip + '？', [{
+              text: '💎 ' + cost + ' 一键补全',
+              color: '#e67e22',
+              action: function() {
+                userProfile.yuanbao -= cost;
+                addFlourDailyCount(canBuy);
+                userProfile.inventory['mianfen'] = (userProfile.inventory['mianfen'] || 0) + canBuy;
+                closeModal();
+                doSummonPull(Math.min(count, flour + canBuy));
+              }
+            }, {
+              text: '取消',
+              color: '#7f8c8d',
+              action: function() {
+                closeModal();
+              }
+            }]);
+        } else {
+          alert('🌾 面粉不足！需要 ' + count + ' 个，当前 ' + flour + ' 个\n💎 元宝不足以一键补全（需 ' + cost +
+            '，当前 ' + yb + '）\n面粉可在商城-元宝页购买：50元宝/个，每日限购100个');
+        }
+        return;
+      }
+      userProfile.inventory['mianfen'] = (userProfile.inventory['mianfen'] || 0) - count;
+      var results = [];
+      for (var i = 0; i < count; i++) {
+        var pity = userProfile.summonPity || 0;
+        results.push(summonRollOne((pity + 1) >= SUMMON_PITY_MAX));
+      }
+      window._summonResults = results;
+      saveProfileToCloud();
+      updateLobbyRankUI();
+      playSummonAnim();
+    }
+
+    // ============ 召唤全屏动画（招募动画.mp4，播完/跳过/加载失败均进入结果展示） ============
+    var summonAnimPlaying = false;
+
+    function playSummonAnim() {
+      if (SETTINGS.skipSummonAnim) {
+        renderSummon();
+        return;
+      }
+      var ov = document.getElementById('summon-anim');
+      var v = document.getElementById('summon-anim-video');
+      if (!ov || !v) {
+        renderSummon();
+        return;
+      }
+      summonAnimPlaying = true;
+      try {
+        var lb = getLobbyBgmEl();
+        if (lb) lb.pause();
+      } catch (e) {}
+      ov.style.display = 'flex';
+      var sl = document.getElementById('summon-loading');
+      if (sl) sl.style.display = 'flex';
+      try {
+        v.currentTime = 0;
+      } catch (e) {}
+      var hideLoad = function() {
+        var s2 = document.getElementById('summon-loading');
+        if (s2) s2.style.display = 'none';
+      };
+      v.addEventListener('playing', hideLoad, { once: true });
+      v.addEventListener('error', hideLoad, { once: true });
+      var pr = v.play();
+      if (pr && pr.catch) pr.catch(function() {
+        hideLoad();
+        finishSummonAnim();
+      });
+      // 兜底：若 ended/error 均未触发（个别 WebView 不触发事件），按 9 秒超时强制结束
+      setTimeout(function() {
+        if (summonAnimPlaying) finishSummonAnim();
+      }, 9000);
+    }
+
+    function finishSummonAnim() {
+      if (!summonAnimPlaying) return;
+      summonAnimPlaying = false;
+      var ov = document.getElementById('summon-anim');
+      var v = document.getElementById('summon-anim-video');
+      if (v) {
+        try {
+          v.pause();
+        } catch (e) {}
+      }
+      if (ov) ov.style.display = 'none';
+      var sl2 = document.getElementById('summon-loading');
+      if (sl2) sl2.style.display = 'none';
+      renderSummon();
+      try {
+        syncLobbyBgm();
+      } catch (e) {}
+    }
+
+    function skipSummonAnim() {
+      finishSummonAnim();
+    }
+
+    function onToggleSkipSummonAnim(c) {
+      SETTINGS.skipSummonAnim = !!c;
+      saveSettings();
+    }
+
+    // ============ 恭喜获得动画（获得道具/武将时弹出；招募获得不触发；点击关闭） ============
+    var _gainQueue = [];
+    var _gainShowing = false;
+
+    function _gainItemMeta(itemId) {
+      var def = null;
+      try {
+        SHOP_ITEMS.concat(EXTRA_ITEM_DEFS).forEach(function(s) {
+          if (s.id === itemId) def = s;
+        });
+      } catch (e) {}
+      if (!def) def = { id: itemId, name: itemId, icon: '🎁' };
+      return def;
+    }
+
+    function _heroNameById(hid) {
+      var n = hid;
+      try {
+        HEROES.forEach(function(h) {
+          if (h.id === hid) n = h.name || n;
+        });
+      } catch (e) {}
+      return n;
+    }
+
+    function _signInGainItem(rw) {
+      if (!rw || !rw.type) return null;
+      if (rw.type === 'coins') return { icon: '💰', name: '金币', count: rw.amount };
+      if (rw.type === 'yuanbao') return { icon: '💎', name: '元宝', count: rw.amount };
+      if (rw.type === 'item') {
+        var m = _gainItemMeta(rw.itemId);
+        return { icon: m.icon, name: m.name, count: rw.count };
+      }
+      if (rw.type === 'hero') return { icon: '🎖️', name: '武将·' + _heroNameById(rw.heroId) };
+      return null;
+    }
+
+    function showGainAnim(items) {
+      if (!items || !items.length) return;
+      _gainQueue.push(items);
+      if (!_gainShowing) nextGainAnim();
+    }
+
+    function nextGainAnim() {
+      var items = _gainQueue.shift();
+      var ov = document.getElementById('gain-popup');
+      var box = document.getElementById('gain-items');
+      if (!items || !items.length || !ov || !box) {
+        _gainShowing = false;
+        if (ov) ov.style.display = 'none';
+        return;
+      }
+      _gainShowing = true;
+      var h = '';
+      items.forEach(function(it, idx) {
+        h += '<div class="gain-item" style="animation-delay:' + (idx * 0.12) + 's">' +
+          '<span class="gi-ic">' + (it.icon || '🎁') + '</span>' +
+          '<span class="gi-nm">' + it.name + '</span>' +
+          (it.count ? '<span class="gi-ct">×' + it.count + '</span>' : '') +
+          '</div>';
+      });
+      box.innerHTML = h;
+      ov.style.display = 'flex';
+      var hint = document.getElementById('gain-hint');
+      if (hint) hint.innerText = _gainQueue.length ? '点击任意处继续 »' : '点击任意处关闭';
+    }
+
+    function closeGainAnim() {
+      if (_gainQueue.length) {
+        nextGainAnim();
+        return;
+      }
+      _gainShowing = false;
+      var ov = document.getElementById('gain-popup');
+      if (ov) ov.style.display = 'none';
+    }
+
+    function openSummonPage() {
+      document.getElementById('lobby-page').classList.remove('active');
+      document.getElementById('summon-page').classList.add('active');
+      window._summonResults = null;
+      renderSummon();
+      try {
+        var v = document.getElementById('summon-anim-video');
+        if (v && v.readyState === 0) v.load();
+      } catch (e) {}
+    }
+
+    function closeSummonPage() {
+      document.getElementById('summon-page').classList.remove('active');
+      document.getElementById('lobby-page').classList.add('active');
+      updateLobbyRankUI();
+    }
+
+    function renderSummon() {
+      var c = document.getElementById('summon-content');
+      if (!c) return;
+      var flour = (userProfile.inventory && userProfile.inventory['mianfen']) || 0,
+        pity = userProfile.summonPity || 0,
+        pct = Math.min(100, pity / SUMMON_PITY_MAX * 100);
+      var hn = document.getElementById('summon-honey-num');
+      if (hn) hn.innerText = flour;
+      var pools = summonHeroPools();
+      var tierBg = {
+        rare: 'linear-gradient(135deg,#8e44ad,#c0392b);border:2px solid #ffd700;color:#fff;',
+        normal: 'linear-gradient(135deg,#2980b9,#27ae60);border:2px solid #aed6f1;color:#fff;',
+        filler: 'background:rgba(255,255,255,.07);border:1px solid #444;color:#ddd;'
+      };
+      var h = '<div style="background:linear-gradient(135deg,#6e2c00 0%,#b9770e 55%,#d4ac0d 100%);border-radius:14px;padding:24px 16px 20px;margin-bottom:14px;text-align:center;position:relative;overflow:hidden;">' +
+        '<div style="font-size:44px;">🍞</div>' +
+        '<div style="font-size:22px;font-weight:900;color:#fff;letter-spacing:2px;margin-top:6px;text-shadow:0 2px 8px rgba(0,0,0,.4);">面包召唤</div>' +
+        '<div style="font-size:12px;color:rgba(255,255,255,.85);margin-top:6px;">每 ' + SUMMON_PITY_MAX + ' 次召唤必得一名武将 · 抽到武将不清空进度</div>' +
+        '<div style="margin-top:14px;background:rgba(0,0,0,.35);border-radius:10px;padding:10px 12px;">' +
+        '<div style="display:flex;justify-content:space-between;font-size:12px;color:#ffe9a0;margin-bottom:6px;"><span>🌾 面粉 ×' + flour + '</span><span>💎 元宝 ×' + (userProfile.yuanbao || 0) + '</span></div>' +
+        '<div style="background:rgba(255,255,255,.15);border-radius:6px;height:10px;overflow:hidden;"><div style="width:' + pct + '%;height:100%;background:linear-gradient(90deg,#f39c12,#e74c3c);transition:width .3s;"></div></div>' +
+        '<div style="font-size:11px;color:#ffe9a0;margin-top:5px;">保底进度 ' + pity + '/' + SUMMON_PITY_MAX + (pity >= SUMMON_PITY_MAX - 1 ? ' · 下一次召唤必得武将！' : ' · 再召唤 ' + (SUMMON_PITY_MAX - pity) + ' 次必得武将') + '</div>' +
+        '</div>' +
+        '<div style="display:flex;gap:10px;justify-content:center;margin-top:14px;">' +
+        '<button onclick="doSummonPull(1)" style="flex:1;max-width:150px;padding:12px 0;border:none;border-radius:10px;background:linear-gradient(135deg,#e67e22,#d35400);color:#fff;font-size:15px;font-weight:bold;cursor:pointer;">召唤 ×1<br><span style="font-size:11px;font-weight:normal;">🌾 面粉×1</span></button>' +
+        '<button onclick="doSummonPull(10)" style="flex:1;max-width:150px;padding:12px 0;border:none;border-radius:10px;background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;font-size:15px;font-weight:bold;cursor:pointer;">召唤 ×10<br><span style="font-size:11px;font-weight:normal;">🌾 面粉×10</span></button>' +
+        '<label style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:12px;font-size:12px;color:rgba(255,255,255,.85);cursor:pointer;"><input type="checkbox" ' + (SETTINGS.skipSummonAnim ? 'checked' : '') + ' onchange="onToggleSkipSummonAnim(this.checked)" style="width:15px;height:15px;accent-color:#f39c12;cursor:pointer;">跳过招募动画（勾选后不再播放）</label>' +
+        '</div></div>';
+      if (window._summonResults && window._summonResults.length) {
+        h += '<div style="font-size:14px;font-weight:bold;color:#eee;margin:10px 0 8px;">召唤结果</div><div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;">';
+        window._summonResults.forEach(function(r) {
+          h += '<div style="' + tierBg[r.tier] + 'border-radius:8px;padding:8px 4px;text-align:center;font-size:11px;min-height:64px;">' +
+            '<div style="font-weight:bold;font-size:11px;">' + r.title + '</div>' +
+            '<div style="margin-top:4px;line-height:1.5;">' + r.lines.join('<br>') + '</div></div>';
+        });
+        h += '</div>';
+      }
+      var nameList = function(arr) {
+        return arr.map(function(x) {
+          return x.name;
+        }).join('/');
+      };
+      h += '<div style="margin-top:16px;background:rgba(255,255,255,.05);border:1px solid #444;border-radius:12px;padding:14px;font-size:12px;color:#bbb;line-height:1.9;">' +
+        '<div style="font-size:14px;font-weight:bold;color:#eee;margin-bottom:6px;">🎰 奖池一览</div>' +
+        '<div><span style="color:#aed6f1;">🎭 普通武将 30%</span>：' + nameList(pools.normal) + '（重复获得转⭐命星×1）</div>' +
+        '<div><span style="color:#f1c40f;">💠 稀有武将 24%</span>：' + nameList(pools.rare) + '（商店在售武将，概率低约20%，重复获得转⭐命星×1）</div>' +
+        '<div><span style="color:#95a5a6;">🍞 其他 46%</span>：🔮将魂×10 ／ 💰金币×100 ／ 💎元宝×2 ／ 💨空（各占11.5%）</div>' +
+        '<div style="color:#7f8c8d;margin-top:4px;">🌾 面粉获取：商城-元宝页购买（💎50元宝/个，每日限购' + FLOUR_DAILY_MAX + '个）· 召唤页支持一键补全</div>' +
+        '<div style="color:#7f8c8d;">⛔ 盛世·徐翊峰、飞升·陈铭瀚不进入本奖池</div>' +
+        '</div>';
+      c.innerHTML = h;
+    }
+
+
     function renderFestival() {
       var c = document.getElementById('activity-content');
       if (!c) return;
@@ -21181,7 +22385,15 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
       try { saveProfileToCloud(); } catch (e) {}
       try { updateLobbyRankUI(); } catch (e) {}
       try { renderFestival(); } catch (e) {}
-      alert('🎉 领取成功！第 ' + day + ' 天福利：' + gains.join('、') + extra);
+      try {
+        var _fi = [];
+        FESTIVAL_REWARDS[day - 1].forEach(function(rw) {
+          var gi = _signInGainItem(rw);
+          if (rw.type === 'hero' && gains.indexOf('武将【' + rw.heroName + '】') === -1) gi = { icon: '💰', name: '金币', count: 1000 };
+          if (gi) _fi.push(gi);
+        });
+        showGainAnim(_fi);
+      } catch (e) {}
     }
 
     var _shopTab = 'coins';
@@ -21238,10 +22450,12 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
         if ((it.currency || 'coins') !== _shopTab) return;
         var card = document.createElement('div');
         card.className = 'shop-card';
+        var holdTxt = '（持有 ' + ((userProfile.inventory && userProfile.inventory[it.id]) || 0) + (it.id ===
+          'mianfen' ? ' · 今日限购剩余 ' + flourRemainingToday() + '/' + FLOUR_DAILY_MAX : '') + '）';
         card.innerHTML = '<div class="shop-icon">' + it.icon + '</div>' +
           '<div class="shop-info"><div class="shop-name">' + it.name +
-          ' <span style="font-size:12px;color:#7f8c8d;">（持有 ' + ((userProfile.inventory && userProfile.inventory[it
-            .id]) || 0) + '）</span></div><div class="shop-desc">' + it.desc + '</div></div>' +
+          ' <span style="font-size:12px;color:#7f8c8d;">' + holdTxt + '</span></div><div class="shop-desc">' + it.desc +
+          '</div></div>' +
           '<button class="shop-buy" onclick="buyShopItem(\'' + it.id + '\')">' + _shopCurrencyLabel(it.currency) +
           it.price + '</button>';
         list.appendChild(card);
@@ -21281,8 +22495,7 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
       saveProfileToCloud();
       renderShop();
       renderHeroesGrid();
-      if (isOfflineMode) alert('🎉 购买成功！' + gd.name + ' 已解锁（离线模式，退出后不保留）');
-      else alert('🎉 购买成功！' + gd.name + ' 已解锁，可在武将页出战');
+      try { showGainAnim([{ icon: '🎖️', name: gd.name }]); } catch (e) {}
     }
 
     function _shopBalance(cur) {
@@ -21295,6 +22508,30 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
       if (cur === 'yuanbao') userProfile.yuanbao = (userProfile.yuanbao || 0) - amount;
       else if (cur === 'jianghun') userProfile.jianghun = (userProfile.jianghun || 0) - amount;
       else userProfile.coins = (userProfile.coins || 0) - amount;
+    }
+
+    // ============ 面粉每日限购（100个/天） ============
+    var FLOUR_DAILY_MAX = 100;
+
+    function flourBoughtToday() {
+      var f = userProfile.flourDaily;
+      if (!f || f.date !== _todayStr()) return 0;
+      return f.count || 0;
+    }
+
+    function flourRemainingToday() {
+      return Math.max(0, FLOUR_DAILY_MAX - flourBoughtToday());
+    }
+
+    function addFlourDailyCount(n) {
+      var today = _todayStr();
+      if (!userProfile.flourDaily || userProfile.flourDaily.date !== today) {
+        userProfile.flourDaily = {
+          date: today,
+          count: 0
+        };
+      }
+      userProfile.flourDaily.count += n;
     }
 
     function buyShopItem(itemId) {
@@ -21311,6 +22548,14 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
         return;
       }
       var max = Math.max(1, Math.floor(bal / it.price));
+      if (itemId === 'mianfen') {
+        var remain = flourRemainingToday();
+        if (remain <= 0) {
+          alert('🌾 今日面粉购买已达限购（' + FLOUR_DAILY_MAX + '个/天），明天 0 点后再来吧');
+          return;
+        }
+        max = Math.min(max, remain);
+      }
       openBatchBuy({
         title: '🛒 购买 ' + it.name,
         unitPrice: it.price,
@@ -21318,13 +22563,17 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
         max: max,
         onConfirm: function(qty) {
           if (_shopBalance(cur) < it.price * qty) return alert('货币不足，请重试');
+          if (itemId === 'mianfen') {
+            var rem2 = flourRemainingToday();
+            if (qty > rem2) return alert('🌾 超出今日限购，今日还可购买 ' + rem2 + ' 个');
+            addFlourDailyCount(qty);
+          }
           _shopDeduct(cur, it.price * qty);
           if (!userProfile.inventory) userProfile.inventory = {};
           userProfile.inventory[itemId] = (userProfile.inventory[itemId] || 0) + qty;
           saveProfileToCloud();
           renderShop();
-          if (isOfflineMode) alert('🛒 购买成功：' + it.name + ' ×' + qty + '，可在背包查看（离线模式，退出后不保留）');
-          else alert('🛒 购买成功：' + it.name + ' ×' + qty + '，可在背包查看');
+          try { showGainAnim([{ icon: it.icon || '🛍️', name: it.name, count: qty }]); } catch (e) {}
         }
       });
     }
@@ -22394,7 +23643,15 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
               rwLog += '，🎫 盛世·徐翊峰体验卡×1（背包中使用）';
             }
             log(rwLog);
-            unlockMsg = '\n' + rwParts.join(' + ');
+            unlockMsg = '';
+            try {
+              var _si = [];
+              if (srw.fengmi) _si.push({ icon: '🍯', name: '蜂蜜', count: srw.fengmi });
+              if (srw.yuanbao) _si.push({ icon: '💎', name: '元宝', count: srw.yuanbao });
+              if (srw.coins) _si.push({ icon: '💰', name: '金币', count: srw.coins });
+              if (srw.card) _si.push({ icon: '🎫', name: '盛世·徐翊峰体验卡', count: 1 });
+              showGainAnim(_si);
+            } catch (e) {}
           } else {
             unlockMsg = '\n（重复通关，仅首通发放奖励）';
           }
@@ -22412,7 +23669,8 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
           saveRankToCloud(true);
         }
         setTimeout(function() {
-          var winMsg = reward > 0 ? ('🎉 获胜！获得 ' + reward + ' 金币' + unlockMsg) : ('🎉 获胜！' + unlockMsg);
+          if (reward > 0) { try { showGainAnim([{ icon: '💰', name: '金币', count: reward }]); } catch (e) {} }
+          var winMsg = '🎉 获胜！' + unlockMsg;
           if (isOfflineMode) winMsg += '\n（离线模式，进度与金币退出后不保留）';
           alert(winMsg);
           if (currentGameMode === 'story' && selectedStoryLevel === 1) {
