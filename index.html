@@ -13185,6 +13185,19 @@ Resources:`;
       z-index: 100
     }
 
+    #pw-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, .88);
+      justify-content: center;
+      align-items: center;
+      z-index: 130
+    }
+
     .set-row {
       display: flex;
       align-items: center;
@@ -15549,6 +15562,10 @@ Resources:`;
             onclick="setHeroFilter('star')">有命星</button></div>
       </div>
       <div class="heroes-grid" id="heroes-grid"></div>
+      <div id="heroes-eggbar" style="display:none;justify-content:space-between;align-items:center;padding:8px 20px 14px;color:#33333e;font-size:11px;user-select:none;-webkit-user-select:none;letter-spacing:1px;">
+        <span id="egg-left" style="cursor:default;padding:8px 12px;" onclick="eggClick('left')">面包杀</span>
+        <span id="egg-right" style="cursor:default;padding:8px 12px;" onclick="eggClick('right')">v1.0</span>
+      </div>
       <div class="heroes-footer" id="heroes-footer" style="display:none;"><button id="btn-confirm-game"
           class="btn-confirm-game btn-confirm-match" onclick="confirmStartGame()">开始主线</button></div>
     </div>
@@ -15773,6 +15790,17 @@ Resources:`;
       <p id="modal-desc">描述信息</p>
       <div id="modal-buttons"></div>
       <div id="modal-card-grid" class="card-grid"></div>
+    </div>
+  </div>
+  <div id="pw-modal">
+    <div class="modal-content" style="border-color:#8e44ad;box-shadow:0 0 24px rgba(142,68,173,.5);text-align:center;">
+      <h2 style="color:#c39bd3;margin-top:0;">🔐 输入暗号</h2>
+      <p style="color:#bbb;font-size:13px;line-height:1.7;">隐藏武将的6位暗号<br><span style="color:#7f8c8d;font-size:11px;">（暗号通过主线/支线获得，已获得的位会自动填好）</span></p>
+      <div id="pw-modal-slots" style="margin:10px 0;"></div>
+      <div style="display:flex;gap:10px;justify-content:center;margin-top:12px;">
+        <button class="modal-btn" style="background:#8e44ad;" onclick="submitPassword()">确 认</button>
+        <button class="modal-btn" style="background:#7f8c8d;" onclick="closePasswordModal()">取 消</button>
+      </div>
     </div>
   </div>
   <div id="settings-modal">
@@ -18845,6 +18873,44 @@ Resources:`;
           type: 'lock',
           desc: '你对【问号】拥有者伤害+1，且你对其造成伤害后，获得其一张手牌。'
         }]
+      },
+      {
+        id: 'chenjiawei',
+        name: '陈佳葳',
+        title: '客串来的',
+        hp: 4,
+        maxHp: 4,
+        faction: '群',
+        portrait: '👻',
+        hidden: true,
+        skills: [{
+          name: '惊吓',
+          type: 'active',
+          desc: '游戏内限4次，当敌方回合开始时，你可以令该敌人弃置2张牌，然后判定：若为红色，敌方失去1点体力并跳过下次出牌阶段；若为黑色，你获得【鬼影】。'
+        }, {
+          name: '鬼影',
+          type: 'lock',
+          desc: '当对方以任意非【杀】方式对你造成伤害时，对方叠加1层「鬼」。「鬼」达到3层后，其每回合开始时失去1点体力；「鬼」达到5层后，你的【疾悚】变为限定技，并增加效果：对敌方造成3点伤害。'
+        }, {
+          name: '疾悚',
+          type: 'active',
+          desc: '五回合限一次，出牌阶段，你可以令一名角色弃置所有手牌与装备栏中的牌。'
+        }, {
+          name: '醋意摇',
+          type: 'limit',
+          cons: 4,
+          desc: '【命星4层】限定技，若敌方「鬼」的层数大于2，你可以清空敌方身上所有「鬼」并弃置你所有手牌，然后令该角色进入濒死状态。'
+        }, {
+          name: '贴纸',
+          type: 'lock',
+          cons: 5,
+          desc: '【命星5层】当你在一名角色上叠加了4层「鬼」后，你每2回合回复1点体力；若体力已满，改为摸2张牌。'
+        }, {
+          name: '阴间',
+          type: 'active',
+          cons: 6,
+          desc: '【命星6层】当一名角色拥有7层及以上「鬼」时，你可以于出牌阶段的任意时刻查看敌方手牌。'
+        }]
       }
     ];
     var HEROES = [],
@@ -18871,8 +18937,7 @@ Resources:`;
     }
 
     function isHeroUnlocked(id) {
-      if (id === 'shengshixuyifeng' && isShengshiTrialActive()) return true;
-      if (id === 'hajifeng') return (userProfile.ownedHeroes || []).indexOf('hajifeng') !== -1;
+      if (id === 'shengshixuyifeng' && isShengshiTrialActive()) return true;      if (id === 'hajifeng') return (userProfile.ownedHeroes || []).indexOf('hajifeng') !== -1;
       if (id === 'chensicong') return (userProfile.ownedHeroes || []).indexOf('chensicong') !== -1;
       if (id === 'chenminghan') return (userProfile.ownedHeroes || []).indexOf('chenminghan') !== -1;
       if (id === 'shengshixuyifeng') return (userProfile.ownedHeroes || []).indexOf('shengshixuyifeng') !== -1;
@@ -18880,6 +18945,7 @@ Resources:`;
       if (id === 'zhangchenrui') return (userProfile.ownedHeroes || []).indexOf('zhangchenrui') !== -1;
       if (id === 'chenqilong') return (userProfile.ownedHeroes || []).indexOf('chenqilong') !== -1;
       if (id === 'sunxinxin') return (userProfile.ownedHeroes || []).indexOf('sunxinxin') !== -1;
+      if (id === 'chenjiawei') return (userProfile.ownedHeroes || []).indexOf('chenjiawei') !== -1;
       var r = HERO_UNLOCK_LEVELS[id];
       return r === undefined ? true : userProfile.level >= r;
     }
@@ -19549,6 +19615,8 @@ Resources:`;
     function renderHeroesGrid() {
       var g = document.getElementById('heroes-grid');
       var tb = document.getElementById('heroes-toolbar');
+      var eb = document.getElementById('heroes-eggbar');
+      if (eb) eb.style.display = currentGameMode ? 'none' : 'flex';
       if (tb) {
         tb.style.display = currentGameMode ? 'none' : 'flex';
         if (!currentGameMode) _syncHeroToolbar();
@@ -19579,6 +19647,8 @@ Resources:`;
         });
       }
       heroList.forEach(function(hero) {
+        // 隐藏武将：未获得时从图鉴与出战列表中完全隐身
+        if (hero.hidden && (userProfile.ownedHeroes || []).indexOf(hero.id) === -1) return;
         if (!currentGameMode) {
           var u0 = isHeroUnlocked(hero.id);
           var cons0 = heroConstellation(hero.id);
@@ -19664,6 +19734,23 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
           '</div></div><div class="hero-skills">' + sh + '</div>' + lr + btnHtml;
         g.appendChild(c);
       });
+      // 隐藏武将彩蛋：触发页脚后出现神秘「?」牌
+      if (!currentGameMode && userProfile._mysteryRevealed) {
+        var ownedHidden = HEROES.some(function(h) {
+          return h.hidden && (userProfile.ownedHeroes || []).indexOf(h.id) !== -1;
+        });
+        if (!ownedHidden) {
+          var mc = document.createElement('div');
+          mc.className = 'hero-card compact';
+          mc.innerHTML = '<div class="hero-portrait" style="filter:grayscale(1) brightness(.55);"><div style="font-size:52px;display:flex;align-items:center;justify-content:center;height:100%;">❓</div>' +
+            '<div class="hero-name-overlay">???</div></div>' +
+            '<div class="hero-faction-row"><span style="color:#7f8c8d">????</span></div>';
+          mc.onclick = function() {
+            openMysteryDetail();
+          };
+          g.appendChild(mc);
+        }
+      }
     }
 
     
@@ -21898,6 +21985,7 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
       HEROES.forEach(function(h) {
         if (!h || !h.id) return;
         if (h.id === 'shengshixuyifeng' || h.id === 'chenminghan') return; // 不进入奖池
+        if (h.hidden) return; // 隐藏武将不进入奖池
         if (isShopExclusiveHero(h.id)) rare.push(h);
         else normal.push(h);
       });
@@ -22168,6 +22256,186 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
       if (ov) ov.style.display = 'none';
     }
 
+    // ============ 隐藏武将（陈佳葳）：页脚彩蛋 · 暗号 · 前往探秘 ============
+    var HIDDEN_PW = ["U", "寅", "2", "i", "s", "L"]; // ★ 暗号共6位（随机生成），可在此修改
+    var EXPLORE_CLUES = [
+      '点击左页脚5次，右页脚5次',
+      '暗号共6位，通过主线/面包往事获得，每次只透露1位',
+      '他被隐藏时，姓名、技能、甚至群星凝聚里都没有他的位置',
+      '每天坚持探秘，好运自然会来',
+      '某位「客串来的」朋友正在等待被发现',
+      '输入全部暗号后，他会真正属于你'
+    ];
+
+    function _pwArr() {
+      if (!Array.isArray(userProfile.hiddenPwRevealed)) userProfile.hiddenPwRevealed = [false, false, false, false, false, false];
+      while (userProfile.hiddenPwRevealed.length < 6) userProfile.hiddenPwRevealed.push(false);
+      return userProfile.hiddenPwRevealed;
+    }
+
+    // 揭示暗号第 idx(0-5) 位，返回提示文本（已揭示则返回空串）
+    function revealHiddenPw(idx) {
+      var a = _pwArr();
+      if (a[idx]) return '';
+      a[idx] = true;
+      queueCloudSave();
+      return '\n🔑 获得隐藏暗号第' + (idx + 1) + '位：「' + HIDDEN_PW[idx] + '」';
+    }
+
+    var _eggClicks = {
+      left: 0,
+      right: 0
+    };
+
+    function eggClick(side) {
+      if ((userProfile.ownedHeroes || []).indexOf('chenjiawei') !== -1) return;
+      _eggClicks[side] = (_eggClicks[side] || 0) + 1;
+      var total = _eggClicks.left + _eggClicks.right;
+      if (!userProfile._mysteryRevealed && total >= 5) {
+        userProfile._mysteryRevealed = true;
+        queueCloudSave();
+        try {
+          renderHeroesGrid();
+        } catch (e) {}
+        if (typeof showToast === 'function') showToast('👻 武将图鉴里好像多了什么……');
+        return;
+      }
+      if (total >= 10) openPasswordModal();
+    }
+
+    function openMysteryDetail() {
+      document.getElementById('heroes-page').classList.remove('active');
+      document.getElementById('hero-detail-title').innerText = '???';
+      var rev = _pwArr(),
+        slots = '';
+      for (var i = 0; i < 6; i++) {
+        slots += '<span style="display:inline-block;width:38px;height:44px;line-height:44px;text-align:center;margin:4px;border-radius:8px;background:rgba(255,255,255,.06);border:1px solid #444;font-size:18px;color:' +
+          (rev[i] ? '#f1c40f' : '#555') + ';">' + (rev[i] ? HIDDEN_PW[i] : '?') + '</span>';
+      }
+      document.getElementById('hero-detail-body').innerHTML =
+        '<div class="hd-portrait" style="filter:grayscale(1) brightness(.55);font-size:64px;display:flex;align-items:center;justify-content:center;">❓</div>' +
+        '<div class="hd-name">??? <span style="font-size:14px;color:#bdc3c7;">????</span></div>' +
+        '<div class="hd-meta">❤️ 体力 ?/? · 🔒 未解锁</div>' +
+        '<div class="hd-obtain">🎭 隐藏武将 · 点击武将页脚10次并输入暗号获得（暗号通过主线/支线获得）</div>' +
+        '<div style="text-align:center;margin-top:10px;">' + slots +
+        '<div style="font-size:11px;color:#7f8c8d;margin-top:6px;">已获得的暗号会以金色显示</div></div>' +
+        '<div class="hd-skills"><div class="skill-item"><span class="skill-name">[???]</span><span class="skill-type-lock">锁定</span><br><span class="skill-desc">？？？？？</span></div>' +
+        '<div class="skill-item"><span class="skill-name">[???]</span><span class="skill-type-active">主动</span><br><span class="skill-desc">？？？？？</span></div></div>';
+      document.getElementById('hero-detail-page').classList.add('active');
+    }
+
+    function openPasswordModal() {
+      var rev = _pwArr(),
+        inputs = '';
+      for (var i = 0; i < 6; i++) {
+        inputs += '<input id="pw-in-' + i + '" maxlength="1" value="' + (rev[i] ? HIDDEN_PW[i] : '') + '" ' + (rev[i] ?
+            'disabled' : '') +
+          ' style="width:38px;height:44px;text-align:center;font-size:18px;border-radius:8px;background:rgba(255,255,255,.08);border:1px solid ' +
+          (rev[i] ? '#f1c40f' : '#555') + ';color:#fff;margin:4px;box-sizing:border-box;">';
+      }
+      var ov = document.getElementById('pw-modal');
+      if (!ov) return;
+      document.getElementById('pw-modal-slots').innerHTML = inputs;
+      ov.style.display = 'flex';
+    }
+
+    function closePasswordModal() {
+      var ov = document.getElementById('pw-modal');
+      if (ov) ov.style.display = 'none';
+    }
+
+    function submitPassword() {
+      var s = '';
+      for (var i = 0; i < 6; i++) {
+        var el = document.getElementById('pw-in-' + i);
+        s += (el && el.value ? el.value : '').trim();
+      }
+      if (s.length < 6) return alert('请输入完整的6位暗号');
+      if (s.toLowerCase() === HIDDEN_PW.join('').toLowerCase()) {
+        closePasswordModal();
+        if ((userProfile.ownedHeroes || []).indexOf('chenjiawei') === -1) {
+          userProfile.ownedHeroes.push('chenjiawei');
+          queueCloudSave();
+        }
+        userProfile._mysteryRevealed = false;
+        _eggClicks = {
+          left: 0,
+          right: 0
+        };
+        try {
+          renderHeroesGrid();
+        } catch (e) {}
+        alert('🎉 暗号正确！隐藏武将【陈佳葳】已加入你的武将列表！');
+      } else {
+        alert('❌ 暗号错误');
+      }
+    }
+
+    // ---- 面包召唤 · 前往探秘 ----
+    function exploreTodayCount() {
+      if (userProfile._exploreDate !== _todayStr()) return 0;
+      return userProfile._exploreCount || 0;
+    }
+
+    function exploreDraw(free) {
+      if (!free) {
+        if ((userProfile.ownedHeroes || []).indexOf('chenjiawei') !== -1) {
+          return showModal('🎭 前往探秘', '你已经揭开了隐藏武将的秘密，没有什么可探秘的了。', [{
+            text: '好的',
+            color: '#7f8c8d',
+            action: closeModal
+          }]);
+        }
+        if (exploreTodayCount() >= 2) {
+          return showModal('🎭 前往探秘', '今日探秘次数已用完（每天限2次），明天再来吧。', [{
+            text: '好的',
+            color: '#7f8c8d',
+            action: closeModal
+          }]);
+        }
+        if (userProfile._exploreDate !== _todayStr()) {
+          userProfile._exploreDate = _todayStr();
+          userProfile._exploreCount = 0;
+        }
+        userProfile._exploreCount = (userProfile._exploreCount || 0) + 1;
+        queueCloudSave();
+      }
+      var r = Math.random();
+      if (r < 0.8) {
+        showModal('🎭 前往探秘', '🎃 你被耍了！什么也没有发生。', [{
+          text: '好吧',
+          color: '#7f8c8d',
+          action: closeModal
+        }]);
+      } else if (r < 0.9) {
+        showModal('🎭 前往探秘', '🍀 运气不错！再抽1次（不消耗次数）', [{
+          text: '再抽1次',
+          color: '#27ae60',
+          action: function() {
+            closeModal();
+            exploreDraw(true);
+          }
+        }]);
+      } else {
+        var clue;
+        if (!userProfile._exploreClue1) {
+          clue = EXPLORE_CLUES[0];
+          userProfile._exploreClue1 = true;
+          queueCloudSave();
+        } else {
+          clue = EXPLORE_CLUES[1 + Math.floor(Math.random() * (EXPLORE_CLUES.length - 1))];
+        }
+        showModal('🔎 发现线索', clue, [{
+          text: '记下了',
+          color: '#f39c12',
+          action: closeModal
+        }]);
+      }
+      try {
+        renderSummon();
+      } catch (e) {}
+    }
+
     function openSummonPage() {
       document.getElementById('lobby-page').classList.remove('active');
       document.getElementById('summon-page').classList.add('active');
@@ -22200,6 +22468,7 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
         filler: 'background:rgba(255,255,255,.07);border:1px solid #444;color:#ddd;'
       };
       var h = '<div style="background:linear-gradient(135deg,#6e2c00 0%,#b9770e 55%,#d4ac0d 100%);border-radius:14px;padding:24px 16px 20px;margin-bottom:14px;text-align:center;position:relative;overflow:hidden;">' +
+        '<button onclick="exploreDraw(false)" style="position:absolute;top:10px;right:10px;background:rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.35);color:#ffe9a0;font-size:11px;padding:6px 11px;border-radius:12px;cursor:pointer;z-index:2;letter-spacing:.5px;">🎭 前往探秘<span style="opacity:.85;">(' + Math.max(0, 2 - exploreTodayCount()) + '/2)</span></button>' +
         '<div style="font-size:44px;">🍞</div>' +
         '<div style="font-size:22px;font-weight:900;color:#fff;letter-spacing:2px;margin-top:6px;text-shadow:0 2px 8px rgba(0,0,0,.4);">面包召唤</div>' +
         '<div style="font-size:12px;color:rgba(255,255,255,.85);margin-top:6px;">每 ' + SUMMON_PITY_MAX + ' 次召唤必得一名武将 · 抽到武将不清空进度</div>' +
@@ -22696,6 +22965,7 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
           if (h.id === hid) hero = h;
         });
         if (!hero) return;
+        if (hero.hidden) return; // 隐藏武将不出现在群星凝聚
         var price = FORGE_PRICES[hid];
         var ownedHero = isHeroUnlocked(hid);
         var stars = (userProfile.inventory && userProfile.inventory[heroStarItemId(hid)]) || 0;
@@ -23644,6 +23914,7 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
             }
             log(rwLog);
             unlockMsg = '';
+            if (selectedStoryLevel >= 1 && selectedStoryLevel <= 5) unlockMsg += revealHiddenPw(selectedStoryLevel - 1);
             try {
               var _si = [];
               if (srw.fengmi) _si.push({ icon: '🍯', name: '蜂蜜', count: srw.fengmi });
@@ -23658,6 +23929,7 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
           if ((userProfile.storyProgress || 0) < selectedStoryLevel) userProfile.storyProgress = selectedStoryLevel;
         }
         if (currentGameMode === 'arena') {
+          unlockMsg += revealHiddenPw(5);
           completeTask('daily', 'arena');
           addXp(80, '演武胜利');
           saveProfileToCloud();
@@ -31162,6 +31434,19 @@ sync2v2State();
       var curHp = isMe ? gameState.myHp : gameState.enemyHp,
         maxHp = isMe ? gameState.myMaxHp : gameState.enemyMaxHp;
       log('💔 ' + nm + '受到' + dmg + '点伤害(' + curHp + '/' + maxHp + ')');
+      // 鬼影（陈佳葳）：对方以非【杀】方式造成伤害时，对方叠加1层「鬼」
+      if (!gameState._killSrc) {
+        if (isMe && gameState.heroId === 'chenjiawei' && gameState.myHasGuiying && !skillSealedMe('鬼影')) {
+          gameState.myGhost = (gameState.myGhost || 0) + 1;
+          log('👻 【鬼影】敌方以非杀方式伤害你，敌方叠加1层「鬼」(' + gameState.myGhost + '层)');
+          if (gameState.myGhost === 4 && cons5On('chenjiawei', 'me')) log('🩹 【贴纸】生效条件达成：你每2回合回复1点体力');
+          if (gameState.myGhost === 5) log('⚡ 「鬼」达5层，你的【疾悚】已变为限定技并附加3点伤害！');
+          if (gameState.myGhost === 7) log('👁️ 「鬼」达7层，出牌阶段可随时查看敌方手牌（【阴间】）');
+        } else if (!isMe && gameState.enemyHeroId === 'chenjiawei' && gameState.enemyHasGuiying && !skillSealedEnemy('鬼影')) {
+          gameState.enemyGhost = (gameState.enemyGhost || 0) + 1;
+          log('👻 敌【鬼影】你以非杀方式伤害敌方，你叠加1层「鬼」(' + gameState.enemyGhost + '层)');
+        }
+      }
       if (isMe && !gameState._noKuanggu && dmg > 0 && gameState.enemyHeroId === 'wangsheng' &&
         (gameState.enemyDisabledSkills || []).indexOf('狂骨') === -1) {
         if (gameState.enemyHp < gameState.enemyMaxHp) {
@@ -31591,6 +31876,15 @@ sync2v2State();
       } else if (gameState.heroId === 'sunxinxin') {
         pe.innerHTML = '😱我的妈呀(' + (gameState.myMaya || 0) + ')|❓问号→' + (gameState.wenhaoTarget === 'enemy' ?
           '敌人' : '你') + '|❗感叹号';
+      } else if (gameState.heroId === 'chenjiawei') {
+        var skj = '😱惊吓(剩' + (4 - (gameState.myJingxiaUsed || 0)) + '次)';
+        skj += '|😨疾悚' + (gameState.myGhost >= 5 ? '(已觉醒·限定)' : '');
+        if (gameState.myHasGuiying) skj += '|👻鬼影(敌「鬼」' + (gameState.myGhost || 0) + '层)';
+        else skj += '|❔鬼影(未获得)';
+        if (cons4On('chenjiawei')) skj += '|🍋醋意摇' + (gameState.myCuyiyaoUsed ? '(已用)' : '');
+        if (cons5On('chenjiawei')) skj += '|🩹贴纸';
+        if (cons6On('chenjiawei')) skj += '|👁️阴间';
+        pe.innerHTML = skj;
       } else pe.innerHTML = '⚡英姿|💨飒爽' + (hasXinshouBaohu() ? '|🛡️新手保护' : '');
       if (cons4On(gameState.heroId)) pe.innerHTML += '|✨' + cons4SkillName(gameState.heroId) + '(命星4层)';
       var bar = document.getElementById('skills-bar');
@@ -31894,6 +32188,37 @@ sync2v2State();
           bfs.disabled = !gameState.isMyTurn || gameState.phase !== 'play';
           bfs.onclick = useSkill_Feisheng;
           bar.appendChild(bfs);
+        }
+      }
+      if (gameState.heroId === 'chenjiawei') {
+        var _limitedJ = (gameState.myGhost || 0) >= 5;
+        var _cdLeftJ = 5 - (gameState.turnNumber - (gameState.myJisongLastTurn === undefined ? -99 : gameState.myJisongLastTurn));
+        var bjs = document.createElement('button');
+        bjs.className = 'skill-btn';
+        bjs.style.background = '#34495e';
+        bjs.innerText = '😨疾悚' + (_limitedJ ? '(限定)' : (_cdLeftJ > 0 ? '(冷却' + _cdLeftJ + '回合)' : ''));
+        bjs.disabled = !gameState.isMyTurn || gameState.phase !== 'play' || gameState.isProcessing ||
+          (_limitedJ ? gameState.myJisongLimitedUsed : _cdLeftJ > 0);
+        bjs.onclick = useSkill_Jisong;
+        bar.appendChild(bjs);
+        if (cons4On('chenjiawei')) {
+          var bcy = document.createElement('button');
+          bcy.className = 'skill-btn';
+          bcy.style.background = '#e17055';
+          bcy.innerText = '🍋醋意摇' + (gameState.myCuyiyaoUsed ? '(已用)' : '');
+          bcy.disabled = !gameState.isMyTurn || gameState.phase !== 'play' || gameState.isProcessing ||
+            gameState.myCuyiyaoUsed || (gameState.myGhost || 0) <= 2;
+          bcy.onclick = useSkill_Cuyiyao;
+          bar.appendChild(bcy);
+        }
+        if (cons6On('chenjiawei')) {
+          var byj = document.createElement('button');
+          byj.className = 'skill-btn';
+          byj.style.background = '#5f27cd';
+          byj.innerText = '👁️阴间(' + (gameState.myGhost || 0) + '鬼)';
+          byj.disabled = !gameState.isMyTurn || gameState.phase !== 'play' || (gameState.myGhost || 0) < 7;
+          byj.onclick = useSkill_Yinjian;
+          bar.appendChild(byj);
         }
       }
       var ab = document.getElementById('main-action-bar');
@@ -32321,6 +32646,20 @@ sync2v2State();
         return AI_CONS_LEVEL >= 4;
       }
       return heroConstellation(heroId) >= 4;
+    }
+
+    function cons5On(heroId, who) {
+      if (who === 'enemy' && typeof currentGameMode !== 'undefined' && (currentGameMode === 'arena' || currentGameMode === 'story')) {
+        return AI_CONS_LEVEL >= 5;
+      }
+      return heroConstellation(heroId) >= 5;
+    }
+
+    function cons6On(heroId, who) {
+      if (who === 'enemy' && typeof currentGameMode !== 'undefined' && (currentGameMode === 'arena' || currentGameMode === 'story')) {
+        return AI_CONS_LEVEL >= 6;
+      }
+      return heroConstellation(heroId) >= 6;
     }
 
     // 手牌归属表（渲染时刷新）：用于同归/屯田的弃牌拦截
@@ -32801,6 +33140,7 @@ sync2v2State();
       if (!eh) {
         var avail = HEROES.filter(function(h) {
           if (h.id === selectedHeroId) return false;
+          if (h.hidden) return false; // 隐藏武将不会被AI使用
           if (currentGameMode === 'arena') return (arenaEnemyCfg.ban || []).indexOf(h.id) === -1; // 演武随机池：全部武将，仅受禁用池限制
           return !isShopExclusiveHero(h.id) && h.id !== 'chenminghan' && h.id !== 'shengshixuyifeng' && h.id !== 'zhangchenrui' && h.id !== 'chenqilong';
         });
@@ -32968,6 +33308,21 @@ sync2v2State();
         enemyTunshiBasicTurn: false,
         enemyDalongCount: 0,
         enemyDalongMaxCut: {},
+        // ===== 陈佳葳（隐藏武将）状态 =====
+        myJingxiaUsed: 0,
+        enemyJingxiaUsed: 0,
+        myHasGuiying: false,
+        enemyHasGuiying: false,
+        myGhost: 0,
+        enemyGhost: 0,
+        myJisongLastTurn: -99,
+        enemyJisongLastTurn: -99,
+        myJisongLimitedUsed: false,
+        enemyJisongLimitedUsed: false,
+        myCuyiyaoUsed: false,
+        enemyCuyiyaoUsed: false,
+        myStickerTurn: 0,
+        enemyStickerTurn: 0,
         initialized: true
       };
       initDeck();
@@ -35554,6 +35909,7 @@ sync2v2State();
     }
 
     function handleKillHit(dmg, ac) {
+      gameState._killSrc = true; // 标记：本次伤害来源为【杀】（鬼影等技能区分用）
       if (gameState.myEquipment.weapon && gameState.myEquipment.weapon.effect === 'weapon_guding' && !gameState
         .enemyHand.length) {
         dmg++;
@@ -35581,6 +35937,7 @@ sync2v2State();
               dn++;
             }
             if (dn) log('🗑️ 敌弃' + nm.join('、'));
+            gameState._killSrc = false;
             gameState.isProcessing = false;
             renderBattle();
           }
@@ -35590,6 +35947,7 @@ sync2v2State();
           action: function() {
             closeModal();
             dealDamageToEnemy(dmg);
+            gameState._killSrc = false;
             gameState.isProcessing = false;
             renderBattle();
           }
@@ -35597,6 +35955,7 @@ sync2v2State();
         return;
       }
       dealDamageToEnemy(dmg);
+      gameState._killSrc = false;
       gameState.isProcessing = false;
       renderBattle();
     }
@@ -35615,6 +35974,128 @@ sync2v2State();
         if (/^(enemyHasUsed|hasUsed|myUsed|enemyUsed|used)/.test(k) && gameState[k] && !snap[k]) return true;
       }
       return false;
+    }
+
+    // ============ 陈佳葳技能（惊吓/疾悚/醋意摇/阴间） ============
+    function applyJingxia(victim, caster, cb) {
+      var vHand = victim === 'enemy' ? gameState.enemyHand : gameState.myHand,
+        dn = [];
+      for (var i = 0; i < 2 && vHand.length > 0; i++) {
+        var ri = Math.floor(Math.random() * vHand.length),
+          dc = vHand.splice(ri, 1)[0];
+        discardCard(dc);
+        if (victim === 'me') playerLoseCard(dc, 'discard');
+        else enemyLoseCard(dc, 'discard');
+        dn.push(dc.name);
+      }
+      log('😱 【惊吓】' + (victim === 'enemy' ? '敌人' : '你') + '弃置' + (dn.length ? dn.join('、') : '（无牌可弃）'));
+      var jc = judgeDrawCard();
+      if (!jc) {
+        if (cb) cb();
+        return;
+      }
+      discardCard(jc);
+      log('🎴 【惊吓】判定' + cardDesc(jc));
+      if (jc.suit === '♥' || jc.suit === '♦') {
+        log('🔴 【惊吓】红色，' + (victim === 'enemy' ? '敌方' : '你') + '失去1点体力并跳过本次出牌阶段');
+        if (victim === 'enemy') gameState.skipPlay = true;
+        else gameState.skipPlay = true;
+        loseHp(victim, 1, '惊吓');
+      } else {
+        log('⚫ 【惊吓】黑色，' + (caster === 'me' ? '你' : '敌方') + '获得【鬼影】');
+        if (caster === 'me') gameState.myHasGuiying = true;
+        else gameState.enemyHasGuiying = true;
+      }
+      renderBattle();
+      if (cb) cb();
+    }
+
+    function useSkill_Jisong() {
+      if (skillSealedMe('疾悚')) {
+        alert('【疾悚】已被封禁');
+        return;
+      }
+      _skillResetTimer();
+      if (!gameState.isMyTurn || gameState.phase !== 'play' || gameState.isProcessing) return;
+      var limited = (gameState.myGhost || 0) >= 5;
+      var cdOk = gameState.turnNumber - (gameState.myJisongLastTurn === undefined ? -99 : gameState.myJisongLastTurn) >= 5;
+      if (limited ? gameState.myJisongLimitedUsed : !cdOk) return;
+      if (limited) gameState.myJisongLimitedUsed = true;
+      gameState.myJisongLastTurn = gameState.turnNumber;
+      var n = gameState.enemyHand.length;
+      gameState.enemyHand.forEach(function(c) {
+        discardCard(c);
+      });
+      gameState.enemyHand = [];
+      ['weapon', 'armor'].forEach(function(sl) {
+        if (gameState.enemyEquipment[sl]) {
+          discardCard(gameState.enemyEquipment[sl]);
+          gameState.enemyEquipment[sl] = null;
+        }
+      });
+      log('😨 【疾悚】敌方弃置所有手牌(' + n + '张)与装备');
+      if (limited) {
+        log('💀 【疾悚·鬼影】对敌方造成3点伤害！');
+        var dead = takeDamage('enemy', 3);
+        if (dead) return;
+      }
+      renderBattle();
+      checkWin();
+    }
+
+    function useSkill_Cuyiyao() {
+      if (skillSealedMe('醋意摇')) {
+        alert('【醋意摇】已被封禁');
+        return;
+      }
+      _skillResetTimer();
+      if (!gameState.isMyTurn || gameState.phase !== 'play' || gameState.isProcessing || gameState.myCuyiyaoUsed) return;
+      if ((gameState.myGhost || 0) <= 2) return alert('【醋意摇】需要敌方「鬼」层数大于2（当前 ' + (gameState.myGhost || 0) +
+        ' 层）');
+      showModal('🍋 醋意摇（限定技）', '清空敌方所有「鬼」(' + gameState.myGhost + '层)并弃置你的所有手牌(' + gameState.myHand
+        .length + '张)，然后令敌方进入濒死状态。确定发动？', [{
+          text: '发动',
+          color: '#e74c3c',
+          action: function() {
+            closeModal();
+            gameState.myCuyiyaoUsed = true;
+            gameState.myGhost = 0;
+            var n = gameState.myHand.length;
+            gameState.myHand.forEach(function(c) {
+              discardCard(c);
+              playerLoseCard(c, 'discard');
+            });
+            gameState.myHand = [];
+            log('🍋 【醋意摇】清空敌方「鬼」，你弃置所有手牌(' + n + '张)');
+            gameState.enemyHp = 0;
+            log('💀 【醋意摇】敌方进入濒死状态！');
+            renderBattle();
+            promptForDying();
+          }
+        }, {
+          text: '取消',
+          color: '#7f8c8d',
+          action: closeModal
+        }]);
+    }
+
+    function useSkill_Yinjian() {
+      if (skillSealedMe('阴间')) {
+        alert('【阴间】已被封禁');
+        return;
+      }
+      _skillResetTimer();
+      if (!gameState.isMyTurn || gameState.phase !== 'play') return;
+      if ((gameState.myGhost || 0) < 7) return alert('【阴间】需要敌方「鬼」达到7层（当前 ' + (gameState.myGhost || 0) +
+        ' 层）');
+      var names = gameState.enemyHand.map(function(c) {
+        return cardDesc(c);
+      });
+      showModal('👁️ 阴间 · 窥视敌方手牌', names.length ? names.join('　') : '敌方没有手牌。', [{
+        text: '收回视线',
+        color: '#8e44ad',
+        action: closeModal
+      }]);
     }
 
     function useSkill_WoDeMaya() {
@@ -35916,6 +36397,33 @@ sync2v2State();
       gameState.myDamageBonus = 0;
       gameState.qixinDamageBonus = 0;
       gameState.turnNumber++;
+      // 敌方陈佳葳：惊吓（AI自动发动，游戏内限4次）
+      if (gameState.enemyHeroId === 'chenjiawei' && gameState.enemyJingxiaUsed < 4 && !skillSealedEnemy('惊吓')) {
+        gameState.enemyJingxiaUsed++;
+        log('😱 敌【惊吓】发动（本局 ' + gameState.enemyJingxiaUsed + '/4）');
+        applyJingxia('me', 'enemy');
+        if (gameOver) return;
+      }
+      // 鬼影：你身上的「鬼」≥3层时，每回合开始失去1点体力
+      if ((gameState.enemyGhost || 0) >= 3) {
+        log('👻 你身上的「鬼」(' + gameState.enemyGhost + '层)发作，你失去1点体力');
+        loseHp('me', 1, '鬼影');
+        if (gameOver || gameState.myHp <= 0) return;
+      }
+      // 贴纸（命星5层）：敌方「鬼」≥4层时，每2回合回复1点体力，满血摸2张
+      if (gameState.heroId === 'chenjiawei' && (gameState.myGhost || 0) >= 4 && cons5On('chenjiawei', 'me')) {
+        gameState.myStickerTurn = (gameState.myStickerTurn || 0) + 1;
+        if (gameState.myStickerTurn % 2 === 0) {
+          if (gameState.myHp < gameState.myMaxHp) {
+            gameState.myHp++;
+            log('🩹 【贴纸】你回复1点体力(' + gameState.myHp + '/' + gameState.myMaxHp + ')');
+          } else {
+            drawCard('me', 2);
+            log('🩹 【贴纸】你体力已满，改为摸2张牌');
+          }
+          renderBattle();
+        }
+      }
       gameState.usedMalou = false;
       gameState.usedTouxi = false;
       gameState.myCixinHeal = 0;
@@ -36230,6 +36738,53 @@ sync2v2State();
       if ((gameState._tangyuEnemy || 0) > 0) gameState._tangyuEnemy--;
       gameState.isProcessing = true;
       gameState.enemyHasUsedMaoniangCount = 0;
+      // 玩家陈佳葳：惊吓（敌方回合开始时询问，游戏内限4次）
+      if (gameState.heroId === 'chenjiawei' && gameState.myJingxiaUsed < 4 && !skillSealedMe('惊吓') && !gameOver) {
+        gameState.myJingxiaUsed++;
+        showModal('😱 惊吓（本局已用 ' + gameState.myJingxiaUsed + '/4）',
+          '敌方回合开始：令敌人弃置2张牌，然后判定——红色：敌方失去1点体力并跳过本次出牌阶段；黑色：你获得【鬼影】。', [{
+            text: '发动',
+            color: '#e74c3c',
+            action: function() {
+              closeModal();
+              applyJingxia('enemy', 'me', function() {
+                if (!gameOver) startEnemyTurnCore();
+              });
+            }
+          }, {
+            text: '不发动',
+            color: '#7f8c8d',
+            action: function() {
+              closeModal();
+              startEnemyTurnCore();
+            }
+          }]);
+        return;
+      }
+      startEnemyTurnCore();
+    }
+
+    function startEnemyTurnCore() {
+      if (gameOver) return;
+      // 鬼影：敌方身上的「鬼」≥3层时，每回合开始失去1点体力
+      if ((gameState.myGhost || 0) >= 3 && gameState.enemyHp > 0) {
+        log('👻 敌方身上的「鬼」(' + gameState.myGhost + '层)发作，敌方失去1点体力');
+        loseHp('enemy', 1, '鬼影');
+        if (gameOver || gameState.enemyHp <= 0) return;
+      }
+      // 贴纸（AI命星5层）：你身上「鬼」≥4层时，敌方每2回合回复1点体力，满血摸2张
+      if (gameState.enemyHeroId === 'chenjiawei' && (gameState.enemyGhost || 0) >= 4 && cons5On('chenjiawei', 'enemy')) {
+        gameState.enemyStickerTurn = (gameState.enemyStickerTurn || 0) + 1;
+        if (gameState.enemyStickerTurn % 2 === 0) {
+          if (gameState.enemyHp < gameState.enemyMaxHp) {
+            gameState.enemyHp++;
+            log('🩹 敌【贴纸】回复1体力(' + gameState.enemyHp + '/' + gameState.enemyMaxHp + ')');
+          } else {
+            drawCard('enemy', 2);
+            log('🩹 敌【贴纸】满血摸2张');
+          }
+        }
+      }
       renderBattle();
       setTimeout(function() {
         triggerChuyin('enemy');
@@ -36387,8 +36942,7 @@ sync2v2State();
       }, 350);
     }
 
-    function chen1v1DwdJudge(who) {
-      var isMe = who === 'me';
+    function chen1v1DwdJudge(who) {      var isMe = who === 'me';
       var key = isMe ? 'my' : 'enemy';
       var hid = isMe ? gameState.heroId : gameState.enemyHeroId;
       if (hid !== 'chenqilong' || gameState[key + 'DwdResult']) return;
@@ -37083,6 +37637,57 @@ sync2v2State();
     }
 
     function enemyAI_Skill(cb) {
+      // 陈佳葳AI：疾悚（五回合限一次；你身上「鬼」≥5层时为限定技并追加3点伤害）
+      if (gameState.enemyHeroId === 'chenjiawei' && !skillSealedEnemy('疾悚') && gameState.myHp > 0) {
+        var _jsLimited = (gameState.enemyGhost || 0) >= 5;
+        var _jsCdOk = gameState.turnNumber - (gameState.enemyJisongLastTurn === undefined ? -99 : gameState.enemyJisongLastTurn) >= 5;
+        var _jsUsable = _jsLimited ? !gameState.enemyJisongLimitedUsed : _jsCdOk;
+        if (_jsUsable && (gameState.myHand.length > 0 || gameState.myEquipment.weapon || gameState.myEquipment.armor)) {
+          if (_jsLimited) gameState.enemyJisongLimitedUsed = true;
+          gameState.enemyJisongLastTurn = gameState.turnNumber;
+          var _jsN = gameState.myHand.length;
+          gameState.myHand.forEach(function(c) {
+            discardCard(c);
+            playerLoseCard(c, 'discard');
+          });
+          gameState.myHand = [];
+          ['weapon', 'armor'].forEach(function(sl) {
+            if (gameState.myEquipment[sl]) {
+              discardCard(gameState.myEquipment[sl]);
+              gameState.myEquipment[sl] = null;
+            }
+          });
+          log('😨 敌【疾悚】你弃置了所有手牌(' + _jsN + '张)与装备');
+          if (_jsLimited) {
+            log('💀 敌【疾悚·鬼影】追加：你受到3点伤害');
+            var _jsDead = takeDamage('me', 3);
+            if (_jsDead || gameOver) {
+              resumeEnemyChain();
+              return;
+            }
+          }
+          renderBattle();
+          if (gameOver) return;
+        }
+      }
+      // 陈佳葳AI：醋意摇（命星4层限定技，需你身上「鬼」>2层）
+      if (gameState.enemyHeroId === 'chenjiawei' && cons4On('chenjiawei', 'enemy') && !gameState.enemyCuyiyaoUsed &&
+        !skillSealedEnemy('醋意摇') && (gameState.enemyGhost || 0) > 2 && gameState.myHp > 0 && gameState.myHp <= 3) {
+        gameState.enemyCuyiyaoUsed = true;
+        gameState.enemyGhost = 0;
+        var _cyN = gameState.enemyHand.length;
+        gameState.enemyHand.forEach(function(c) {
+          discardCard(c);
+          enemyLoseCard(c, 'discard');
+        });
+        gameState.enemyHand = [];
+        log('🍋 敌【醋意摇】清空你身上的「鬼」，敌方弃置所有手牌(' + _cyN + '张)');
+        gameState.myHp = 0;
+        log('💀 敌【醋意摇】你进入濒死状态！');
+        renderBattle();
+        promptForDying();
+        return;
+      }
       if (gameState.enemyHeroId === 'chenqilong') {
         aiChenqilong1v1();
         if (gameOver || gameState.enemyHp <= 0) return;
@@ -38219,6 +38824,7 @@ sync2v2State();
     }
 
     function handleEnemyKillHit_player(dmg, ac) {
+      gameState._killSrc = true; // 标记：本次伤害来源为【杀】
       if (gameState.enemyEquipment.weapon && gameState.enemyEquipment.weapon.effect === 'weapon_guding' && !gameState
         .myHand.length) {
         dmg++;
@@ -38241,6 +38847,7 @@ sync2v2State();
             nm.push(dc.name);
           });
           if (nm.length) log('🗑️ 你弃' + nm.join('、'));
+          gameState._killSrc = false;
           gameState.isProcessing = false;
           renderBattle();
           setTimeout(function() {
@@ -38254,6 +38861,7 @@ sync2v2State();
         log('❗ 敌【感叹号】对【问号】拥有者(你)伤害+1');
       }
       var dead = takeDamage('me', dmg);
+      gameState._killSrc = false;
       if (!dead && gameState.wenhaoTarget === 'me' && gameState.enemyHeroId === 'sunxinxin' && !skillSealedEnemy('感叹号') &&
         gameState.myHand.length > 0) {
         var _sc2 = gameState.myHand.splice(Math.floor(Math.random() * gameState.myHand.length), 1)[0];
