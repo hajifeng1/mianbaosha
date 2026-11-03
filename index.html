@@ -15380,6 +15380,7 @@ Resources:`;
       font-size: 13px;
       cursor: pointer;
     }
+  .yb-ic{width:1.05em;height:1.05em;vertical-align:-0.18em;object-fit:contain;}
   </style>
   <div id="story-overlay" onclick="storyAdvance()">
     <button class="story-skip" onclick="event.stopPropagation(); storySkipAll()">跳过全部 ▸▸</button>
@@ -15476,7 +15477,7 @@ Resources:`;
       <div class="lobby-body">
         <div class="lobby-side-nav">
           <div class="side-title">杂栏</div>
-          <div class="side-item" onclick="openTaskPage()"><i class="ic">📋</i><span>任务</span></div>
+          <div class="side-item" onclick="openDailyPage()"><i class="ic">📆</i><span>日常</span></div>
           <div class="side-item" onclick="openModalEl('announce-modal')"><i class="ic">📢</i><span>公告</span></div>
           <div class="side-item" onclick="openActivityPage()"><i class="ic">🎡</i><span>活动</span></div>
           <div class="side-item" onclick="openSettings()"><i class="ic">⚙️</i><span>设置</span></div>
@@ -15490,7 +15491,7 @@ Resources:`;
                 id="lobby-level">1</span> <span id="lobby-rank-badge" class="rank-badge">无段位</span><span
                 id="lobby-rank-change" class="rank-change"></span><span id="lobby-coins"
                 style="margin-left:8px;color:#f1c40f;">💰 0</span><span id="lobby-yuanbao"
-                style="margin-left:8px;color:#e67e22;">💎 0</span><span id="lobby-jianghun"
+                style="margin-left:8px;color:#e67e22;"><img src="yuanbao.png" class="yb-ic"> 0</span><span id="lobby-jianghun"
                 style="margin-left:8px;color:#9b59b6;">🔮 0</span></span>
             <div class="xp-bar-wrap" title="经验值">
               <div class="xp-bar-fill" id="xp-bar-fill"></div>
@@ -15548,6 +15549,12 @@ Resources:`;
       </div>
       <div id="task-content" style="padding:14px;overflow-y:auto;"></div>
     </div>
+    <div id="daily-page" class="page">
+      <div class="heroes-header"><button class="btn-back" onclick="closeSubPage('daily-page')">← 返回</button>
+        <h2>📆 日常</h2>
+      </div>
+      <div id="daily-content" style="padding:14px;overflow-y:auto;"></div>
+    </div>
     <div id="heroes-page" class="page">
       <div class="heroes-header"><button class="btn-back" onclick="hideHeroesPage()">← 返回</button>
         <h2 id="heroes-page-title">武将图鉴</h2>
@@ -15586,7 +15593,7 @@ Resources:`;
       <div class="heroes-header"><button class="btn-back" onclick="closeSubPage('shop-page')">← 返回</button>
         <h2>🛒 商城</h2>
         <div class="shop-coins">💰 <span id="shop-coins-num">0</span></div>
-        <div class="shop-coins" style="color:#e67e22;margin-left:10px;">💎 <span id="shop-yuanbao-num">0</span></div>
+        <div class="shop-coins" style="color:#e67e22;margin-left:10px;"><img src="yuanbao.png" class="yb-ic"> <span id="shop-yuanbao-num">0</span></div>
         <div class="shop-coins" style="color:#9b59b6;margin-left:10px;">🔮 <span id="shop-jianghun-num">0</span></div>
       </div>
       <div class="shop-tabs" id="shop-tabs"></div>
@@ -15865,7 +15872,7 @@ Resources:`;
           clearInterval(_wd);
           endIntro();
         }
-      }, 5000);
+      }, 3000);
       vid.addEventListener('playing', function() {
         clearInterval(_wd);
       });
@@ -15900,7 +15907,7 @@ Resources:`;
               iv.style.display = 'none';
               releaseVideo();
             }, 520);
-          }, 1400);
+          }, 900);
         } else {
           iv.classList.add('fade-out');
           setTimeout(function() {
@@ -15925,7 +15932,7 @@ Resources:`;
       // 兜底：15 秒未结束强制跳过，防止卡死
       setTimeout(function() {
         if (!ended) endIntro();
-      }, 15000);
+      }, 10000);
     })();
 
     // ============ 大厅背景音乐（主页/底部导航页播放，登录/开局/战斗暂停） ============
@@ -16481,10 +16488,10 @@ Resources:`;
         await Promise.all(assets.map(preloadImage));
       } catch (e) {}
       var dt = Date.now() - t0;
-      if (dt < 1200) {
+      if (dt < 450) {
         try {
           await new Promise(function(r) {
-            setTimeout(r, 1200 - dt);
+            setTimeout(r, 450 - dt);
           });
         } catch (e) {}
       }
@@ -16493,7 +16500,7 @@ Resources:`;
         ss.classList.add('fade-out');
         setTimeout(function() {
           ss.style.display = 'none';
-        }, 650);
+        }, 400);
       }
     }
 
@@ -18046,7 +18053,7 @@ Resources:`;
             closeModalEl('receive-invite-modal');
           }
         } catch (e) {}
-      }, 5000);
+      }, 3000);
     }
     async function showInvitePopup(hostId) {
       if (!sb) return;
@@ -18359,7 +18366,7 @@ Resources:`;
       var ce0 = document.getElementById('lobby-coins');
       if (ce0) ce0.innerText = '💰 ' + (userProfile.coins || 0);
       var yb0 = document.getElementById('lobby-yuanbao');
-      if (yb0) yb0.innerText = '💎 ' + (userProfile.yuanbao || 0);
+      if (yb0) yb0.innerHTML = '<img src="yuanbao.png" class="yb-ic"> ' + (userProfile.yuanbao || 0);
       var jh0 = document.getElementById('lobby-jianghun');
       if (jh0) jh0.innerText = '🔮 ' + (userProfile.jianghun || 0);
       var b = document.getElementById('lobby-rank-badge');
@@ -18912,6 +18919,35 @@ Resources:`;
           cons: 6,
           desc: '【命星6层】当一名角色拥有7层及以上「鬼」时，你可以于出牌阶段的任意时刻查看敌方手牌。'
         }]
+      },
+      {
+        id: 'yuanyuming',
+        name: '袁煜明',
+        title: '虚弱的大爷（在我的网站里还想嚣张）',
+        hp: 2,
+        maxHp: 2,
+        faction: '面',
+        portrait: '👴',
+        skills: [{
+          name: '虚弱',
+          type: 'lock',
+          persistent: true,
+          desc: '持恒技，当你受到伤害时，你可以判定：若为红牌，伤害来源失去1点体力；若为黑牌，你摸2张牌并使伤害来源弃置1张牌。'
+        }, {
+          name: '尊老爱幼',
+          type: 'lock',
+          persistent: true,
+          desc: '持恒技，当你被任意伤害类手牌或技能指定时，来源需额外弃置1张基本牌，否则使本次效果无效。'
+        }, {
+          name: '空竹砸死人',
+          type: 'active',
+          desc: '出牌阶段限一次，你可以对一名角色造成1点火焰伤害；若其体力值大于3，重复此效果（无重复次数限制）。'
+        }, {
+          name: '装糖',
+          type: 'lock',
+          persistent: true,
+          desc: '阵营技，若场上有【糖】阵营的角色，你的手牌上限改为无限、摸牌阶段摸牌数+1、初始手牌+5，且你的【杀】不计入次数限制。'
+        }]
       }
     ];
     var HEROES = [],
@@ -18946,6 +18982,7 @@ Resources:`;
       if (id === 'zhangchenrui') return (userProfile.ownedHeroes || []).indexOf('zhangchenrui') !== -1;
       if (id === 'chenqilong') return (userProfile.ownedHeroes || []).indexOf('chenqilong') !== -1;
       if (id === 'sunxinxin') return (userProfile.ownedHeroes || []).indexOf('sunxinxin') !== -1;
+      if (id === 'yuanyuming') return (userProfile.ownedHeroes || []).indexOf('yuanyuming') !== -1;
       if (id === 'chenjiawei') return (userProfile.ownedHeroes || []).indexOf('chenjiawei') !== -1;
       var r = HERO_UNLOCK_LEVELS[id];
       return r === undefined ? true : userProfile.level >= r;
@@ -19369,6 +19406,7 @@ Resources:`;
           obtain = '🎁 限定招募获取';
         else if (id === 'chenqilong') obtain = '🛒 元宝商城 · 20元宝购买 ／ 🎁 限定招募';
         else if (id === 'sunxinxin') obtain = '🔮 将魂商城 · 1000将魂购买';
+        else if (id === 'yuanyuming') obtain = '🔮 将魂商城 · 1000将魂购买';
         else obtain = '🔒 等级达到 LV.' + (HERO_UNLOCK_LEVELS[id] || 1) + ' 解锁';
       }
       var sh = '';
@@ -19711,6 +19749,9 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
           } else if (hero.id === 'sunxinxin') {
             lr = '<div class="lock-requirement">🔮 将魂商城 · 1000将魂购买</div>';
             btnHtml = '<button class="hero-select-btn" onclick="openShopPage()">🛒 去商城购买</button>';
+          } else if (hero.id === 'yuanyuming') {
+            lr = '<div class="lock-requirement">🔮 将魂商城 · 1000将魂购买</div>';
+            btnHtml = '<button class="hero-select-btn" onclick="openShopPage()">🛒 去商城购买</button>';
           } else if (hero.id === 'shengshixuyifeng' || hero.id === 'sunjiayuan' || hero.id === 'zhangchenrui' ||
             hero.id === 'chenqilong') {
             lr = '<div class="lock-requirement">🎁 限定招募获取</div>';
@@ -19797,6 +19838,13 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
       price: 1000,
       currency: 'jianghun',
       desc: '武将「孙星星女士」。售价 1000 将魂，购买后永久解锁，可出战主线与2v2。'
+    }, {
+      heroId: 'yuanyuming',
+      name: '袁煜明',
+      icon: '👴',
+      price: 1000,
+      currency: 'jianghun',
+      desc: '武将「虚弱的大爷」。售价 1000 将魂，购买后永久解锁，可出战主线与2v2。'
     }];
     var SHOP_ITEMS = [{
       id: 'fuhuo',
@@ -19822,10 +19870,10 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
     }, {
       id: 'coin2yb',
       name: '元宝',
-      icon: '💎',
-      price: 10000,
+      icon: '<img src="yuanbao.png" class="yb-ic">',
+      price: 100000,
       currency: 'coins',
-      desc: '💰 10000 金币兑换 💎 1 元宝。金币太多的面包师可以在此换点硬通货。'
+      desc: '💰 100000 金币兑换 💎 1 元宝。金币太多的面包师可以在此换点硬通货。'
     }];
 
     function isShopExclusiveHero(id) {
@@ -20155,7 +20203,7 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
             el.innerText = '';
             el.className = 'chat-status';
           }
-        }, 5000);
+        }, 3000);
       }
     }
 
@@ -21343,7 +21391,7 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
       if (!r) return '';
       if (typeof r === 'number') return '💰' + r;
       var parts = [];
-      if (r.yuanbao) parts.push('💎' + r.yuanbao);
+      if (r.yuanbao) parts.push('<img src="yuanbao.png" class="yb-ic">' + r.yuanbao);
       if (r.coins) parts.push('💰' + r.coins);
       return parts.join(' ');
     }
@@ -21438,63 +21486,119 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
       saveProfileToCloud();
       updateLobbyRankUI();
       renderTasks();
+      renderDaily();
       var msg = '🎁 任务完成！获得 ';
-      if (yb) msg += '💎 ' + yb + ' 元宝 ';
+      if (yb) msg += yb + ' 元宝 ';
       if (coins) msg += '💰 ' + coins + ' 金币';
       alert(msg);
     }
 
-    function openTaskPage() {
+    function _subPageShow(id) {
       var pageIds = ['lobby-page', 'activity-page', 'heroes-page', 'shop-page', 'bag-page', 'rank-page', 'level-page',
-        'chat-page'
+        'chat-page', 'task-page', 'daily-page'
       ];
-      pageIds.forEach(function(id) {
-        var p = document.getElementById(id);
+      pageIds.forEach(function(pid) {
+        var p = document.getElementById(pid);
         if (p) p.classList.remove('active');
       });
-      document.getElementById('task-page').classList.add('active');
+      document.getElementById(id).classList.add('active');
+    }
+
+    function openTaskPage() {
+      _subPageShow('task-page');
       renderTasks();
+    }
+
+    function openDailyPage() {
+      _subPageShow('daily-page');
+      renderDaily();
+    }
+
+    function _taskItemHTML(kind, key, name, desc) {
+      var st = userProfile.tasks[kind][key];
+      var status;
+      if (st === 0) {
+        status = '<span style="color:#7f8c8d;white-space:nowrap;">⬜ 未完成</span>';
+      } else if (st === 1) {
+        status = '<button class="btn-primary" style="padding:5px 14px;font-size:13px;white-space:nowrap;" onclick="claimTask(\'' +
+          kind + '\',\'' + key + '\')">🎁 领取 ' + taskRewardLabel(key) + '</button>';
+      } else {
+        status = '<span style="color:#2ecc71;white-space:nowrap;">✅ 已领取</span>';
+      }
+      return '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;background:rgba(255,255,255,.06);border:1px solid #444;border-radius:10px;padding:12px 14px;margin-bottom:10px;">' +
+        '<div><div style="font-size:15px;color:#eee;font-weight:bold;">' + name + '</div>' +
+        '<div style="font-size:12px;color:#9aa0a6;margin-top:3px;">' + desc + '</div></div>' + status + '</div>';
+    }
+
+    // ============ 日常页：元宝树 + 每日任务 ============
+    function moneyTreeClaimedToday() {
+      return (userProfile.moneyTree && userProfile.moneyTree.date === _todayStr());
+    }
+
+    function claimMoneyTree() {
+      if (moneyTreeClaimedToday()) return alert('🌳 今天的元宝已经摘过啦，明天 0 点后再来！');
+      // 分段随机：1-10（70%）/ 11-30（20%）/ 31-60（7%）/ 61-99（3%），越高越稀有，整体均值约13
+      var r = Math.random(),
+        amt;
+      if (r < 0.70) amt = 1 + Math.floor(Math.random() * 10);
+      else if (r < 0.90) amt = 11 + Math.floor(Math.random() * 20);
+      else if (r < 0.97) amt = 31 + Math.floor(Math.random() * 30);
+      else amt = 61 + Math.floor(Math.random() * 39);
+      userProfile.moneyTree = {
+        date: _todayStr(),
+        last: amt
+      };
+      userProfile.yuanbao = (userProfile.yuanbao || 0) + amt;
+      saveProfileToCloud();
+      updateLobbyRankUI();
+      renderDaily();
+      try { showGainAnim([{ icon: '<img src="yuanbao.png" class="yb-ic">', name: '元宝', count: amt }]); } catch (e) {}
+      setTimeout(function() {
+        alert('🌳 元宝树今日结出了 ' + amt + ' 元宝！' + (amt >= 60 ? '\n✨ 大吉大利，人品爆发！' : (amt >= 31 ?
+          '\n🎉 运气不错哦！' : '')));
+      }, 350);
+    }
+
+    function renderDaily() {
+      ensureTaskState();
+      var box = document.getElementById('daily-content');
+      if (!box) return;
+      var now = new Date(),
+        midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0);
+      var hLeft = Math.max(1, Math.round((midnight - now) / 3600000));
+      var claimed = moneyTreeClaimedToday(),
+        lastAmt = (userProfile.moneyTree && userProfile.moneyTree.last) || 0;
+      var h = '<div style="background:linear-gradient(135deg,#1e5631 0%,#27ae60 100%);border-radius:14px;padding:22px 18px;margin-bottom:16px;text-align:center;position:relative;overflow:hidden;">' +
+        '<div style="font-size:44px;line-height:1;">🌳</div>' +
+        '<div style="font-size:18px;font-weight:900;color:#fff;margin-top:8px;text-shadow:0 2px 8px rgba(0,0,0,.35);">元宝树</div>' +
+        '<div style="font-size:12px;color:rgba(255,255,255,.85);margin-top:6px;line-height:1.7;">每天可摘取 1 ~ 99 元宝 · 数额越大越稀有<br>今日份已经' + (claimed ? '摘取：✨ ' + lastAmt + ' 元宝' : '成熟，等你来摘！') + '</div>' +
+        (claimed ?
+          '<button class="btn-signin" disabled style="margin-top:12px;">✅ 今日已摘取 · 明天再来</button>' :
+          '<button class="btn-signin" style="margin-top:12px;" onclick="claimMoneyTree()">🖐️ 摘取今日元宝</button>') +
+        '</div>';
+      h += '<div style="font-size:15px;color:#f1c40f;margin:2px 0 10px;">📅 每日任务 <span style="font-size:12px;color:#7f8c8d;">（每天 0 点刷新 · 还剩约 ' +
+        hLeft + ' 小时）</span></div>' +
+        _taskItemHTML('daily', 'login', '📣 每日登录', '登录游戏即可领取') +
+        _taskItemHTML('daily', 'arena', '⚔️ 进行 1 局演武', '与 AI 进行一局单挑，胜负均计入') +
+        _taskItemHTML('daily', 'campaign', '🗺️ 通过 1 关主线', '在主线模式通过任意一关') +
+        _taskItemHTML('daily', 'chatmsg', '💬 在聊天里发送一条消息', '在聊天频道发出一条消息（表情、图片均可）') +
+        _taskItemHTML('daily', 'dmg10', '💥 在任意战局内造成 10 点伤害', '演武、主线、面包往事或 2v2 中累计造成 10 点伤害');
+      var dow = now.getDay() || 7,
+        monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - (dow - 1) + 7, 0, 0, 0);
+      var dLeft = Math.max(1, Math.round((monday - now) / 86400000));
+      h += '<div style="font-size:15px;color:#e67e22;margin:16px 0 10px;">🗓️ 周任务 <span style="font-size:12px;color:#7f8c8d;">（每周一 0 点刷新 · 还剩约 ' +
+        dLeft + ' 天）</span></div>' +
+        _taskItemHTML('weekly', 'tv2', '🏟️ 进行 1 局 2v2', '与好友进行一局 2v2，胜负均计入') +
+        _taskItemHTML('weekly', 'addfriend', '🤝 添加一名好友', '在好友申请中同意一条申请，即可与对方成为好友');
+      box.innerHTML = h;
     }
 
     function renderTasks() {
       ensureTaskState();
       var box = document.getElementById('task-content');
       if (!box) return;
-      var now = new Date(),
-        midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0),
-        dow = now.getDay() || 7,
-        monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - (dow - 1) + 7, 0, 0, 0);
-      var hLeft = Math.max(1, Math.round((midnight - now) / 3600000)),
-        dLeft = Math.max(1, Math.round((monday - now) / 86400000));
-
-      function itemHTML(kind, key, name, desc) {
-        var st = userProfile.tasks[kind][key];
-        var status;
-        if (st === 0) {
-          status = '<span style="color:#7f8c8d;white-space:nowrap;">⬜ 未完成</span>';
-        } else if (st === 1) {
-          status = '<button class="btn-primary" style="padding:5px 14px;font-size:13px;white-space:nowrap;" onclick="claimTask(\'' +
-            kind + '\',\'' + key + '\')">🎁 领取 ' + taskRewardLabel(key) + '</button>';
-        } else {
-          status = '<span style="color:#2ecc71;white-space:nowrap;">✅ 已领取</span>';
-        }
-        return '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;background:rgba(255,255,255,.06);border:1px solid #444;border-radius:10px;padding:12px 14px;margin-bottom:10px;">' +
-          '<div><div style="font-size:15px;color:#eee;font-weight:bold;">' + name + '</div>' +
-          '<div style="font-size:12px;color:#9aa0a6;margin-top:3px;">' + desc + '</div></div>' + status + '</div>';
-      }
-
-      box.innerHTML =
-        '<div style="font-size:15px;color:#f1c40f;margin:2px 0 10px;">📅 每日任务 <span style="font-size:12px;color:#7f8c8d;">（每天 0 点刷新 · 还剩约 ' +
-        hLeft + ' 小时）</span></div>' +
-        itemHTML('daily', 'login', '📣 每日登录', '登录游戏即可领取') +
-        itemHTML('daily', 'arena', '⚔️ 进行 1 局演武', '与 AI 进行一局单挑，胜负均计入') +
-        itemHTML('daily', 'campaign', '🗺️ 通过 1 关主线', '在主线模式通过任意一关') +
-        itemHTML('daily', 'chatmsg', '💬 在聊天里发送一条消息', '在聊天频道发出一条消息（表情、图片均可）') +
-        itemHTML('daily', 'dmg10', '💥 在任意战局内造成 10 点伤害', '演武、主线、面包往事或 2v2 中累计造成 10 点伤害') +
-        '<div style="font-size:15px;color:#e67e22;margin:18px 0 10px;">🗓️ 周任务 <span style="font-size:12px;color:#7f8c8d;">（每周一 0 点刷新 · 还剩约 ' +
-        dLeft + ' 天）</span></div>' +
-        itemHTML('weekly', 'tv2', '🏟️ 进行 1 局 2v2', '与好友进行一局 2v2，胜负均计入') +
-        itemHTML('weekly', 'addfriend', '🤝 添加一名好友', '在好友申请中同意一条申请，即可与对方成为好友');
+      box.innerHTML = '<div style="font-size:13px;color:#9aa0a6;padding:30px 10px;text-align:center;">📋 任务已合并至「杂栏 → 📆 日常」<br>每日任务、周任务和元宝树都在那里等你哦</div>';
+      renderDaily();
     }
 
     function _yesterdayStr() {
@@ -21534,7 +21638,7 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
           (rwI.img ? '<img src="' + rwI.img + '" alt="">' :
             (rwI.type === 'hero' ? (rwI.heroId === 'hajifeng' ? '🐝' : '🎖️') :
               (rwI.type === 'item' && rwI.itemId === 'shuangbei' ? '🎫' :
-                (rwI.type === 'yuanbao' ? '💎' : (i === 7 && loop < 1 ? '🎁' : '🪙')))));
+                (rwI.type === 'yuanbao' ? '<img src="yuanbao.png" class="yb-ic">' : (i === 7 && loop < 1 ? '🎁' : '🪙')))));
         h += '<div class="' + cls + '"><div class="d-num">第' + i + '天</div>' +
           '<div class="d-ic">' + ic + '</div>' +
           '<div class="d-rw">' + rwI.label + '</div></div>';
@@ -21678,7 +21782,7 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
         count: 10
       }]
     ];
-    var FESTIVAL_ICONS = ['💰', '💰', '💰', '💎', '💎', '🎖️', '🍯', '🍯', '🍯', '🍯'];
+    var FESTIVAL_ICONS = ['💰', '💰', '💰', '<img src="yuanbao.png" class="yb-ic">', '<img src="yuanbao.png" class="yb-ic">', '🎖️', '🍯', '🍯', '🍯', '🍯'];
     var FESTIVAL_LABELS = [
       '💰1000金币<br>💎10元宝',
       '💰4000金币<br>💎15元宝',
@@ -22268,7 +22372,7 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
     function _signInGainItem(rw) {
       if (!rw || !rw.type) return null;
       if (rw.type === 'coins') return { icon: '💰', name: '金币', count: rw.amount };
-      if (rw.type === 'yuanbao') return { icon: '💎', name: '元宝', count: rw.amount };
+      if (rw.type === 'yuanbao') return { icon: '<img src="yuanbao.png" class="yb-ic">', name: '元宝', count: rw.amount };
       if (rw.type === 'item') {
         var m = _gainItemMeta(rw.itemId);
         return { icon: m.icon, name: m.name, count: rw.count };
@@ -22353,8 +22457,17 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
       var a = _pwArr();
       if (a[idx]) return '';
       a[idx] = true;
-      queueCloudSave();
+      try { saveProfileToCloud(); } catch (e) { queueCloudSave(); }
       return '\n🔑 获得隐藏暗号第' + (idx + 1) + '位：「' + hiddenPwArr()[idx] + '」';
+    }
+
+    // 揭示下一个未获得的暗号位（用于保底：对应关卡位已获得时，自动补发下一位，防止老玩家卡暗号）
+    function revealNextHiddenPw() {
+      var a = _pwArr();
+      for (var i = 0; i < 6; i++) {
+        if (!a[i]) return revealHiddenPw(i);
+      }
+      return '';
     }
 
     var _eggClicks = {
@@ -22807,7 +22920,7 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
           userProfile.yuanbao = (userProfile.yuanbao || 0) + 1500;
           userProfile.coins = (userProfile.coins || 0) + 10000;
           gains.push('💎1500元宝', '💰10000金币');
-          _gi.push({ icon: '💎', name: '元宝', count: 1500 }, { icon: '💰', name: '金币', count: 10000 });
+          _gi.push({ icon: '<img src="yuanbao.png" class="yb-ic">', name: '元宝', count: 1500 }, { icon: '💰', name: '金币', count: 10000 });
           if (!userProfile.ownedHeroes) userProfile.ownedHeroes = [];
           if (userProfile.ownedHeroes.indexOf('shengshixuyifeng') === -1) {
             userProfile.ownedHeroes.push('shengshixuyifeng');
@@ -22826,7 +22939,7 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
           userProfile.inventory['shengshi_trial'] = (userProfile.inventory['shengshi_trial'] || 0) + 1;
           userProfile.inventory['fengmi'] = (userProfile.inventory['fengmi'] || 0) + 76;
           gains.push('💎1000元宝', '🎫盛世·徐翊峰体验卡×1', '🍯蜂蜜×76');
-          _gi.push({ icon: '💎', name: '元宝', count: 1000 }, { icon: '🎫', name: '盛世·徐翊峰体验卡', count: 1 }, {
+          _gi.push({ icon: '<img src="yuanbao.png" class="yb-ic">', name: '元宝', count: 1000 }, { icon: '🎫', name: '盛世·徐翊峰体验卡', count: 1 }, {
             icon: '🍯',
             name: '蜂蜜',
             count: 76
@@ -22849,7 +22962,7 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
     var _shopTab = 'coins';
 
     function _shopCurrencyLabel(cur) {
-      return cur === 'yuanbao' ? '💎 ' : (cur === 'jianghun' ? '🔮 ' : '💰 ');
+      return cur === 'yuanbao' ? '<img src="yuanbao.png" class="yb-ic"> ' : (cur === 'jianghun' ? '🔮 ' : '💰 ');
     }
 
     function renderShop() {
@@ -22867,14 +22980,14 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
           label: '💰 金币'
         }, {
           id: 'yuanbao',
-          label: '💎 元宝'
+          label: '<img src="yuanbao.png" class="yb-ic"> 元宝'
         }, {
           id: 'jianghun',
           label: '🔮 将魂'
         }].forEach(function(t) {
           var b = document.createElement('button');
           b.className = 'shop-tab' + (_shopTab === t.id ? ' active' : '');
-          b.innerText = t.label;
+          b.innerHTML = t.label;
           b.onclick = function() {
             _shopTab = t.id;
             renderShop();
@@ -22993,7 +23106,7 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
       var cur = it.currency || 'coins';
       var bal = _shopBalance(cur);
       if (bal < it.price) {
-        alert(_shopCurrencyLabel(cur) + ' ' + _curName(cur) + '不足（需要 ' + it.price + '，当前 ' + bal +
+        alert('⚠️ ' + _curName(cur) + '不足（需要 ' + it.price + '，当前 ' + bal +
           '）\n通过主线过关可获得金币（首通 600 / 扫荡 300）');
         return;
       }
@@ -23094,11 +23207,12 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
       chenqilong: 4,
       chenminghan: 4,
       hajifeng: 3,
-      sunxinxin: 3
+      sunxinxin: 3,
+      yuanyuming: 3
     };
     var FORGE_ORDER = ['default', 'wangsheng', 'liyucheng', 'manhongyi', 'sunliangcheng', 'zhangchenrui',
       'sunjiayuan', 'xuzongwei', 'chensicong', 'yuchengxiao', 'shengshixuyifeng', 'xuyifeng', 'chenqilong', 'chenminghan',
-      'hajifeng', 'sunxinxin'
+      'hajifeng', 'sunxinxin', 'yuanyuming'
     ];
 
     function openForgePage() {
@@ -23198,7 +23312,7 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
     function bbQtyUpdate() {
       document.getElementById('fbm-num').innerText = _bb.qty;
       document.getElementById('fbm-range').value = _bb.qty;
-      document.getElementById('fbm-cost').innerText = '消耗 ' + _shopCurrencyLabel(_bb.currency) + _bb.unitPrice +
+      document.getElementById('fbm-cost').innerHTML = '消耗 ' + _shopCurrencyLabel(_bb.currency) + _bb.unitPrice +
         ' × ' + _bb.qty + ' = ' + (_bb.unitPrice * _bb.qty) + ' ' + _curName(_bb.currency);
       document.getElementById('fbm-ok').innerText = '确认 ×' + _bb.qty;
     }
@@ -23831,6 +23945,77 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
       ].indexOf(c.effect) !== -1;
     }
 
+    function isBasicCard(c) {
+      return c && ['damage', 'fire_damage', 'thunder_damage', 'dodge', 'peach', 'wine'].indexOf(c.effect) !== -1;
+    }
+
+    function heroFactionById(id) {
+      for (var i = 0; i < HEROES.length; i++) {
+        if (HEROES[i].id === id) return HEROES[i].faction || '';
+      }
+      return '';
+    }
+
+    // 袁煜明【装糖】：场上是否存在【糖】阵营角色
+    function yumTangActive(isMe) {
+      try {
+        if (typeof is2v2Mode !== 'undefined' && is2v2Mode && typeof seats !== 'undefined' && seats && seats.length) {
+          for (var i = 0; i < seats.length; i++) {
+            if (seats[i].alive && seats[i].hero && seats[i].hero.faction === '糖') return true;
+          }
+          return false;
+        }
+        var otherId = isMe ? gameState.enemyHeroId : gameState.heroId;
+        return heroFactionById(otherId) === '糖';
+      } catch (e) {
+        return false;
+      }
+    }
+
+    // 袁煜明【尊老爱幼】中央结算：来源需额外弃置1张基本牌，否则本次效果无效。返回 false = 无效
+    function zlGate(isMeTarget) {
+      var heroId = isMeTarget ? gameState.heroId : gameState.enemyHeroId;
+      if (heroId !== 'yuanyuming') return true;
+      if (isMeTarget ? skillSealedMe('尊老爱幼') : skillSealedEnemy('尊老爱幼')) return true;
+      var srcHand = isMeTarget ? gameState.enemyHand : gameState.myHand;
+      var srcNm = isMeTarget ? '敌方' : '你';
+      var idx = srcHand.findIndex(isBasicCard);
+      if (idx === -1) {
+        log('🧓【尊老爱幼】' + srcNm + '没有基本牌可弃，本次效果无效！');
+        renderBattle();
+        return false;
+      }
+      var bc = srcHand.splice(idx, 1)[0];
+      discardCard(bc);
+      if (isMeTarget) enemyLoseCard(bc, 'discard');
+      else playerLoseCard(bc, 'discard');
+      log('🧓【尊老爱幼】' + srcNm + '额外弃置基本牌【' + bc.name + '】');
+      return true;
+    }
+
+    // 袁煜明【虚弱】：受到伤害后判定反制
+    function triggerXuruo(isMeTarget) {
+      var jc = judgeDrawCard();
+      if (!jc) return;
+      discardCard(jc);
+      var nm = isMeTarget ? '你' : '敌人';
+      log('🧓 ' + nm + '【虚弱】判定' + cardDesc(jc));
+      if (getSuitColor(jc.suit) === 'suit-red') {
+        log('🧓 ' + nm + '【虚弱】红色！伤害来源失去1点体力');
+        loseHp(isMeTarget ? 'enemy' : 'me', 1, '虚弱');
+      } else {
+        drawCard(isMeTarget ? 'me' : 'enemy', 2);
+        var sh = isMeTarget ? gameState.enemyHand : gameState.myHand;
+        if (sh.length) {
+          var dc = sh.splice(Math.floor(Math.random() * sh.length), 1)[0];
+          discardCard(dc);
+          log('🧓 ' + nm + '【虚弱】黑色，摸2张，伤害来源弃置【' + dc.name + '】');
+        } else {
+          log('🧓 ' + nm + '【虚弱】黑色，摸2张');
+        }
+      }
+    }
+
     function countCards(hand, fn) {
       var n = 0;
       hand.forEach(function(c) {
@@ -23861,8 +24046,49 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
       m.style.display = 'flex';
     }
 
+    var _respTimerInt = null;
+
+    function _startRespTimer(seconds, onTimeout) {
+      _stopRespTimer();
+      var t = document.getElementById('turn-timer');
+      var left = seconds * 1000,
+        total = left;
+      if (t) {
+        t.style.display = 'block';
+        t.className = '';
+      }
+      _respTimerInt = setInterval(function() {
+        try {
+          if (gameOver) {
+            _stopRespTimer();
+            return;
+          }
+          left -= 100;
+          var fill = document.getElementById('turn-timer-fill'),
+            txt = document.getElementById('turn-timer-text');
+          if (fill) fill.style.width = Math.max(0, left / total * 100) + '%';
+          if (txt) txt.innerText = Math.ceil(Math.max(0, left) / 1000) + 's';
+          if (t) t.className = left / total > 0.5 ? '' : (left / total > 0.2 ? 'low' : 'critical');
+          if (left <= 0) {
+            _stopRespTimer();
+            onTimeout();
+          }
+        } catch (e) {}
+      }, 100);
+    }
+
+    function _stopRespTimer() {
+      if (_respTimerInt) {
+        clearInterval(_respTimerInt);
+        _respTimerInt = null;
+      }
+      var t = document.getElementById('turn-timer');
+      if (t && !gameState.isMyTurn) t.style.display = 'none';
+    }
+
     function closeModal() {
       document.getElementById('response-modal').style.display = 'none';
+      _stopRespTimer();
     }
 
     function scheduleTurn(fn, delay) {
@@ -23976,6 +24202,7 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
     }
 
     function getKillLimit(heroId, hasW) {
+      if (heroId === 'yuanyuming' && yumTangActive(heroId === gameState.heroId)) return 999;
       if (heroId === 'chensicong') return 999;
       if (heroId === 'chenqilong') {
         var cqBF = (heroId === gameState.heroId) ? (gameState.myDwdDiamond || gameState.myTunshiBasicTurn) : (
@@ -24116,11 +24343,11 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
             }
             log(rwLog);
             unlockMsg = '';
-            if (selectedStoryLevel >= 1 && selectedStoryLevel <= 5) unlockMsg += revealHiddenPw(selectedStoryLevel - 1);
+            if (selectedStoryLevel >= 1 && selectedStoryLevel <= 5) unlockMsg += revealHiddenPw(selectedStoryLevel - 1) || revealNextHiddenPw();
             try {
               var _si = [];
               if (srw.fengmi) _si.push({ icon: '🍯', name: '蜂蜜', count: srw.fengmi });
-              if (srw.yuanbao) _si.push({ icon: '💎', name: '元宝', count: srw.yuanbao });
+              if (srw.yuanbao) _si.push({ icon: '<img src="yuanbao.png" class="yb-ic">', name: '元宝', count: srw.yuanbao });
               if (srw.coins) _si.push({ icon: '💰', name: '金币', count: srw.coins });
               if (srw.card) _si.push({ icon: '🎫', name: '盛世·徐翊峰体验卡', count: 1 });
               showGainAnim(_si);
@@ -24131,7 +24358,7 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
           if ((userProfile.storyProgress || 0) < selectedStoryLevel) userProfile.storyProgress = selectedStoryLevel;
         }
         if (currentGameMode === 'arena') {
-          unlockMsg += revealHiddenPw(5);
+          unlockMsg += revealHiddenPw(5) || revealNextHiddenPw();
           completeTask('daily', 'arena');
           addXp(80, '演武胜利');
           saveProfileToCloud();
@@ -24146,7 +24373,7 @@ var tl = sk.persistent ? '<span class="skill-type-persistent">持恒</span>' : (
           if (reward > 0 || ybReward > 0) {
             try {
               var _rwArr = [];
-              if (ybReward > 0) _rwArr.push({ icon: '💎', name: '元宝', count: ybReward });
+              if (ybReward > 0) _rwArr.push({ icon: '<img src="yuanbao.png" class="yb-ic">', name: '元宝', count: ybReward });
               if (reward > 0) _rwArr.push({ icon: '💰', name: '金币', count: reward });
               showGainAnim(_rwArr);
             } catch (e) {}
@@ -24243,7 +24470,10 @@ var isInitializing2v2 = false;
 
     function getSeatHandLimit(seat) {
       var hid = seat.hero.id;
-      if (hid === 'chensicong') return 999; 
+      if (hid === 'yuanyuming' && seats.some(function(s) {
+          return s.alive && s.hero && s.hero.faction === '糖';
+        })) return 999;
+      if (hid === 'chensicong') return 999;
       if (hid === 'xuzongwei' || hid === 'default') return 999;
       if (hid === 'chenqilong' && seat._dwdDiamond) return 999;
       if (hid === 'liyucheng') return seat.maxHp + 2;
@@ -24267,9 +24497,54 @@ var isInitializing2v2 = false;
       log('💨 ' + seat.hero.name + '【灵动】响应' + reason + '，叠加1层闪避(共' + seat._shanbi + '层)');
     }
 
+    // 袁煜明【尊老爱幼】2v2中央闸门：被伤害类牌/技能指定时，来源需弃1张基本牌否则无效
+    function zlGate2v2(targetSeat, sourceSeatIdx) {
+      if (!targetSeat || targetSeat.hero.id !== 'yuanyuming') return true;
+      if (skillSealed2v2(targetSeat, '尊老爱幼')) return true;
+      var src = (sourceSeatIdx !== undefined && sourceSeatIdx !== null) ? seats[sourceSeatIdx] : null;
+      if (!src || !src.alive || src === targetSeat) return true;
+      var bi = src.hand.findIndex(function(c) { return isBasicCard(c); });
+      if (bi === -1) {
+        log('🧓【尊老爱幼】' + src.hero.name + '无基本牌可弃，对' + targetSeat.hero.name + '的效果无效！');
+        render2v2Battle();
+        return false;
+      }
+      var bc = src.hand.splice(bi, 1)[0];
+      discardCard(bc);
+      log('🧓【尊老爱幼】' + src.hero.name + '额外弃置一张基本牌【' + bc.name + '】');
+      return true;
+    }
+
+    // 袁煜明【虚弱】2v2：受伤判定，红牌→来源失去1体力；黑牌→自己摸2且来源随机弃1
+    function triggerXuruo2v2(seat, sourceSeatIdx) {
+      var jc = judgeDrawCard();
+      var src = (sourceSeatIdx !== undefined && sourceSeatIdx !== null) ? seats[sourceSeatIdx] : null;
+      if (!jc) return;
+      if (jc.color === 'red') {
+        log('🧓 ' + seat.hero.name + '【虚弱】判定为红牌' + (jc.name || '') + '，伤害来源失去1点体力');
+        if (src && src.alive && src !== seat) loseHpSeat2v2(src, 1, '虚弱', seats.indexOf(seat));
+        render2v2Battle();
+      } else {
+        log('🧓 ' + seat.hero.name + '【虚弱】判定为黑牌' + (jc.name || '') + '，摸2张牌');
+        drawCardToSeat(seat, 2);
+        if (src && src.alive && src.hand.length > 0) {
+          var ri = Math.floor(Math.random() * src.hand.length);
+          var rc = src.hand.splice(ri, 1)[0];
+          discardCard(rc);
+          log('🧓 伤害来源' + src.hero.name + '被弃置一张【' + rc.name + '】');
+        }
+        render2v2Battle();
+      }
+    }
+
     function takeDamage2v2(seatIdx, dmg, sourceSeatIdx, cb) {
       if (gameOver) { if (cb) cb(true); return true; }      var seat = seats[seatIdx];
       if (!seat || !seat.alive) return true;
+      // 袁煜明【尊老爱幼】2v2
+      if (!zlGate2v2(seat, sourceSeatIdx)) {
+        if (cb) cb(false);
+        return false;
+      }
       if ((seat._feishengTurns || 0) > 0) {
         log('🌌【飞升】' + seat.hero.name + '免疫了' + dmg + '点伤害！');
         render2v2Battle();
@@ -24330,6 +24605,8 @@ var isInitializing2v2 = false;
       seat.hp -= dmg;
       if (typeof sourceSeatIdx === 'number' && seats[sourceSeatIdx] === seats[my2v2SeatIndex]) _trackDmgTask(dmg);
       playHitEffect(seats.indexOf(seat));
+      // 袁煜明【虚弱】：受伤判定
+      if (seat.hero.id === 'yuanyuming' && seat.hp > 0) triggerXuruo2v2(seat, sourceSeatIdx);
       sunGainBean2v2(seat, dmg);
       // 树影：受到伤害获得5层影
       shuyingGain2v2(seat);
@@ -27498,6 +27775,8 @@ sync2v2State();
     
     function loseHpSeat2v2(seat, n, srcName, srcIdx) {
       if (!seat || !seat.alive || n <= 0) return;
+      // 袁煜明【尊老爱幼】2v2
+      if (!zlGate2v2(seat, srcIdx)) return;
       // 树影：影可抵消一次失去体力
       if ((seat._shuying || 0) > 0) {
         seat._shuying--;
@@ -30217,7 +30496,7 @@ sync2v2State();
         log('⏳ 限定技结算完毕，强制进入你的回合');
         gameState.isMyTurn = true;
         gameState.turnNumber++;
-        scheduleTurn(startMyTurn, 700);
+        scheduleTurn(startMyTurn, 450);
       }
     }
 
@@ -31510,8 +31789,9 @@ sync2v2State();
     }
 
     function arenaEnemyPool() {
-      // 全部武将均可作为对手 / 移出随机池（仅排除玩家自己）
+      // 全部武将均可作为对手 / 移出随机池（排除玩家自己与隐藏武将）
       return HEROES.filter(function(h) {
+        if (h.hidden) return false;
         return h.id !== (currentHero && currentHero.id);
       });
     }
@@ -31577,6 +31857,8 @@ sync2v2State();
         armor = isMe ? gameState.myArmor : gameState.enemyArmor,
         heroId = isMe ? gameState.heroId : gameState.enemyHeroId,
         nm = isMe ? '你' : '敌人';
+      // 袁煜明【尊老爱幼】：被伤害类手牌/技能指定时（【杀】已在响应前结算，此处跳过）
+      if (!gameState._killSrc && !zlGate(isMe)) return true;
       if (!isMe && gameState.heroId === 'zhangchenrui' && gameState.chuangxinTarget === 'enemy' && !skillSealedMe('创新')) {
         dmg += 1;
         log('🚀 【创新】你对标记目标的伤害+1');
@@ -31754,6 +32036,8 @@ sync2v2State();
         }
       }
       if (isMe && hasXinshouBaohu()) triggerXinshouBaohu('受伤');
+      // 袁煜明【虚弱】：受到伤害后判定反制（未濒死时）
+      if (heroId === 'yuanyuming' && !gameOver && (isMe ? gameState.myHp : gameState.enemyHp) > 0) triggerXuruo(isMe);
       renderBattle();
       if (isMe && gameState.myHp <= 0) {
         promptForDying();
@@ -31771,6 +32055,8 @@ sync2v2State();
       var isMe = who === 'me';
       var heroId = isMe ? gameState.heroId : gameState.enemyHeroId;
       var nm = isMe ? '你' : '敌人';
+      // 袁煜明【尊老爱幼】：失去体力的技能同样需额外弃基本牌，否则无效
+      if (!zlGate(isMe)) return;
       // 树影：影可抵消一次失去体力
       if (isMe && (gameState.myShuying || 0) > 0) {
         gameState.myShuying--;
@@ -31809,7 +32095,7 @@ sync2v2State();
         ['偷袭', '吗喽', '强袭'].indexOf(skillName) !== -1) {
         for (var _sm2 = 0; _sm2 < n; _sm2++) triggerShoumen();
       }
-      else gameState.enemyHp -= n;
+      else if (!isMe) gameState.enemyHp -= n;
       playHitEffect(who);
       log('💔 ' + nm + '【' + skillName + '】失去' + n + '点体力(' + (isMe ? gameState.myHp : gameState.enemyHp) +
         '/' + (isMe ? gameState.myMaxHp : gameState.enemyMaxHp) + ')');
@@ -32139,6 +32425,15 @@ sync2v2State();
         b1.disabled = !gameState.isMyTurn || gameState.phase !== 'play' || gameState.myShouban <= 0;
         b1.onclick = useSkill_Shouban;
         bar.appendChild(b1);
+      }
+      if (gameState.heroId === 'yuanyuming') {
+        var bkz = document.createElement('button');
+        bkz.className = 'skill-btn';
+        bkz.style.background = '#d35400';
+        bkz.innerText = '🎋空竹砸死人';
+        bkz.disabled = !gameState.isMyTurn || gameState.phase !== 'play' || gameState.isProcessing || gameState.usedKongzhu;
+        bkz.onclick = useSkill_Kongzhu;
+        bar.appendChild(bkz);
       }
       if (gameState.heroId === 'manhongyi') {
         var bt = document.createElement('button');
@@ -32988,6 +33283,7 @@ sync2v2State();
       if (gameState.heroId === 'xuzongwei' || gameState.heroId === 'default') return 999;
       if (gameState.heroId === 'chenqilong' && gameState.myDwdDiamond) return 999;
       if (gameState.heroId === 'xuyifeng' && gameState.hasXianshangZuozhe) return 999;
+      if (gameState.heroId === 'yuanyuming' && yumTangActive(true)) return 999;
       if (gameState.heroId === 'liyucheng') return gameState.myMaxHp + 2;
       if (gameState.heroId === 'manhongyi') return Math.max(1, gameState.myHp) + 2;
       return Math.max(1, gameState.myHp);
@@ -32999,6 +33295,7 @@ sync2v2State();
       if (e === 'chensicong') return 999; 
       if (e === 'default' || e === 'xuzongwei') return 999;
       if (e === 'chenqilong' && gameState.enemyDwdDiamond) return 999;
+      if (e === 'yuanyuming' && yumTangActive(false)) return 999;
       if (e === 'liyucheng') return gameState.enemyMaxHp + 2;
       if (e === 'manhongyi') return Math.max(1, gameState.enemyHp) + 2;
       return Math.max(1, gameState.enemyHp);
@@ -33063,7 +33360,7 @@ sync2v2State();
       log('🃏 重摸4张');
       hideMulliganPanel();
       renderBattle();
-      setTimeout(startFirstTurnAfterMulligan, 800);
+      setTimeout(startFirstTurnAfterMulligan, 500);
     }
 
     function triggerChuyin(who) {
@@ -33299,6 +33596,9 @@ sync2v2State();
           } else if (gameState.heroId === 'manhongyi' && !skillSealedMe('糖浆')) {
             drawCard('me', 5);
             log('🍯 【糖浆】摸5');
+          } else if (gameState.heroId === 'yuanyuming' && yumTangActive(true) && !skillSealedMe('装糖')) {
+            drawCard('me', 3);
+            log('🍬 【装糖】场上有糖阵营角色，摸3');
           } else {
             drawCard('me', 2);
             log('📚 摸2');
@@ -33558,9 +33858,16 @@ sync2v2State();
         drawCard('me', 2);
         log('⭐ 命星2层生效：初始手牌+2');
       }
+      if (hero.id === 'yuanyuming' && yumTangActive(true) && !skillSealedMe('装糖')) {
+        drawCard('me', 5);
+        log('🍬 【装糖】初始手牌+5');
+      }
       drawCard('enemy', 4);
       if (AI_CONS_LEVEL >= 2) {
         drawCard('enemy', 2);
+      }
+      if (eh.id === 'yuanyuming' && yumTangActive(false) && !skillSealedEnemy('装糖')) {
+        drawCard('enemy', 5);
       }
       document.getElementById('battle-page').classList.remove('mode-2v2');
       document.getElementById('battle-2v2-top').style.display = 'none';
@@ -35259,6 +35566,25 @@ sync2v2State();
       renderBattle();
     }
 
+    function useSkill_Kongzhu() {
+      if (skillSealedMe('空竹砸死人')) { alert('【空竹砸死人】已被封禁'); return; }
+      _skillResetTimer();
+      if (!gameState.isMyTurn || gameState.phase !== 'play' || gameState.isProcessing || gameState.usedKongzhu) return;
+      gameState.usedKongzhu = true;
+      log('🎋 【空竹砸死人】燃烧的空竹呼啸而出！');
+      var n = 0,
+        dead = false;
+      while (!dead && !gameOver && n < 20) {
+        var hpBefore = gameState.enemyHp;
+        dead = takeDamage('enemy', 1);
+        n++;
+        if (!dead && gameState.enemyHp >= hpBefore) break; // 伤害被免疫/抵消，停止重复
+        if (!dead && (gameState.enemyHp <= 3 || gameState.enemyHp <= 0)) break;
+      }
+      log('🎋 【空竹砸死人】共造成' + n + '点火焰伤害');
+      renderBattle();
+    }
+
     function useSkill_Banwei() {
       if (skillSealedMe('班威')) { alert('【班威】已被封禁'); return; }
       _skillResetTimer();
@@ -35844,7 +36170,7 @@ sync2v2State();
       };
       log('⚔️ 决斗开始');
       renderBattle();
-      setTimeout(processDuelTurn, 800);
+      setTimeout(processDuelTurn, 500);
     }
 
     function processDuelTurn() {
@@ -35866,7 +36192,7 @@ sync2v2State();
           log('🛡️ 敌人打出' + needTwo + '张杀反击' + (attackerHasKillerBee ? '【杀人蜂】' : ''));
           gameState.duel.currentTurn = 'me';
           renderBattle();
-          setTimeout(processDuelTurn, 800);
+          setTimeout(processDuelTurn, 500);
         } else {
           log('❌ 敌人杀不足' + needTwo + '张' + (attackerHasKillerBee ? '【杀人蜂】' : ''));
           endDuel('me');
@@ -35899,7 +36225,7 @@ sync2v2State();
               closeModal();
               gameState.duel.currentTurn = 'enemy';
               renderBattle();
-              setTimeout(processDuelTurn, 800);
+              setTimeout(processDuelTurn, 500);
             }
           });
         }
@@ -35942,6 +36268,19 @@ sync2v2State();
     function enemyDefend(dmg, ac) {
       gameState.isProcessing = true;
       gameState.pendingFankeDamage = 0;
+      // 袁煜明【尊老爱幼】：被【杀】指定时，来源需额外弃置1张基本牌，否则本次杀无效
+      if (gameState.enemyHeroId === 'yuanyuming' && !skillSealedEnemy('尊老爱幼')) {
+        var _zIdx = gameState.myHand.findIndex(isBasicCard);
+        if (_zIdx === -1) {
+          log('🧓【尊老爱幼】你没有基本牌，本次【杀】无效！');
+          handleKillDodged(dmg, ac);
+          return;
+        }
+        var _zc = gameState.myHand.splice(_zIdx, 1)[0];
+        discardCard(_zc);
+        playerLoseCard(_zc, 'discard');
+        log('🧓【尊老爱幼】你额外弃置基本牌【' + _zc.name + '】');
+      }
       renderBattle();
       setTimeout(function() {
         if (gameState.enemyImmuneKill) {
@@ -36594,12 +36933,12 @@ sync2v2State();
         gameState.extraTurn = true;
         log('⏳ 【当先】跳过敌方再动');
         renderBattle();
-        scheduleTurn(startMyTurn, 700);
+        scheduleTurn(startMyTurn, 450);
       } else {
         gameState.extraTurn = false;
         log('--- 你的回合结束 ---');
         renderBattle();
-        scheduleTurn(startEnemyTurn, 700);
+        scheduleTurn(startEnemyTurn, 450);
       }
     }
 
@@ -36648,6 +36987,7 @@ sync2v2State();
       }
       gameState.usedMalou = false;
       gameState.usedTouxi = false;
+      gameState.usedKongzhu = false;
       gameState.myCixinHeal = 0;
       gameState.myUsedCixinDmg = false;
       gameState.myUsedDounai = false;
@@ -36901,7 +37241,7 @@ sync2v2State();
       }
       log('🗑️ ' + dn.join('、'));
       renderBattle();
-      scheduleTurn(finishEnemyTurn, 1000);
+      scheduleTurn(finishEnemyTurn, 600);
     }
 
     function startEnemyTurn() {
@@ -36924,6 +37264,7 @@ sync2v2State();
       gameState.enemyHasUsedBeici = false;
       gameState.enemyHasUsedFanke = false;
       gameState.enemyHasUsedHeal = false;
+      gameState.enemyUsedKongzhu = false;
       gameState.enemyHasUsedTouxi = false;
       gameState.enemyHasUsedMalou = false;
       gameState.enemyCixinHeal = 0;
@@ -37130,6 +37471,9 @@ sync2v2State();
                       } else if (gameState.enemyHeroId === 'chenqilong' && gameState.enemyDwdDiamond) {
                         drawCard('enemy', 4);
                         log('🐉 敌【大胃袋·方片】摸4');
+                      } else if (gameState.enemyHeroId === 'yuanyuming' && yumTangActive(false) && !skillSealedEnemy('装糖')) {
+                        drawCard('enemy', 3);
+                        log('🍬 敌【装糖】摸3');
                       } else {
                         var _whCutE = gameState.wenhaoTarget === 'enemy' ? 1 : 0;
                         drawCard('enemy', 2 + (AI_CONS_LEVEL >= 2 ? 1 : 0) - _whCutE);
@@ -38402,7 +38746,7 @@ sync2v2State();
         });
         return;
       }
-      setTimeout(enemyAI_Equip, 800);
+      setTimeout(enemyAI_Equip, 450);
     }
 
     function showEnemyHarvest() {
@@ -38489,7 +38833,7 @@ sync2v2State();
         log('🛡️ 敌装备' + cardDesc(c));
         renderBattle();
       }
-      setTimeout(enemyAI_AOE, 800);
+      setTimeout(enemyAI_AOE, 450);
     }
 
     function enemyAI_AOE() {
@@ -38519,7 +38863,7 @@ sync2v2State();
           log('🛡️ 你打出' + cardDesc(kc) + '响应【南蛮入侵】');
           gameState.isProcessing = false;
           renderBattle();
-          setTimeout(enemyAI_WineAndKill, 800);
+          setTimeout(enemyAI_WineAndKill, 450);
         } else {
           log('【南蛮入侵】结算：你没有打出【杀】，受到 1 点伤害');
           var dead = takeDamage('me', 1);
@@ -38550,7 +38894,7 @@ sync2v2State();
           log('🛡️ 你打出' + cardDesc(dc) + '响应【万箭齐发】');
           gameState.isProcessing = false;
           renderBattle();
-          setTimeout(enemyAI_WineAndKill, 800);
+          setTimeout(enemyAI_WineAndKill, 450);
         } else {
           log('【万箭齐发】结算：你没有打出【闪】，受到 1 点伤害');
           var dead = takeDamage('me', 1);
@@ -38568,6 +38912,26 @@ sync2v2State();
 
     function enemyAI_WineAndKill() {
       if (gameOver || gameState.myHp <= 0) return;
+      // 袁煜明AI：【空竹砸死人】体力大于3必用，体力1可用于收割
+      if (gameState.enemyHeroId === 'yuanyuming' && !gameState.enemyUsedKongzhu && !skillSealedEnemy('空竹砸死人')) {
+        gameState.enemyUsedKongzhu = true;
+        if (gameState.myHp > 3 || gameState.myHp <= 1) {
+          log('🎋 敌【空竹砸死人】燃烧的空竹砸向你！');
+          var _kzDead = takeDamage('me', 1),
+            _kzN = 1;
+          while (!_kzDead && !gameOver && gameState.myHp > 3 && gameState.myHp > 0 && _kzN < 20) {
+            var _hpB = gameState.myHp;
+            _kzDead = takeDamage('me', 1);
+            _kzN++;
+            if (!_kzDead && gameState.myHp >= _hpB) break; // 伤害被免疫/抵消，停止重复
+          }
+          log('🎋 空竹共造成' + _kzN + '点火焰伤害');
+          renderBattle();
+          if (_kzDead || gameOver) return;
+          setTimeout(enemyAI_WineAndKill, 600);
+          return;
+        }
+      }
       var hasW = !!(gameState.enemyEquipment.weapon && gameState.enemyEquipment.weapon.effect === 'weapon_zhuge');
       var ekl = getKillLimit(gameState.enemyHeroId, hasW);
       if (gameState.enemyHeroId === 'manhongyi' && gameState.enemyArmor > 0 && !gameState.enemyHasUsedBeici && !skillSealedEnemy('背刺')) {
@@ -38701,7 +39065,21 @@ sync2v2State();
           renderBattle();
         }
         setTimeout(function() {
-          var kc = gameState.enemyHand.splice(kI, 1)[0];
+          // 延迟后重新定位杀（此前的弃牌/换牌可能已改变手牌顺序，防止取下标越界拿到 undefined 卡死战斗）
+          var kc = null;
+          if (kI >= 0 && kI < gameState.enemyHand.length && isKill(gameState.enemyHand[kI])) {
+            kc = gameState.enemyHand.splice(kI, 1)[0];
+          } else {
+            var _kI2 = gameState.enemyHand.findIndex(function(c) {
+              return isKill(c);
+            });
+            if (_kI2 === -1) {
+              log('⚠️ 敌方【杀】丢失，结束出牌');
+              finishEnemyTurnWithExtraCheck();
+              return;
+            }
+            kc = gameState.enemyHand.splice(_kI2, 1)[0];
+          }
           discardCard(kc);
           enemyLoseCard(kc, 'play');
           tangyuCheck1v1(kc);
@@ -38753,7 +39131,7 @@ sync2v2State();
         gameState.enemyExtraTurn = true;
         log('⏳ 敌【当先】第二回合');
         renderBattle();
-        scheduleTurn(startEnemyTurn, 700);
+        scheduleTurn(startEnemyTurn, 450);
       } else {
         gameState.enemyExtraTurn = false;
         enemyDiscardPhase();
@@ -38773,11 +39151,28 @@ sync2v2State();
       gameState.enemyQixinDamageBonus = 0;
       log('--- 敌回合结束 ---');
       renderBattle();
-      scheduleTurn(startMyTurn, 700);
+      scheduleTurn(startMyTurn, 450);
     }
 
     function playerDefend(dmg, ac) {
       if (gameOver || gameState.myHp <= 0) return;
+      // 袁煜明【尊老爱幼】：被【杀】指定时，来源需额外弃置1张基本牌，否则本次杀无效
+      if (gameState.heroId === 'yuanyuming' && !skillSealedMe('尊老爱幼')) {
+        var _zIdx2 = gameState.enemyHand.findIndex(isBasicCard);
+        if (_zIdx2 === -1) {
+          log('🧓【尊老爱幼】敌方没有基本牌，本次【杀】无效！');
+          gameState.isProcessing = false;
+          renderBattle();
+          setTimeout(function() {
+            if (!gameOver && gameState.myHp > 0) enemyAI_WineAndKill();
+          }, 500);
+          return;
+        }
+        var _zc2 = gameState.enemyHand.splice(_zIdx2, 1)[0];
+        discardCard(_zc2);
+        enemyLoseCard(_zc2, 'discard');
+        log('🧓【尊老爱幼】敌方额外弃置基本牌【' + _zc2.name + '】');
+      }
       if (gameState.heroId === 'chenminghan' && !skillSealedMe('香蕉皮') && gameState.myHand.length === 0) {
         drawCard('me', 2);
         log('🍌【香蕉皮】你没有手牌，受到攻击摸两张牌(现' + gameState.myHand.length + '张)');
@@ -39001,6 +39396,12 @@ sync2v2State();
         }
       });
       showModal('⚔️ 敌方使用了【杀】', '请打出一张【闪】抵消 ' + dmg + ' 点伤害，否则受到伤害', btns);
+      // 响应超时保护：30秒未操作自动视为不出闪，防止战斗卡死
+      _startRespTimer(30, function() {
+        log('⏰ 响应超时，自动视为不出【闪】');
+        closeModal();
+        handleEnemyKillHit_player(dmg, ac);
+      });
     }
 
     function handleEnemyKillDodged(dmg, ac) {
