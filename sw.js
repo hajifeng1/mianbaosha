@@ -1,5 +1,5 @@
 /* 面包杀 Service Worker：静态资源缓存优先，网络兜底，支持离线游玩 */
-var CACHE_NAME = 'mianbaosha-v19';
+var CACHE_NAME = 'mianbaosha-v20';
 
 var CORE_ASSETS = [
   './index.html',
@@ -52,6 +52,25 @@ self.addEventListener('fetch', function(e) {
   }
   if (url.origin !== self.location.origin) return;
 
+  // HTML/导航请求：网络优先，拿到新版本立即缓存；离线时回退旧缓存。
+  // 防止缓存优先导致玩家永远停留在旧版本。
+  if (req.mode === 'navigate' || /\.html?$/.test(url.pathname)) {
+    e.respondWith(
+      fetch(req).then(function(resp) {
+        if (resp && resp.status === 200 && resp.type === 'basic') {
+          var clone = resp.clone();
+          caches.open(CACHE_NAME).then(function(cache) {
+            cache.put('./index.html', clone);
+          });
+        }
+        return resp;
+      }).catch(function() {
+        return caches.match('./index.html');
+      })
+    );
+    return;
+  }
+  // 其余静态资源（图片/视频/清单）：缓存优先，支持离线游玩
   e.respondWith(
     caches.match(req, {
       ignoreSearch: true
@@ -66,10 +85,6 @@ self.addEventListener('fetch', function(e) {
         }
         return resp;
       }).catch(function() {
-        // 离线兜底：导航请求回退到主页缓存
-        if (req.mode === 'navigate') {
-          return caches.match('./index.html');
-        }
         return Response.error();
       });
     })
